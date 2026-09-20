@@ -281,12 +281,12 @@
 </ng-template>
 
 <ng-template #balanceRow>
-  <td i18n="address.confirmed-balance">Confirmed balance</td>
+  <td>{{ address.electrum ? 'Balance' : 'Confirmed balance' }}</td>
   <td *ngIf="chainStats.funded_txo_sum !== undefined; else confidentialTd" class="wrap-cell"><app-amount [satoshis]="chainStats.balance" [noFiat]="true"></app-amount> <span class="fiat"><app-fiat [value]="chainStats.balance"></app-fiat></span></td>
 </ng-template>
 
 <ng-template #pendingBalanceRow>
-  <td i18n="accelerator.pending-state" class="fst-italic">Pending</td>
+  <td class="fst-italic">{{ address.electrum ? 'Pending balance' : 'Pending' }}</td>
   <td *ngIf="mempoolStats.funded_txo_sum !== undefined; else confidentialTd" class="fst-italic wrap-cell"><app-amount [satoshis]="mempoolStats.balance" [noFiat]="true" [addPlus]="true"></app-amount> <span class="fiat"><app-fiat [value]="mempoolStats.balance"></app-fiat></span></td>
 </ng-template>
 
@@ -308,9 +308,10 @@
 <ng-template #typeRow>
   <td i18n="address.type">Type</td>
   <td class="wrap-cell">
-    <span placement="bottom" class="badge bg-primary">
+    <span *ngIf="address.electrum; else bitcoinAddressType" class="badge bg-primary">Ethereum account</span>
+    <ng-template #bitcoinAddressType><span placement="bottom" class="badge bg-primary">
       <app-address-type [address]="addressTypeInfo"></app-address-type>
-    </span>
+    </span></ng-template>
     <button *ngIf="showTaprootPsbtButton()" type="button" class="btn btn-sm taproot-psbt-btn" (click)="taprootPsbtExpanded = !taprootPsbtExpanded" i18n-ngbTooltip="address.taproot-psbt-add-unpublished-spend-paths" ngbTooltip="Add unpublished spending paths">
       <fa-icon [icon]="['fas', 'code-fork']" [fixedWidth]="true"></fa-icon>
     </button>

@@ -32,10 +32,9 @@
   <table class="table latest-transactions">
     <thead>
       <th class="table-cell-txid" i18n="dashboard.latest-transactions.txid">TXID</th>
-      <th class="table-cell-fiat" *ngIf="(network$ | async) === ''">{{ currency }}</th>
-      <th class="table-cell-satoshis" i18n="dashboard.latest-transactions.amount">Amount</th>
-      <th class="table-cell-vsize" *ngIf="!widget" i18n="transaction.vsize|Transaction Virtual Size">vSize</th>
-      <th class="table-cell-fees" i18n="transaction.fee|Transaction fee">Fee</th>
+      <th class="table-cell-satoshis">Value</th>
+      <th class="table-cell-vsize" *ngIf="!widget">Gas used</th>
+      <th class="table-cell-fees">Gas price</th>
     </thead>
     <tbody data-cy="transactions-list" *ngIf="transactions$ | async as transactions; else skeleton">
       <tr *ngFor="let transaction of transactions; trackBy: trackByTxid">
@@ -44,21 +43,17 @@
             <app-truncate [text]="transaction.txid" [lastChars]="5"></app-truncate>
           </a>
         </td>
-        <td class="table-cell-fiat" *ngIf="(network$ | async) === ''">
-          <app-fiat [value]="transaction.value" digitsInfo="1.0-0"></app-fiat>
-        </td>
         <td class="table-cell-satoshis">
           <app-amount *ngIf="(network$ | async) !== 'liquidtestnet'; else liquidAmount" [satoshis]="transaction.value" digitsInfo="1.2-4" [noFiat]="true"></app-amount>
           <ng-template #liquidAmount i18n="shared.confidential">Confidential</ng-template>
         </td>
-        <td class="table-cell-vsize" *ngIf="!widget" [innerHTML]="'&lrm;' + (transaction.vsize | vbytes: 2)"></td>
+        <td class="table-cell-vsize" *ngIf="!widget">{{ transaction.vsize | number }} gas</td>
         <td class="table-cell-fees">
           <app-fee-rate [fee]="transaction.fee" [weight]="transaction.vsize * 4"></app-fee-rate>
         </td>
       </tr>
       <tr *ngIf="!widget && transactions.length < (limit$ | async)" data-cy="transactions-skeleton-row">
         <td class="table-cell-txid"><span class="skeleton-loader"></span></td>
-        <td class="table-cell-fiat" *ngIf="(network$ | async) === ''"><span class="skeleton-loader"></span></td>
         <td class="table-cell-satoshis"><span class="skeleton-loader"></span></td>
         <td class="table-cell-vsize"><span class="skeleton-loader"></span></td>
         <td class="table-cell-fees"><span class="skeleton-loader"></span></td>
@@ -68,7 +63,6 @@
       <tbody>
         <tr *ngFor="let i of (widget ? [1,2,3,4,5,6] : [1])">
           <td class="table-cell-txid"><span class="skeleton-loader"></span></td>
-          <td class="table-cell-fiat" *ngIf="(network$ | async) === ''"><span class="skeleton-loader"></span></td>
           <td class="table-cell-satoshis"><span class="skeleton-loader"></span></td>
           <td class="table-cell-vsize" *ngIf="!widget"><span class="skeleton-loader"></span></td>
           <td class="table-cell-fees"><span class="skeleton-loader"></span></td>

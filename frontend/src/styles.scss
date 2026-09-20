@@ -1,12 +1,13 @@
 @use "sass:color";
 
-/* Theme */
-$bg: #11131f;
-$active-bg: #000000;
-$hover-bg: #12131e;
+/* Ethereum explorer theme. The Mempool interface remains intact while
+ * Ethereum's blue-violet identity drives the shared visual tokens. */
+$bg: #10111a;
+$active-bg: #070812;
+$hover-bg: #191b2a;
 $fg: #fff;
 $nav-bg: $bg;
-$title-fg: #2055e3;
+$title-fg: #8c9eff;
 
 $taproot: #eba814;
 $taproot-light: #d5a90a;
@@ -20,11 +21,11 @@ $gray-700: $fg;
 
 $nav-tabs-link-active-bg: $active-bg;
 
-$primary: #007cfa;
-$secondary: #272f4e;
-$tertiary: #6225b2;
-$success: #0aab2f;
-$info: #00ddff;
+$primary: #627eea;
+$secondary: #20243b;
+$tertiary: #4e61c7;
+$success: #35c99a;
+$info: #aab7ff;
 
 $h5-font-size: 1.15rem !default;
 
@@ -109,26 +110,26 @@ $dropdown-link-active-bg: $active-bg;
   --link-color: #{$link-color};
   --link-hover-color: #{$link-hover-color};
   --icon: #f1f1f1;
-  --skeleton-bg: #2e324e;
-  --skeleton-bg-light: #5d6182;
+  --skeleton-bg: #303752;
+  --skeleton-bg-light: #59658e;
 
-  --box-bg: #171c2a;
-  --stat-box-bg: #0b1018;
+  --box-bg: #151827;
+  --stat-box-bg: #0d0f1c;
   --border-subtle: rgba(255, 255, 255, 0.11);
-  --block-top: #232838;
-  --block-side: #191c27;
-  --block-goggles-overlay: #181b2d7f;
-  --mempool-block-top: #403834;
-  --mempool-block-side: #2d2825;
-  --mempool-block-loading: #554b45;
-  --alert-bg: #3a1c61;
-  --navbar-bg: #212121;
+  --block-top: #292f4d;
+  --block-side: #1a1e32;
+  --block-goggles-overlay: #15192b7f;
+  --mempool-block-top: #34406e;
+  --mempool-block-side: #22294b;
+  --mempool-block-loading: #4b5783;
+  --alert-bg: #303a73;
+  --navbar-bg: #171a2d;
   --transparent-fg: #ffffffbb;
   --footer-fg: rgba(255, 255, 255, 0.4);
-  --fade-out-box-bg-start: rgba(23, 28, 42, 0);
-  --fade-out-box-bg-end: rgba(23, 28, 42, 1);
+  --fade-out-box-bg-start: rgba(21, 24, 39, 0);
+  --fade-out-box-bg-end: rgba(21, 24, 39, 1);
   --opacity: 0.57;
-  --world-map-bg: #272b3f;
+  --world-map-bg: #262c48;
   --world-map-border: #000;
 
   --testnet: #1d486f;
@@ -147,18 +148,23 @@ $dropdown-link-active-bg: $active-bg;
   --taproot-light: #d5a90a;
   --taproot-dark: #9d7c05;
 
-  --green: #83fd00;
+  --green: #35c99a;
   --red: #ff3d00;
   --yellow: #fff000;
   --grey: #7e7e7e;
   --tooltip-grey: #b1b1b1;
-  --orange: #ff9f00;
+  --orange: #8c9eff;
   --pink: #e83e8c;
 
-  --search-button: #4d2d77;
-  --search-button-border: #472a6e;
-  --search-button-focus: #533180;
-  --search-button-shadow: #7c58ab80;
+  --fee-tier-slow: #374474;
+  --fee-tier-normal: #5368c8;
+  --fee-tier-fast: #627eea;
+  --fee-tier-fastest: #aab7ff;
+
+  --search-button: #4e61c7;
+  --search-button-border: #4355b5;
+  --search-button-focus: #6379e0;
+  --search-button-shadow: #8c9eff80;
   
   --bs-body-color: var(--fg);
   --bs-body-bg: var(--active-bg);

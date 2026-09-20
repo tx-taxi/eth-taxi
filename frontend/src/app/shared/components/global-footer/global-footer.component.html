@@ -8,7 +8,7 @@
             <img [src]="enterpriseInfo?.footer_img" [alt]="enterpriseInfo.title" height="60px" class="enterprise-logo">
           } @else {
             <app-svg-images *ngIf="officialMempoolSpace" name="officialMempoolSpace" viewBox="0 0 500 126"></app-svg-images>
-            <app-svg-images *ngIf="!officialMempoolSpace" name="mempoolSpace" viewBox="0 0 500 126"></app-svg-images>
+            <app-svg-images *ngIf="!officialMempoolSpace" name="ethTaxi" viewBox="0 0 500 126"></app-svg-images>
           }
         </div>
         @if (!enterpriseInfo?.footer_img) {

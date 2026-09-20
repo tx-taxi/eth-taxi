@@ -47,6 +47,10 @@ export const TransactionFlags = {
   inscription:                      0b00000100_00000000_00000000_00000000n,
   fake_scripthash:                  0b00001000_00000000_00000000_00000000n,
   annex:                            0b00010000_00000000_00000000_00000000n,
+  // Ethereum transaction types
+  eth_transfer:                     0b00010000_00000000_00000000_00000000n,
+  eth_contract_call:                0b00100000_00000000_00000000_00000000n,
+  eth_token_transfer:               0b01000000_00000000_00000000_00000000n,
   // heuristics
   coinjoin:                0b00000001_00000000_00000000_00000000_00000000n,
   consolidation:           0b00000010_00000000_00000000_00000000_00000000n,
@@ -104,6 +108,9 @@ export const TransactionFilters: { [key: string]: Filter } = {
     inscription: { key: 'inscription', label: $localize`:@@99264845cdffed75db1a32df6e66febbdf1d99f1:Inscription`, flag: TransactionFlags.inscription, important: true, tooltip: true, txPage: true, },
     fake_scripthash: { key: 'fake_scripthash', label: 'Fake scripthash', flag: TransactionFlags.fake_scripthash, tooltip: true, txPage: true,},
     annex: { key: 'annex', label: 'Annex', flag: TransactionFlags.annex, important: false, tooltip: true, txPage: true,},
+    eth_transfer: { key: 'eth_transfer', label: 'ETH transfer', flag: TransactionFlags.eth_transfer, important: true, tooltip: true, txPage: true },
+    eth_contract_call: { key: 'eth_contract_call', label: 'Contract call', flag: TransactionFlags.eth_contract_call, important: true, tooltip: true, txPage: true },
+    eth_token_transfer: { key: 'eth_token_transfer', label: 'Token transfer', flag: TransactionFlags.eth_token_transfer, important: true, tooltip: true, txPage: true },
     /* heuristics */
     coinjoin: { key: 'coinjoin', label: $localize`Coinjoin`, flag: TransactionFlags.coinjoin, important: true, tooltip: true, txPage: true, },
     consolidation: { key: 'consolidation', label: $localize`Consolidation`, flag: TransactionFlags.consolidation, tooltip: true, txPage: true, },

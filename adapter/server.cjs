@@ -54,6 +54,10 @@ function gwei(value) {
   }
 }
 
+function gweiToWei(value) {
+  return Math.round(number(value) * 1_000_000_000);
+}
+
 function timestamp(value) {
   const parsed = Date.parse(value);
   return Number.isFinite(parsed) ? Math.floor(parsed / 1000) : Math.floor(Date.now() / 1000);
@@ -78,7 +82,7 @@ async function providerJson(requestPath) {
 }
 
 function mapBlock(block) {
-  const baseFee = gwei(block.base_fee_per_gas);
+  const baseFee = wei(block.base_fee_per_gas);
   const totalFees = wei(block.transaction_fees);
   const reward = wei(block.rewards?.reduce((sum, item) => sum + BigInt(item.reward || 0), 0n));
   return {
@@ -116,7 +120,7 @@ function mapTransaction(tx) {
   if (types.has('token_transfer') || (tx.token_transfers?.length ?? 0) > 0) flags |= 0x40000000;
   return {
     txid: tx.hash,
-    fee: rate * gas,
+    fee: wei(tx.fee?.value),
     vsize: gas,
     value: wei(tx.value),
     rate,
@@ -196,6 +200,27 @@ async function transactionById(id) {
   return mapTransactionDetail(transaction, blockHash);
 }
 
+async function addressById(address) {
+  const [details, transactions] = await Promise.all([
+    providerJson(`/api/v2/addresses/${encodeURIComponent(address)}`),
+    providerJson(`/api/v2/addresses/${encodeURIComponent(address)}/transactions`),
+  ]);
+  const balance = wei(details.coin_balance);
+  const transactionCount = (transactions.items || []).length;
+  return {
+    // Marks this non-UTXO compatibility view so the frontend suppresses BTC-only rows.
+    electrum: true,
+    address: details.hash || address,
+    chain_stats: { funded_txo_count: 0, funded_txo_sum: balance, spent_txo_count: 0, spent_txo_sum: 0, tx_count: transactionCount },
+    mempool_stats: { funded_txo_count: 0, funded_txo_sum: 0, spent_txo_count: 0, spent_txo_sum: 0, tx_count: 0 },
+  };
+}
+
+async function addressTransactions(address) {
+  const response = await providerJson(`/api/v2/addresses/${encodeURIComponent(address)}/transactions`);
+  return (response.items || []).map((transaction) => mapTransactionDetail(transaction, transaction.block_hash));
+}
+
 async function blockTransactions(blockId) {
   const response = await providerJson(`/api/v2/blocks/${encodeURIComponent(blockId)}/transactions`);
   return (response.items || []).map(mapTransaction);
@@ -225,10 +250,10 @@ async function snapshot(force = false) {
     backendInfo: { hostname: new URL(activeProvider).hostname, version: 'eth-taxi-adapter', gitCommit: 'main', lightning: false },
     loadingIndicators: { mempool: 100 },
     blocks: mappedBlocks,
-    'mempool-blocks': pendingTransactions.length ? [{ blockSize: gasUsed, blockVSize: gasUsed, nTx: pendingTransactions.length, medianFee: average, totalFees: gasFees, feeRange: [slow, slow, average, average, fast, fast, fast], index: 0 }] : [],
-    mempoolInfo: { loaded: true, size: pendingTransactions.length, bytes: gasUsed, usage: gasUsed, maxmempool: Math.max(gasUsed, 1), mempoolminfee: slow, minrelaytxfee: slow, total_fee: gasFees },
+    'mempool-blocks': pendingTransactions.length ? [{ blockSize: gasUsed, blockVSize: Math.ceil(gasUsed / 4), nTx: pendingTransactions.length, medianFee: gweiToWei(average), totalFees: gasFees, feeRange: [slow, slow, average, average, fast, fast, fast].map(gweiToWei), index: 0 }] : [],
+    mempoolInfo: { loaded: true, size: pendingTransactions.length, bytes: gasUsed, usage: gasUsed, maxmempool: Math.max(gasUsed, 1), mempoolminfee: gweiToWei(slow), minrelaytxfee: gweiToWei(slow), total_fee: gasFees },
     bytesPerSecond: 0,
-    fees: { fastestFee: fast, halfHourFee: average, hourFee: average, economyFee: slow, minimumFee: slow },
+    fees: { fastestFee: gweiToWei(fast), halfHourFee: gweiToWei(average), hourFee: gweiToWei(average), economyFee: gweiToWei(slow), minimumFee: gweiToWei(slow) },
     da: { progressPercent: 100, difficultyChange: 0, estimatedRetargetDate: tip?.timestamp ? tip.timestamp * 1_000 + 12_000 : Date.now() + 12_000, remainingBlocks: 1, remainingTime: 12_000, previousRetarget: 0, nextRetargetHeight: (tip?.height || 0) + 1, timeAvg: 12_000 },
     transactions: pendingTransactions.slice(0, 6),
     'live-2h-chart': liveMempoolSample,
@@ -296,6 +321,10 @@ const server = http.createServer(async (req, res) => {
     if (blockSummaryMatch) return respond(res, 200, await blockTransactions(blockSummaryMatch[1]));
     const transactionMatch = requestPath.match(/^\/(?:api\/v1\/)?tx\/(0x[a-fA-F0-9]+)$/);
     if (transactionMatch) return respond(res, 200, await transactionById(transactionMatch[1]));
+    const addressTransactionsMatch = requestPath.match(/^\/api\/address\/(0x[a-fA-F0-9]{40})\/txs$/);
+    if (addressTransactionsMatch) return respond(res, 200, await addressTransactions(addressTransactionsMatch[1]));
+    const addressMatch = requestPath.match(/^\/api\/address\/(0x[a-fA-F0-9]{40})$/);
+    if (addressMatch) return respond(res, 200, await addressById(addressMatch[1]));
     const statusMatch = requestPath.match(/^\/api\/tx\/(0x[a-fA-F0-9]+)\/status$/);
     if (statusMatch) return respond(res, 200, (await transactionById(statusMatch[1])).status);
     if (requestPath === '/api/v1/transaction-times') {
