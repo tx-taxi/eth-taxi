@@ -12,6 +12,9 @@ RUN npm run build
 FROM node:24-bookworm-slim
 
 WORKDIR /app
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
 COPY adapter/package.json ./adapter/package.json
 RUN cd adapter && npm install --omit=dev --package-lock=false
 COPY adapter ./adapter
