@@ -43,6 +43,7 @@ export class WebsocketService {
   private latestGitCommit = '';
   private onlineCheckTimeout: number;
   private onlineCheckTimeoutTwo: number;
+  private reconnectTimeout: number | undefined;
   private subscription: Subscription;
   private network = '';
 
@@ -93,8 +94,12 @@ export class WebsocketService {
 
   reconnectWebsocket(retrying = false, hasInitData = false) {
     console.log('reconnecting websocket');
+    if (this.reconnectTimeout !== undefined) {
+      clearTimeout(this.reconnectTimeout);
+      this.reconnectTimeout = undefined;
+    }
+    this.subscription?.unsubscribe();
     this.websocketSubject.complete();
-    this.subscription.unsubscribe();
     this.websocketSubject = webSocket<WebsocketResponse>(
       this.webSocketUrl.replace('{network}', this.network ? '/' + this.network : '')
     );
@@ -159,6 +164,9 @@ export class WebsocketService {
       (err: Error) => {
         console.log(err);
         console.log(`WebSocket error`);
+        this.goOffline();
+      },
+      () => {
         this.goOffline();
       });
   }
@@ -321,11 +329,15 @@ export class WebsocketService {
   }
 
   goOffline() {
+    if (this.reconnectTimeout !== undefined) {
+      return;
+    }
     const retryDelay = OFFLINE_RETRY_AFTER_MS + (Math.random() * OFFLINE_RETRY_AFTER_MS);
     console.log(`trying to reconnect websocket in ${retryDelay} seconds`);
     this.goneOffline = true;
     this.stateService.connectionState$.next(0);
-    window.setTimeout(() => {
+    this.reconnectTimeout = window.setTimeout(() => {
+      this.reconnectTimeout = undefined;
       this.reconnectWebsocket(true);
     }, retryDelay);
   }
@@ -339,8 +351,8 @@ export class WebsocketService {
       this.onlineCheckTimeoutTwo = window.setTimeout(() => {
         if (!this.goneOffline) {
           console.log('WebSocket response timeout, force closing');
-          this.websocketSubject.complete();
           this.subscription.unsubscribe();
+          this.websocketSubject.complete();
           this.goOffline();
         }
       }, EXPECT_PING_RESPONSE_AFTER_MS);
