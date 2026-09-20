@@ -1,0 +1,323 @@
+#!/usr/bin/env node
+'use strict';
+
+const fs = require('node:fs/promises');
+const http = require('node:http');
+const path = require('node:path');
+const { URL } = require('node:url');
+const { WebSocketServer } = require('ws');
+
+const host = process.env.ETH_ADAPTER_HOST || '0.0.0.0';
+const port = Number(process.env.PORT || 8080);
+const staticRoot = path.resolve(process.env.ETH_STATIC_ROOT || '/app/public');
+const providers = (process.env.ETH_PROVIDER_URLS || 'https://eth.blockscout.com,https://blockscout.com/eth/mainnet')
+  .split(',')
+  .map((provider) => provider.trim().replace(/\/$/, ''))
+  .filter(Boolean);
+const sockets = new Set();
+let activeProvider = providers[0];
+let cachedSnapshot;
+let cachedAt = 0;
+let mempoolSamples = [];
+
+const contentTypes = {
+  '.css': 'text/css; charset=utf-8',
+  '.html': 'text/html; charset=utf-8',
+  '.ico': 'image/x-icon',
+  '.js': 'application/javascript; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.map': 'application/json; charset=utf-8',
+  '.png': 'image/png',
+  '.svg': 'image/svg+xml',
+  '.webmanifest': 'application/manifest+json',
+  '.woff': 'font/woff',
+  '.woff2': 'font/woff2',
+};
+
+function number(value, fallback = 0) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function wei(value) {
+  return number(value);
+}
+
+function gwei(value) {
+  try {
+    const atomic = BigInt(value || 0);
+    const whole = atomic / 1_000_000_000n;
+    const fraction = (atomic % 1_000_000_000n).toString().padStart(9, '0').slice(0, 6);
+    return Number(`${whole}.${fraction}`);
+  } catch {
+    return 0;
+  }
+}
+
+function timestamp(value) {
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed) ? Math.floor(parsed / 1000) : Math.floor(Date.now() / 1000);
+}
+
+async function providerJson(requestPath) {
+  let lastError;
+  for (const provider of providers) {
+    try {
+      const response = await fetch(new URL(requestPath.replace(/^\//, ''), `${provider}/`), {
+        headers: { accept: 'application/json', 'user-agent': 'eth-taxi/0.1' },
+        signal: AbortSignal.timeout(12_000),
+      });
+      if (!response.ok) throw new Error(`${provider}${requestPath} returned ${response.status}`);
+      activeProvider = provider;
+      return response.json();
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError || new Error('No Ethereum providers configured');
+}
+
+function mapBlock(block) {
+  const baseFee = gwei(block.base_fee_per_gas);
+  const totalFees = wei(block.transaction_fees);
+  const reward = wei(block.rewards?.reduce((sum, item) => sum + BigInt(item.reward || 0), 0n));
+  return {
+    id: block.hash,
+    height: number(block.height),
+    version: 0,
+    timestamp: timestamp(block.timestamp),
+    bits: 0,
+    nonce: number(block.nonce),
+    difficulty: number(block.total_difficulty || block.difficulty),
+    merkle_root: '',
+    tx_count: number(block.transactions_count),
+    size: number(block.size),
+    weight: number(block.gas_used),
+    previousblockhash: block.parent_hash,
+    extras: {
+      reward,
+      totalFees,
+      medianFee: baseFee,
+      minFee: baseFee,
+      maxFee: baseFee,
+      feeRange: [baseFee, baseFee, baseFee, baseFee, baseFee, baseFee, baseFee],
+      pool: { id: 0, name: block.miner?.name || block.miner?.hash || 'Unknown validator', slug: 'ethereum-validator' },
+    },
+  };
+}
+
+function mapTransaction(tx) {
+  const gas = number(tx.gas_used || tx.gas_limit);
+  const rate = gwei(tx.gas_price || tx.max_fee_per_gas);
+  const types = new Set(tx.transaction_types || []);
+  let flags = 0;
+  if (types.has('coin_transfer')) flags |= 0x10000000;
+  if (types.has('contract_call')) flags |= 0x20000000;
+  if (types.has('token_transfer') || (tx.token_transfers?.length ?? 0) > 0) flags |= 0x40000000;
+  return {
+    txid: tx.hash,
+    fee: rate * gas,
+    vsize: gas,
+    value: wei(tx.value),
+    rate,
+    flags,
+    time: tx.timestamp ? timestamp(tx.timestamp) : Math.floor(Date.now() / 1000),
+  };
+}
+
+function mapTransactionDetail(tx, blockHash) {
+  const transaction = mapTransaction(tx);
+  const gas = number(tx.gas_used || tx.gas_limit);
+  const confirmed = Boolean(tx.block_number);
+  const from = tx.from?.hash || '';
+  const to = tx.to?.hash || tx.created_contract?.hash || '';
+  const rawInput = tx.raw_input || '0x';
+  return {
+    ...transaction,
+    version: number(tx.type),
+    locktime: 0,
+    size: Math.max(0, Math.floor(Math.max(rawInput.length - 2, 0) / 2)),
+    weight: gas * 4,
+    vin: [{
+      txid: from,
+      vout: 0,
+      is_coinbase: false,
+      scriptsig: rawInput,
+      scriptsig_asm: tx.method || 'contract call',
+      sequence: number(tx.nonce),
+      prevout: { scriptpubkey: '', scriptpubkey_asm: '', scriptpubkey_type: 'ethereum-address', scriptpubkey_address: from, value: 0 },
+    }],
+    vout: [{
+      scriptpubkey: rawInput,
+      scriptpubkey_asm: tx.method || 'transfer',
+      scriptpubkey_type: to ? 'ethereum-address' : 'contract-creation',
+      ...(to ? { scriptpubkey_address: to } : {}),
+      value: wei(tx.value),
+    }],
+    status: {
+      confirmed,
+      ...(confirmed ? {
+        block_height: number(tx.block_number),
+        ...(blockHash ? { block_hash: blockHash } : {}),
+        ...(tx.timestamp ? { block_time: timestamp(tx.timestamp) } : {}),
+      } : {}),
+    },
+  };
+}
+
+function sampleMempool(pendingItems, gasUsed, gasFees) {
+  const sample = { added: Math.floor(Date.now() / 1000), count: pendingItems.length, vbytes_per_second: 0, total_fee: gasFees, mempool_byte_weight: gasUsed, vsizes: [] };
+  const previous = mempoolSamples.at(-1);
+  if (!previous || sample.added - previous.added >= 10) {
+    mempoolSamples.push(sample);
+    mempoolSamples = mempoolSamples.filter((item) => item.added >= sample.added - 7_200);
+  }
+  return mempoolSamples.at(-1);
+}
+
+async function blocksEndingAt(height) {
+  const heights = Array.from({ length: 6 }, (_, index) => height - index).filter((value) => value > 0);
+  const blocks = await Promise.all(heights.map(async (blockHeight) => {
+    try { return mapBlock(await providerJson(`/api/v2/blocks/${blockHeight}`)); } catch { return null; }
+  }));
+  return blocks.filter(Boolean);
+}
+
+async function blockById(id) {
+  return mapBlock(await providerJson(`/api/v2/blocks/${encodeURIComponent(id)}`));
+}
+
+async function transactionById(id) {
+  const transaction = await providerJson(`/api/v2/transactions/${encodeURIComponent(id)}`);
+  let blockHash;
+  if (transaction.block_number) {
+    try { blockHash = (await providerJson(`/api/v2/blocks/${transaction.block_number}`)).hash; } catch { /* Detail remains useful without a block hash. */ }
+  }
+  return mapTransactionDetail(transaction, blockHash);
+}
+
+async function blockTransactions(blockId) {
+  const response = await providerJson(`/api/v2/blocks/${encodeURIComponent(blockId)}/transactions`);
+  return (response.items || []).map(mapTransaction);
+}
+
+async function snapshot(force = false) {
+  if (!force && cachedSnapshot && Date.now() - cachedAt < 4_000) return cachedSnapshot;
+  const [blocks, transactions, pending, stats] = await Promise.all([
+    providerJson('/api/v2/main-page/blocks'),
+    providerJson('/api/v2/main-page/transactions'),
+    providerJson('/api/v2/transactions?filter=pending'),
+    providerJson('/api/v2/stats'),
+  ]);
+  const mappedBlocks = blocks.map(mapBlock).reverse();
+  const pendingItems = pending.items || [];
+  const pendingTransactions = pendingItems.map(mapTransaction);
+  const gasPrices = stats.gas_prices || {};
+  const slow = number(gasPrices.slow);
+  const average = number(gasPrices.average);
+  const fast = number(gasPrices.fast);
+  const gasUsed = pendingItems.reduce((sum, item) => sum + number(item.gas_limit || item.gas_used), 0);
+  const gasFees = pendingItems.reduce((sum, item) => sum + wei(item.fee?.value), 0);
+  const liveMempoolSample = sampleMempool(pendingItems, gasUsed, gasFees);
+  const tip = mappedBlocks.at(-1);
+  cachedSnapshot = {
+    backend: 'blockscout',
+    backendInfo: { hostname: new URL(activeProvider).hostname, version: 'eth-taxi-adapter', gitCommit: 'main', lightning: false },
+    loadingIndicators: { mempool: 100 },
+    blocks: mappedBlocks,
+    'mempool-blocks': pendingTransactions.length ? [{ blockSize: gasUsed, blockVSize: gasUsed, nTx: pendingTransactions.length, medianFee: average, totalFees: gasFees, feeRange: [slow, slow, average, average, fast, fast, fast], index: 0 }] : [],
+    mempoolInfo: { loaded: true, size: pendingTransactions.length, bytes: gasUsed, usage: gasUsed, maxmempool: Math.max(gasUsed, 1), mempoolminfee: slow, minrelaytxfee: slow, total_fee: gasFees },
+    bytesPerSecond: 0,
+    fees: { fastestFee: fast, halfHourFee: average, hourFee: average, economyFee: slow, minimumFee: slow },
+    da: { progressPercent: 100, difficultyChange: 0, estimatedRetargetDate: tip?.timestamp ? tip.timestamp * 1_000 + 12_000 : Date.now() + 12_000, remainingBlocks: 1, remainingTime: 12_000, previousRetarget: 0, nextRetargetHeight: (tip?.height || 0) + 1, timeAvg: 12_000 },
+    transactions: pendingTransactions.slice(0, 6),
+    'live-2h-chart': liveMempoolSample,
+    conversions: { USD: number(stats.coin_price) },
+  };
+  cachedAt = Date.now();
+  return cachedSnapshot;
+}
+
+function respond(res, status, value) {
+  res.writeHead(status, { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' });
+  res.end(JSON.stringify(value));
+}
+
+async function serveStatic(pathname, res) {
+  if (pathname.startsWith('/api/')) return false;
+  const requested = pathname === '/' ? '/en-US/index.html' : pathname;
+  const relative = path.posix.normalize(requested).replace(/^\/+/, '');
+  let filePath = path.join(staticRoot, relative);
+  if (!filePath.startsWith(`${staticRoot}${path.sep}`)) return false;
+  try {
+    const body = await fs.readFile(filePath);
+    res.writeHead(200, { 'content-type': contentTypes[path.extname(filePath)] || 'application/octet-stream', 'cache-control': 'no-store' });
+    res.end(body);
+    return true;
+  } catch (error) {
+    if (error?.code !== 'ENOENT' && error?.code !== 'EISDIR') throw error;
+  }
+  filePath = path.join(staticRoot, 'en-US/index.html');
+  try {
+    const body = await fs.readFile(filePath);
+    res.writeHead(200, { 'content-type': contentTypes['.html'], 'cache-control': 'no-store' });
+    res.end(body);
+    return true;
+  } catch (error) {
+    if (error?.code === 'ENOENT') return false;
+    throw error;
+  }
+}
+
+const server = http.createServer(async (req, res) => {
+  try {
+    const requestUrl = new URL(req.url, `http://${req.headers.host}`);
+    const requestPath = requestUrl.pathname;
+    if (requestPath === '/healthz') return respond(res, 200, { ok: true, provider: activeProvider });
+    if (await serveStatic(requestPath, res)) return;
+    const data = await snapshot();
+    if (requestPath === '/api/v1/init-data') return respond(res, 200, data);
+    if (requestPath === '/api/v1/blocks') return respond(res, 200, data.blocks);
+    const blocksMatch = requestPath.match(/^\/api\/v1\/blocks\/(\d+)$/);
+    if (blocksMatch) return respond(res, 200, await blocksEndingAt(Number(blocksMatch[1])));
+    if (requestPath === '/api/v1/txs') return respond(res, 200, data.transactions);
+    const blockMatch = requestPath.match(/^\/api\/v1\/block\/(0x[a-fA-F0-9]+)$/);
+    if (blockMatch) return respond(res, 200, await blockById(blockMatch[1]));
+    const blockSummaryMatch = requestPath.match(/^\/api\/v1\/block\/(0x[a-fA-F0-9]+)\/summary$/);
+    if (blockSummaryMatch) return respond(res, 200, await blockTransactions(blockSummaryMatch[1]));
+    const transactionMatch = requestPath.match(/^\/(?:api\/v1\/)?tx\/(0x[a-fA-F0-9]+)$/);
+    if (transactionMatch) return respond(res, 200, await transactionById(transactionMatch[1]));
+    const statusMatch = requestPath.match(/^\/api\/tx\/(0x[a-fA-F0-9]+)\/status$/);
+    if (statusMatch) return respond(res, 200, (await transactionById(statusMatch[1])).status);
+    if (requestPath === '/api/v1/transaction-times') {
+      return respond(res, 200, requestUrl.searchParams.getAll('txId[]').map((id) => data.transactions.find((tx) => tx.txid === id)?.time || 0));
+    }
+    if (requestPath === '/api/v1/mempool') return respond(res, 200, data.mempoolInfo);
+    if (requestPath === '/api/v1/statistics/2h') return respond(res, 200, [...mempoolSamples].reverse());
+    if (requestPath === '/api/v1/fees/recommended') return respond(res, 200, data.fees);
+    if (requestPath === '/api/v1/info') return respond(res, 200, { height: data.blocks.at(-1)?.height || 0, target_height: 0, synced: true, nettype: 'mainnet', average_block_time: 12_000 });
+    return respond(res, 404, { error: 'Unsupported Ethereum explorer endpoint', path: requestPath });
+  } catch (error) {
+    return respond(res, 503, { error: 'Ethereum provider unavailable', detail: error instanceof Error ? error.message : String(error) });
+  }
+});
+
+const wss = new WebSocketServer({ noServer: true });
+wss.on('connection', async (socket) => {
+  sockets.add(socket);
+  socket.on('close', () => sockets.delete(socket));
+  try { socket.send(JSON.stringify(await snapshot())); } catch { socket.close(); }
+});
+server.on('upgrade', (req, socket, head) => {
+  if (new URL(req.url, `http://${req.headers.host}`).pathname !== '/api/v1/ws') return socket.destroy();
+  wss.handleUpgrade(req, socket, head, (client) => wss.emit('connection', client, req));
+});
+setInterval(async () => {
+  if (!sockets.size) return;
+  try {
+    const encoded = JSON.stringify(await snapshot(true));
+    for (const socket of sockets) if (socket.readyState === socket.OPEN) socket.send(encoded);
+  } catch { /* Retain the last good provider response. */ }
+}, 12_000).unref();
+
+server.listen(port, host, () => console.log(`ETH adapter listening on http://${host}:${port}`));

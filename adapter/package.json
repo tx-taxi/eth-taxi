@@ -1,0 +1,9 @@
+{
+  "name": "eth-taxi-adapter",
+  "private": true,
+  "version": "0.1.0",
+  "type": "commonjs",
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}
