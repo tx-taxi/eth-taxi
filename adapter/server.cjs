@@ -257,6 +257,15 @@ async function serveStatic(pathname, res) {
   } catch (error) {
     if (error?.code !== 'ENOENT' && error?.code !== 'EISDIR') throw error;
   }
+  filePath = path.join(staticRoot, 'en-US', relative);
+  try {
+    const body = await fs.readFile(filePath);
+    res.writeHead(200, { 'content-type': contentTypes[path.extname(filePath)] || 'application/octet-stream', 'cache-control': 'no-store' });
+    res.end(body);
+    return true;
+  } catch (error) {
+    if (error?.code !== 'ENOENT' && error?.code !== 'EISDIR') throw error;
+  }
   filePath = path.join(staticRoot, 'en-US/index.html');
   try {
     const body = await fs.readFile(filePath);
