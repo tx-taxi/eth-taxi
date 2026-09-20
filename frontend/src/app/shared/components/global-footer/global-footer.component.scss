@@ -133,6 +133,21 @@ footer .row.version p a {
   color: #09a3ba;
 }
 
+footer .row.footer-credit {
+  padding: 20px 0;
+  text-align: center;
+  color: var(--footer-fg);
+}
+
+.footer-credit-link {
+  color: var(--primary) !important;
+  font-weight: 600;
+}
+
+.footer-credit-emoji {
+  margin: 0 2px;
+}
+
 .main-logo {
   width: 220px;
   margin: 0;

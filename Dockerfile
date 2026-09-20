@@ -9,6 +9,17 @@ RUN npm ci
 COPY frontend ./
 RUN npm run build
 
+FROM node:24-bookworm-slim AS source-archive
+
+WORKDIR /source
+COPY . .
+RUN printf '%s\n' \
+      'This archive is generated from the same sanitized Docker build context as the deployed eth.tx.taxi image.' \
+      'It intentionally excludes secrets, dependencies, caches, and generated build output.' \
+      > SOURCE-ARCHIVE.txt \
+    && tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 --numeric-owner \
+      -czf /tmp/eth-taxi-source.tar.gz .
+
 FROM node:24-bookworm-slim
 
 WORKDIR /app
@@ -19,6 +30,10 @@ COPY adapter/package.json ./adapter/package.json
 RUN cd adapter && npm install --omit=dev --package-lock=false
 COPY adapter ./adapter
 COPY --from=frontend-builder /app/frontend/dist/mempool/browser ./public
+# Keep runtime configuration, theme assets, and the Ethereum favicon available
+# even when an Angular build omits the copied resources directory.
+COPY --from=frontend-builder /app/frontend/src/resources ./public/resources
+COPY --from=source-archive /tmp/eth-taxi-source.tar.gz ./public/source/eth-taxi-source.tar.gz
 
 ENV ETH_ADAPTER_HOST=0.0.0.0
 ENV ETH_STATIC_ROOT=/app/public

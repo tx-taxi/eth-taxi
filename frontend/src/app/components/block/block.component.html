@@ -59,8 +59,8 @@
                 <td [innerHTML]="'&lrm;' + (block.size | bytes: 2)"></td>
               </tr>
               <tr>
-                <td i18n="block.weight">Weight</td>
-                <td [innerHTML]="'&lrm;' + (block.weight | wuBytes: 2)"></td>
+                <td>Gas used</td>
+                <td>&lrm;{{ block.weight | number }} gas</td>
               </tr>
               <tr *ngIf="auditAvailable">
                 <td><ng-container i18n="latest-blocks.health">Health</ng-container><a class="info-link" [routerLink]="['/docs/faq' | relativeUrl ]" fragment="what-is-block-health"><fa-icon [icon]="['fas', 'info-circle']" [fixedWidth]="true"></fa-icon></a></td>
@@ -134,42 +134,26 @@
 
   <ng-template #restOfTable>
     <ng-container *ngIf="block && !isLoadingBlock; else loadingRest">
-      <tr *ngIf="network !== 'liquid' && network !== 'liquidtestnet'">
-        <td i18n="mempool-block.fee-span">Fee span</td>
-        <td><app-fee-rate [fee]="block.extras?.minFee" [showUnit]="false"></app-fee-rate> - <app-fee-rate [fee]="block.extras?.maxFee"></app-fee-rate></td>
-      </tr>
       <tr *ngIf="block.extras?.medianFee != undefined">
-        <td class="td-width" i18n="block.median-fee">Median fee</td>
-        <td>~<app-fee-rate [fee]="block.extras?.medianFee" rounding="1.0-0"></app-fee-rate>
-          <span class="fiat">
-            <app-fiat [blockConversion]="blockConversion" [value]="block.extras?.medianFee * 140" digitsInfo="1.2-2"
-              i18n-ngbTooltip="Transaction fee tooltip" ngbTooltip="Based on average native segwit transaction of 140 vBytes"
-              placement="bottom"></app-fiat>
-          </span>
-        </td>
+        <td class="td-width">Base fee</td>
+        <td><app-fee-rate [fee]="block.extras?.medianFee" [dp]="2"></app-fee-rate></td>
       </tr>
-      <ng-template [ngIf]="fees !== undefined" [ngIfElse]="loadingFees">
+      <ng-template [ngIf]="block.extras?.totalFees !== undefined" [ngIfElse]="loadingFees">
         <tr>
           <td i18n="block.total-fees|Total fees in a block">Total fees</td>
-          <td *ngIf="network !== 'liquid' && network !== 'liquidtestnet'; else liquidTotalFees">
+          <td>
             <app-amount [satoshis]="block.extras.totalFees" digitsInfo="1.2-3" [noFiat]="true"></app-amount>
             <span class="fiat">
               <app-fiat [blockConversion]="blockConversion" [value]="block.extras.totalFees" digitsInfo="1.0-0"></app-fiat>
             </span>
           </td>
-          <ng-template #liquidTotalFees>
-            <td>
-              <app-amount [satoshis]="fees * 100000000" digitsInfo="1.2-2" [noFiat]="true"></app-amount>&nbsp; <app-fiat
-              [blockConversion]="blockConversion" [value]="fees * 100000000" digitsInfo="1.2-2"></app-fiat>
-            </td>
-          </ng-template>
         </tr>
-        <tr *ngIf="network !== 'liquid' && network !== 'liquidtestnet'">
-          <td i18n="block.subsidy-and-fees|Total subsidy and fees in a block">Subsidy + fees</td>
+        <tr>
+          <td>Validator reward</td>
           <td>
             <app-amount [satoshis]="block.extras.reward" digitsInfo="1.2-3" [noFiat]="true"></app-amount>
             <span class="fiat">
-              <app-fiat [blockConversion]="blockConversion" [value]="(blockSubsidy + fees) * 100000000" digitsInfo="1.0-0"></app-fiat>
+              <app-fiat [blockConversion]="blockConversion" [value]="block.extras.reward" digitsInfo="1.0-0"></app-fiat>
             </span>
           </td>
         </tr>
@@ -179,31 +163,14 @@
           <td i18n="block.total-fees|Total fees in a block">Total fees</td>
           <td style="width: 75%;"><span class="skeleton-loader"></span></td>
         </tr>
-        <tr *ngIf="network !== 'liquid' && network !== 'liquidtestnet'">
-          <td i18n="block.subsidy-and-fees|Total subsidy and fees in a block">Subsidy + fees</td>
+        <tr>
+          <td>Validator reward</td>
           <td><span class="skeleton-loader"></span></td>
         </tr>
       </ng-template>
-      <tr *ngIf="network !== 'liquid' && network !== 'liquidtestnet'">
-        <td i18n="block.miner">Miner</td>
-        <td *ngIf="stateService.env.MINING_DASHBOARD">
-          <a placement="bottom" [routerLink]="['/mining/pool' | relativeUrl, block.extras.pool.slug]" class="badge" style="color: #FFF;padding:0;">
-            <span class="miner-name" *ngIf="block.extras.pool.minerNames?.length > 1 && block.extras.pool.minerNames[1] != ''">
-              @if (block.extras.pool.minerNames[1].length > 16) {
-                {{ block.extras.pool.minerNames[1].slice(0, 15) }}…
-              } @else {
-                {{ block.extras.pool.minerNames[1] }}
-              }
-            </span>
-            <app-mining-pool [slug]="block.extras.pool.slug" [name]="block.extras.pool.name"></app-mining-pool>
-          </a>
-        </td>
-        <td *ngIf="!stateService.env.MINING_DASHBOARD && stateService.env.BASE_MODULE === 'mempool'">
-          <span placement="bottom" class="badge"
-            [class]="block.extras.pool.slug === 'unknown' ? 'bg-secondary' : 'bg-primary'">
-            {{ block.extras.pool.name }}
-        </span>
-        </td>
+      <tr>
+        <td>Fee recipient</td>
+        <td><app-truncate [text]="block.extras.pool.name" [lastChars]="8" [link]="['/address/' | relativeUrl, block.extras.pool.name]"></app-truncate></td>
       </tr>
     </ng-container>
     <ng-template #loadingRest>
@@ -324,35 +291,35 @@
             <table class="table table-borderless table-striped">
               <tbody>
                 <tr>
-                  <td class="td-width" i18n="transaction.version">Version</td>
-                  <td>{{ block.version | decimal2hex }} <span *ngIf="displayTaprootStatus() && hasTaproot(block.version)" class="badge bg-success ms-1" i18n="tx-features.tag.taproot|Taproot">Taproot</span></td>
-                </tr>
-                <tr *ngIf="network !== 'liquid' && network !== 'liquidtestnet'">
-                  <td i18n="block.bits">Bits</td>
-                  <td>{{ block.bits | decimal2hex }}</td>
+                  <td class="td-width">Parent hash</td>
+                  <td><app-truncate [text]="block.previousblockhash" [lastChars]="8" [link]="['/block/' | relativeUrl, block.previousblockhash]"></app-truncate></td>
                 </tr>
                 <tr>
-                  <td i18n="block.merkle-root">Merkle root</td>
-                  <td><p class="break-all">{{ block.merkle_root }}</p></td>
+                  <td>Transactions</td>
+                  <td>{{ block.tx_count | number }}</td>
+                </tr>
+                <tr>
+                  <td>Data size</td>
+                  <td [innerHTML]="'&lrm;' + (block.size | bytes: 2)"></td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <div class="col-sm" *ngIf="network !== 'liquid' && network !== 'liquidtestnet'">
+          <div class="col-sm">
             <table class="table table-borderless table-striped">
               <tbody>
                 <tr *ngIf="isMobile"></tr>
                 <tr>
-                  <td class="td-width" i18n="block.difficulty">Difficulty</td>
-                  <td>{{ block.difficulty }}</td>
+                  <td class="td-width">Gas used</td>
+                  <td>{{ block.weight | number }} gas</td>
                 </tr>
                 <tr>
-                  <td i18n="block.nonce">Nonce</td>
-                  <td>{{ block.nonce | decimal2hex }}</td>
+                  <td>Base fee</td>
+                  <td><app-fee-rate [fee]="block.extras?.medianFee" [dp]="2"></app-fee-rate></td>
                 </tr>
                 <tr>
-                  <td i18n="block.header">Block Header Hex</td>
-                  <td><a target="_blank" href="{{ network === '' ? '' : '/' + network }}/api/block/{{block.id}}/header"><fa-icon [icon]="['fas', 'external-link-alt']" [fixedWidth]="true"></fa-icon></a></td>
+                  <td>Fee recipient</td>
+                  <td><app-truncate [text]="block.extras?.pool?.name" [lastChars]="8" [link]="['/address/' | relativeUrl, block.extras?.pool?.name]"></app-truncate></td>
                 </tr>
               </tbody>
             </table>

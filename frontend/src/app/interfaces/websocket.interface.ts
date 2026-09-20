@@ -113,6 +113,7 @@ export interface MempoolInfo {
   maxmempool: number;              //  (numeric) Maximum memory usage for the mempool
   mempoolminfee: number;           //  (numeric) Minimum fee rate in BTC/kB for tx to be accepted.
   minrelaytxfee: number;           //  (numeric) Current minimum relay fee for transactions
+  total_fee?: number;              //  (numeric) Aggregate fees in the pending transaction sample
 }
 
 // [txid, fee, vsize, value, rate, flags, acceleration?]

@@ -8,7 +8,6 @@ import { StateService } from '@app/services/state.service';
 import { WebsocketService } from '@app/services/websocket.service';
 import { SeoService } from '@app/services/seo.service';
 import { OpenGraphService } from '@app/services/opengraph.service';
-import { seoDescriptionNetwork } from '@app/shared/common.utils';
 import { RelativeUrlPipe } from '@app/shared/pipes/relative-url/relative-url.pipe';
 
 @Component({
@@ -70,11 +69,7 @@ export class BlocksList implements OnInit {
 
       this.seoService.setTitle($localize`:@@8a7b4bd44c0ac71b2e72de0398b303257f7d2f54:Blocks`);
       this.ogService.setManualOgImage('recent-blocks.jpg');
-      if( this.stateService.network==='liquid'||this.stateService.network==='liquidtestnet' ) {
-        this.seoService.setDescription($localize`:@@meta.description.liquid.blocks:See the most recent Liquid${seoDescriptionNetwork(this.stateService.network)} blocks along with basic stats such as block height, block size, and more.`);
-      } else {
-        this.seoService.setDescription($localize`:@@meta.description.bitcoin.blocks:See the most recent Bitcoin${seoDescriptionNetwork(this.stateService.network)} blocks along with basic stats such as block height, block reward, block size, and more.`);
-      }
+      this.seoService.setDescription('See recent Ethereum blocks with validator, gas usage, transaction count, rewards, and fees.');
 
       this.blocksCountInitializedSubscription = combineLatest([this.blocksCountInitialized$, this.route.params]).pipe(
         filter(([blocksCountInitialized, _]) => blocksCountInitialized),

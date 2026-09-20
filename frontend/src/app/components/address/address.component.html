@@ -25,7 +25,9 @@
             <table class="table table-borderless table-striped address-table">
               <tbody>
                 <tr><ng-container *ngTemplateOutlet="balanceRow"></ng-container></tr>
-                <tr><ng-container *ngTemplateOutlet="pendingBalanceRow"></ng-container></tr>
+                @if (!address.electrum) {
+                  <tr><ng-container *ngTemplateOutlet="pendingBalanceRow"></ng-container></tr>
+                }
                 @if (!address.electrum) {
                   <tr><ng-container *ngTemplateOutlet="utxoRow"></ng-container></tr>
                   <tr><ng-container *ngTemplateOutlet="pendingUtxoRow"></ng-container></tr>
@@ -46,7 +48,11 @@
                 <tr>
                   <ng-container *ngTemplateOutlet="balanceRow"></ng-container>
                   <ng-container *ngTemplateOutlet="spacerCell"></ng-container>
-                  <ng-container *ngTemplateOutlet="pendingBalanceRow"></ng-container>
+                  @if (address.electrum) {
+                    <ng-container *ngTemplateOutlet="typeRow"></ng-container>
+                  } @else {
+                    <ng-container *ngTemplateOutlet="pendingBalanceRow"></ng-container>
+                  }
                 </tr>
                 @if (!address.electrum) {
                 <tr>
@@ -64,7 +70,11 @@
                     <ng-container *ngTemplateOutlet="emptyTd"></ng-container>
                   }                  
                   <ng-container *ngTemplateOutlet="spacerCell"></ng-container>
-                  <ng-container *ngTemplateOutlet="typeRow"></ng-container>
+                  @if (!address.electrum) {
+                    <ng-container *ngTemplateOutlet="typeRow"></ng-container>
+                  } @else {
+                    <ng-container *ngTemplateOutlet="emptyTd"></ng-container>
+                  }
                 </tr>
               </tbody>
             </table>
@@ -73,7 +83,7 @@
       </div>
     </div>
 
-    <ng-container *ngIf="(addressTypeInfo?.tapscript && addressTypeInfo?.scripts?.size > 0) || taprootPsbtExpanded"> 
+    <ng-container *ngIf="!address?.electrum && ((addressTypeInfo?.tapscript && addressTypeInfo?.scripts?.size > 0) || taprootPsbtExpanded)">
       <br>
       <div class="title-tx">
         <h2 class="text-start" i18n="address.taproot-tree">Taproot Tree</h2>
@@ -139,8 +149,12 @@
     <div class="title-tx">
       <h2 class="text-start">
         <ng-template [ngIf]="!transactions?.length">&nbsp;</ng-template>
-        <ng-template i18n="X of X Address Transaction" [ngIf]="transactions?.length === 1">{{ (transactions?.length | number) || '?' }} of {{ mempoolStats.tx_count + chainStats.tx_count | number }} transaction</ng-template>
-        <ng-template i18n="X of X Address Transactions (Plural)" [ngIf]="transactions?.length > 1">{{ (transactions?.length | number) || '?' }} of {{ mempoolStats.tx_count + chainStats.tx_count | number }} transactions</ng-template>
+        @if (address?.electrum && transactions?.length) {
+          {{ transactions.length | number }} recent transactions
+        } @else {
+          <ng-template i18n="X of X Address Transaction" [ngIf]="transactions?.length === 1">{{ (transactions?.length | number) || '?' }} of {{ mempoolStats.tx_count + chainStats.tx_count | number }} transaction</ng-template>
+          <ng-template i18n="X of X Address Transactions (Plural)" [ngIf]="transactions?.length > 1">{{ (transactions?.length | number) || '?' }} of {{ mempoolStats.tx_count + chainStats.tx_count | number }} transactions</ng-template>
+        }
       </h2>
     </div>
 
@@ -247,12 +261,10 @@
           <br>
           <i>There are too many transactions on this address, more than your backend can handle. See more on <a href="/docs/faq#address-lookup-issues">setting up a stronger backend</a>.</i>
           <br><br>
-          Consider viewing this address on the official Mempool website instead:
+          Consider viewing this address on another Ethereum explorer instead:
         </ng-container>
           <br>
-          <a href="https://mempool.space/address/{{ addressString }}" target="_blank">https://mempool.space/address/{{ addressString }}</a>
-          <br>
-          <a href="http://mempoolhqx4isw62xs7abwphsq7ldayuidyx2v2oethdhhj6mlo2r6ad.onion/address/{{ addressString }}" target="_blank">http://mempoolhqx4isw62xs7abwphsq7ldayuidyx2v2oethdhhj6mlo2r6ad.onion/address/{{ addressString }}</a>
+          <a href="https://eth.blockscout.com/address/{{ addressString }}" target="_blank" rel="noopener noreferrer">View on Blockscout</a>
         }
       </div>
   </ng-template>
@@ -312,7 +324,7 @@
     <ng-template #bitcoinAddressType><span placement="bottom" class="badge bg-primary">
       <app-address-type [address]="addressTypeInfo"></app-address-type>
     </span></ng-template>
-    <button *ngIf="showTaprootPsbtButton()" type="button" class="btn btn-sm taproot-psbt-btn" (click)="taprootPsbtExpanded = !taprootPsbtExpanded" i18n-ngbTooltip="address.taproot-psbt-add-unpublished-spend-paths" ngbTooltip="Add unpublished spending paths">
+    <button *ngIf="!address?.electrum && showTaprootPsbtButton()" type="button" class="btn btn-sm taproot-psbt-btn" (click)="taprootPsbtExpanded = !taprootPsbtExpanded" i18n-ngbTooltip="address.taproot-psbt-add-unpublished-spend-paths" ngbTooltip="Add unpublished spending paths">
       <fa-icon [icon]="['fas', 'code-fork']" [fixedWidth]="true"></fa-icon>
     </button>
     <app-address-labels *ngIf="!addressTypeInfo?.tapscript" [channel]="exampleChannel" [address]="addressTypeInfo" class="ms-1"></app-address-labels>

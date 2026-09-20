@@ -47,10 +47,6 @@ export const TransactionFlags = {
   inscription:                      0b00000100_00000000_00000000_00000000n,
   fake_scripthash:                  0b00001000_00000000_00000000_00000000n,
   annex:                            0b00010000_00000000_00000000_00000000n,
-  // Ethereum transaction types
-  eth_transfer:                     0b00010000_00000000_00000000_00000000n,
-  eth_contract_call:                0b00100000_00000000_00000000_00000000n,
-  eth_token_transfer:               0b01000000_00000000_00000000_00000000n,
   // heuristics
   coinjoin:                0b00000001_00000000_00000000_00000000_00000000n,
   consolidation:           0b00000010_00000000_00000000_00000000_00000000n,
@@ -61,6 +57,11 @@ export const TransactionFlags = {
   sighash_single: 0b00000100_00000000_00000000_00000000_00000000_00000000n,
   sighash_default:0b00001000_00000000_00000000_00000000_00000000_00000000n,
   sighash_acp:    0b00010000_00000000_00000000_00000000_00000000_00000000n,
+  // Ethereum transaction types. These must not overlap Bitcoin's serialized
+  // feature flags; values remain exactly representable in JSON numbers.
+  eth_transfer:      0b00000001_00000000_00000000_00000000_00000000_00000000_00000000n,
+  eth_contract_call: 0b00000010_00000000_00000000_00000000_00000000_00000000_00000000n,
+  eth_token_transfer:0b00000100_00000000_00000000_00000000_00000000_00000000_00000000n,
 };
 
 export function toFlags(filters: string[]): bigint {

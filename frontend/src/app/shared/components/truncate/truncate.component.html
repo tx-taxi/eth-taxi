@@ -11,7 +11,10 @@
 </span>
 
 <ng-template #ltrTruncated>
-  <span class="first">{{text.slice(0,-lastChars)}}</span><span class="last-four">{{text.slice(-lastChars)}}</span>
+  <ng-container *ngIf="isEthereumAddress; else standardLtrTruncated">
+    <span class="last-four">{{ text.slice(0, 4) }}</span><span class="ethereum-ellipsis">...</span><span class="last-four">{{ text.slice(-6) }}</span>
+  </ng-container>
+  <ng-template #standardLtrTruncated><span class="first">{{text.slice(0,-lastChars)}}</span><span class="last-four">{{text.slice(-lastChars)}}</span></ng-template>
   <div class="hidden-content">{{ text }}</div>
 </ng-template>
 

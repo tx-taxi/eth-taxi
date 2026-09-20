@@ -26,7 +26,7 @@ export class PrivacyPolicyComponent {
 
   ngOnInit(): void {
     this.seoService.setTitle('Privacy Policy');
-    this.seoService.setDescription('Trusted third parties are security holes, as are trusted first parties...you should only trust your own self-hosted instance of The Mempool Open Source Project®.');
+    this.seoService.setDescription('How eth.tx.taxi handles the limited technical data required to operate its Ethereum explorer.');
     this.ogService.setManualOgImage('privacy.jpg');
 
     this.themeStateSubscription = this.themeService.themeState$.subscribe((state) => {

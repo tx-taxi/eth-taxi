@@ -131,7 +131,11 @@
                   </ng-template>
                   <ng-template #defaultOutput>
                     <span *ngIf="vin.lazy" class="skeleton-loader"></span>
-                    <app-amount [blockConversion]="tx.price" *ngIf="vin.prevout" [satoshis]="vin.prevout.value"></app-amount>
+                    @if (vin.prevout?.scriptpubkey_type === 'ethereum-address') {
+                      <span class="grey-info-text">From</span>
+                    } @else {
+                      <app-amount [blockConversion]="tx.price" *ngIf="vin.prevout" [satoshis]="vin.prevout.value"></app-amount>
+                    }
                   </ng-template>
                 </td>
               </tr>
@@ -514,8 +518,7 @@
     <div class="summary">
       <div class="float-start mt-2-5" *ngIf="!transactionPage && !tx.vin[0].is_coinbase && tx.fee !== -1">
         <app-fee-rate [fee]="tx.fee" [weight]="tx.weight"></app-fee-rate>
-        <span class="d-none d-sm-inline-block">&nbsp;&ndash; {{ tx.fee | number }} <span class="symbol"
-            i18n="shared.sats">sats</span> <span class="fiat"><app-fiat [blockConversion]="tx.price" [value]="tx.fee"></app-fiat></span></span>
+        <span class="d-none d-sm-inline-block">&nbsp;&ndash; <app-amount [blockConversion]="tx.price" [satoshis]="tx.fee"></app-amount></span>
       </div>
       <div class="float-start mt-2-5 grey-info-text" *ngIf="tx.fee === -1" i18n="transactions-list.load-to-reveal-fee-info">Show more inputs to reveal fee data</div>
 

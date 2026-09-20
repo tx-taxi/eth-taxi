@@ -19,6 +19,10 @@ export class TruncateComponent {
   @Input() disabled: boolean = false;
   rtl: boolean;
 
+  get isEthereumAddress(): boolean {
+    return /^0x[a-fA-F0-9]{40}$/.test(this.text || '');
+  }
+
   constructor(
     @Inject(LOCALE_ID) private locale: string,
   ) {

@@ -477,7 +477,7 @@ export class WebsocketService {
             block: this.trackingMempoolBlock,
             transactions: response['projected-block-transactions'].blockTransactions.map(uncompressTx),
           });
-        } else if (response['projected-block-transactions'].delta) {
+        } else if (response['projected-block-transactions']?.delta) {
           if (this.stateService.mempoolSequence && response['projected-block-transactions'].sequence !== this.stateService.mempoolSequence + 1) {
             this.stateService.mempoolSequence = 0;
             this.startTrackMempoolBlock(this.trackingMempoolBlock, true);

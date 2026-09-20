@@ -1,11 +1,6 @@
 <div class="container-xl">
 
   <div class="title-block">
-    <div *ngIf="rbfTransaction && !tx?.status?.confirmed" class="alert alert-mempool" role="alert">
-      <span i18n="transaction.rbf.replacement|RBF replacement">This transaction has been replaced by:</span>
-      <app-truncate [text]="rbfTransaction.txid" [lastChars]="12" [link]="['/tx/' | relativeUrl, rbfTransaction.txid]"></app-truncate>
-    </div>
-
     <ng-container *ngIf="!rbfTransaction || rbfTransaction?.size || tx">
       <h1 i18n="shared.transaction">Transaction</h1>
 
@@ -30,21 +25,6 @@
     </ng-container>
   </div>
   <div class="clearfix"></div>
-
-  @if (duplicateTxBlocks) {
-    <div class="box duplicate-tx-alert">
-      <div class="icon-container">
-        <fa-icon [icon]="['fas', 'info-circle']" [fixedWidth]="true"></fa-icon>
-      </div>
-      <span>
-        <ng-container i18n="transaction.duplicate.notice|Duplicate transaction notice">
-          This transaction ID appears twice in the blockchain as the coinbase of blocks <a [routerLink]="['/block/' | relativeUrl, duplicateTxBlocks[0]]">{{ duplicateTxBlocks[0] }}</a> and <a [routerLink]="['/block/' | relativeUrl, duplicateTxBlocks[1]]">{{ duplicateTxBlocks[1] }}</a>, due to a bug later mitigated by <a href="https://github.com/bitcoin/bips/blob/master/bip-0030.mediawiki" target="_blank" rel="noopener">BIP-30</a>.
-        </ng-container>
-        <span class="me-3"></span>
-        <a href="https://blog.bitmex.com/bitcoins-duplicate-transactions/" target="_blank" rel="noopener" i18n="transaction.duplicate.read-more|Duplicate transaction read more" style="white-space: nowrap;">Read more</a>
-      </span>
-    </div>
-  }
 
   @if (!error) {
     <app-transaction-details
@@ -133,15 +113,6 @@
 
     <br>
 
-    <ng-container *ngIf="rbfInfo">
-      <div class="title float-start">
-        <h2 id="rbf" i18n="transaction.rbf-history|RBF Timeline">RBF Timeline</h2>
-      </div>
-      <div class="clearfix"></div>
-      <app-rbf-timeline [txid]="txId" [replacements]="rbfInfo"></app-rbf-timeline>
-      <br>
-    </ng-container>
-
     <ng-container *ngIf="transactionTime > 0 && tx.acceleratedAt > 0 && (isAcceleration || accelerationCanceled)">
       <div class="title float-start">
         <h2 id="acceleration-timeline" i18n="transaction.acceleration-timeline|Acceleration Timeline">Acceleration Timeline</h2>
@@ -153,7 +124,7 @@
 
     <ng-container *ngIf="flowEnabled; else flowPlaceholder">
       <div class="title float-start">
-        <h2 id="flow" #flow class="anchor" i18n="transaction.flow|Transaction flow">Flow</h2>
+        <h2 id="flow" #flow class="anchor">Transfer flow</h2>
       </div>
 
       <button type="button" class="btn btn-outline-info flow-toggle btn-sm float-end" (click)="toggleGraph()" i18n="hide-diagram">Hide diagram</button>
@@ -195,12 +166,11 @@
 
     <div class="subtitle-block">
       <div class="title">
-        <h2 i18n="transaction.inputs-and-outputs|Transaction inputs and outputs">Inputs & Outputs</h2>
+        <h2>From &amp; To</h2>
       </div>
 
       <div class="title-buttons">
         <button *ngIf="!flowEnabled" type="button" class="btn btn-outline-info flow-toggle btn-sm" (click)="toggleGraph()" i18n="show-diagram">Show diagram</button>
-        <button type="button" class="btn btn-outline-info btn-sm" (click)="toggleDetailsFromTxPage()" i18n="transaction.details|Transaction Details">Details</button>
       </div>
     </div>
 
@@ -216,24 +186,12 @@
           <table class="table table-borderless table-striped">
             <tbody>
               <tr>
-                <td i18n="block.size">Size</td>
+                <td>Input data</td>
                 <td [innerHTML]="'&lrm;' + (tx.size | bytes: 2)"></td>
               </tr>
               <tr>
-                <td i18n="transaction.vsize|Transaction Virtual Size">Virtual size</td>
-                <td [innerHTML]="'&lrm;' + (tx.weight / 4 | vbytes: 2)"></td>
-              </tr>
-              <tr *ngIf="adjustedVsize != null">
-                <td><ng-container i18n="transaction.adjusted-vsize|Transaction Adjusted VSize">Adjusted vsize</ng-container>
-                  <a class="info-link" [routerLink]="['/docs/faq/' | relativeUrl]" fragment="what-is-adjusted-vsize">
-                    <fa-icon [icon]="['fas', 'info-circle']" [fixedWidth]="true"></fa-icon>
-                  </a>
-                </td>
-                <td [innerHTML]="'&lrm;' + (adjustedVsize | vbytes: 2)"></td>
-              </tr>
-              <tr>
-                <td i18n="block.weight">Weight</td>
-                <td [innerHTML]="'&lrm;' + (tx.weight | wuBytes: 2)"></td>
+                <td>Gas used</td>
+                <td>&lrm;{{ tx.weight / 4 | number }} gas</td>
               </tr>
             </tbody>
           </table>
@@ -242,24 +200,16 @@
           <table class="table table-borderless table-striped">
             <tbody>
               <tr>
-                <td i18n="transaction.version">Version</td>
+                <td>Transaction type</td>
                 <td [innerHTML]="'&lrm;' + (tx.version | number)"></td>
               </tr>
               <tr>
-                <td i18n="transaction.locktime">Locktime</td>
-                <td [innerHTML]="'&lrm;' + (tx.locktime | number)"></td>
-              </tr>
-              <tr *ngIf="sigops != null">
-                <td><ng-container i18n="transaction.sigops|Transaction Sigops">Sigops</ng-container>
-                  <a class="info-link" [routerLink]="['/docs/faq/' | relativeUrl]" fragment="what-are-sigops">
-                    <fa-icon [icon]="['fas', 'info-circle']" [fixedWidth]="true"></fa-icon>
-                  </a>
-                </td>
-                <td [innerHTML]="'&lrm;' + (sigops | number)"></td>
+                <td>Nonce</td>
+                <td>&lrm;{{ tx.vin[0]?.sequence | number }}</td>
               </tr>
               <tr>
-                <td i18n="transaction.hex">Transaction hex</td>
-                <td><a target="_blank" href="{{ network === '' ? '' : '/' + network }}/api/tx/{{ txId }}/hex"><fa-icon [icon]="['fas', 'external-link-alt']" [fixedWidth]="true"></fa-icon></a></td>
+                <td>Method</td>
+                <td>{{ tx.vin[0]?.scriptsig_asm || 'Transfer' }}</td>
               </tr>
             </tbody>
           </table>
@@ -304,7 +254,7 @@
     </ng-container>
 
     <div class="title">
-      <h2 i18n="transaction.inputs-and-outputs|Transaction inputs and outputs">Inputs & Outputs</h2>
+      <h2>From &amp; To</h2>
     </div>
 
     <div class="box">

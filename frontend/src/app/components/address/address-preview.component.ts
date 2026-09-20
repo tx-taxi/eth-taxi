@@ -9,7 +9,6 @@ import { AudioService } from '@app/services/audio.service';
 import { ApiService } from '@app/services/api.service';
 import { of, merge, Subscription, Observable } from 'rxjs';
 import { SeoService } from '@app/services/seo.service';
-import { seoDescriptionNetwork } from '@app/shared/common.utils';
 import { AddressInformation } from '@interfaces/node-api.interface';
 
 @Component({
@@ -72,7 +71,7 @@ export class AddressPreviewComponent implements OnInit, OnDestroy {
             this.addressString = this.addressString.toLowerCase();
           }
           this.seoService.setTitle($localize`:@@address.component.browser-title:Address: ${this.addressString}:INTERPOLATION:`);
-          this.seoService.setDescription($localize`:@@meta.description.bitcoin.address:See mempool transactions, confirmed transactions, balance, and more for ${this.stateService.network==='liquid'||this.stateService.network==='liquidtestnet'?'Liquid':'Bitcoin'}${seoDescriptionNetwork(this.stateService.network)} address ${this.addressString}:INTERPOLATION:.`);
+          this.seoService.setDescription(`See the balance and recent transactions for Ethereum address ${this.addressString}.`);
 
           return (this.addressString.match(/04[a-fA-F0-9]{128}|(02|03)[a-fA-F0-9]{64}/)
               ? this.electrsApiService.getPubKeyAddress$(this.addressString)

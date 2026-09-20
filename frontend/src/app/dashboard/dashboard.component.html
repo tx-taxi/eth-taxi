@@ -65,16 +65,10 @@
       <div class="card graph-card">
         <div class="card-body">
           <ng-container *ngTemplateOutlet="mempoolTable; context: { $implicit: mempoolInfoData }"></ng-container>
-            <h5 class="card-title mt-3" i18n="dashboard.incoming-transactions">Incoming Transactions</h5>
-            <div class="mempool-graph" *ngIf="(mempoolStats$ | async) as mempoolStats">
-              <app-incoming-transactions-graph
-                [height]="incomingGraphHeight"
-                [left]="50"
-                [right]="20"
-                [data]="mempoolStats?.weightPerSecond"
-                [windowPreferenceOverride]="'2h'"
-                ></app-incoming-transactions-graph>
-            </div>
+            <h5 class="card-title mt-3">Pending fees</h5>
+            <p class="card-text" *ngIf="(isLoadingWebSocket$ | async) === false && mempoolInfoData.value; else loading">
+              <app-amount [satoshis]="mempoolInfoData.value.memPoolInfo.total_fee" digitsInfo="1.2-4" [noFiat]="true"></app-amount>
+            </p>
         </div>
       </div>
     </div>

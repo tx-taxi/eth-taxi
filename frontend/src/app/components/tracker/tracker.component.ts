@@ -21,7 +21,6 @@ import { WebsocketService } from '@app/services/websocket.service';
 import { AudioService } from '@app/services/audio.service';
 import { ApiService } from '@app/services/api.service';
 import { SeoService } from '@app/services/seo.service';
-import { seoDescriptionNetwork } from '@app/shared/common.utils';
 import { Filter, TransactionFlags } from '@app/shared/filters.utils';
 import { BlockExtended, CpfpInfo, RbfTree, MempoolPosition, DifficultyAdjustment, Acceleration, AccelerationPosition } from '@interfaces/node-api.interface';
 import { PriceService } from '@app/services/price.service';
@@ -166,9 +165,11 @@ export class TrackerComponent implements OnInit, OnDestroy {
 
     this.acceleratorAvailable = this.stateService.env.OFFICIAL_MEMPOOL_SPACE && this.stateService.env.ACCELERATOR && this.stateService.network === '';
 
-    this.miningService.getMiningStats('1w').subscribe(stats => {
-      this.miningStats = stats;
-    });
+    if (this.stateService.env.MINING_DASHBOARD) {
+      this.miningService.getMiningStats('1w').subscribe(stats => {
+        this.miningStats = stats;
+      });
+    }
 
     this.enterpriseService.page();
 
@@ -445,9 +446,8 @@ export class TrackerComponent implements OnInit, OnDestroy {
           this.seoService.setTitle(
             $localize`:@@bisq.transaction.browser-title:Transaction: ${this.txId}:INTERPOLATION:`
           );
-          const network = this.stateService.network === 'liquid' || this.stateService.network === 'liquidtestnet' ? 'Liquid' : 'Bitcoin';
-          const seoDescription = seoDescriptionNetwork(this.stateService.network);
-          this.seoService.setDescription($localize`:@@meta.description.bitcoin.transaction:Get real-time status, addresses, fees, script info, and more for ${network}${seoDescription} transaction with txid ${this.txId}.`);
+          const seoDescription = this.tx?.status?.confirmed ? '' : ' unconfirmed';
+          this.seoService.setDescription(`Track the real-time status, gas, fee, and confirmation details for Ethereum${seoDescription} transaction ${this.txId}.`);
           this.resetTransaction();
           return merge(
             of(true),
@@ -758,7 +758,7 @@ export class TrackerComponent implements OnInit, OnDestroy {
 
   setIsAccelerated(initialState: boolean = false) {
     this.isAcceleration = (this.tx.acceleration || (this.accelerationInfo && this.pool && this.accelerationInfo.pools.some(pool => (pool === this.pool.id))));
-    if (this.isAcceleration) {
+    if (this.isAcceleration && this.stateService.env.MINING_DASHBOARD) {
       // this immediately returns cached stats if we fetched them recently
       this.miningService.getMiningStats('1w').subscribe(stats => {
         this.miningStats = stats;

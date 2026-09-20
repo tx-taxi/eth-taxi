@@ -9,9 +9,9 @@ import { StateService } from '@app/services/state.service';
 })
 export class SeoService {
   network = '';
-  baseTitle = 'mempool';
-  baseDescription = 'Explore the full Bitcoin ecosystem&reg; with The Mempool Open Source Project&reg;.';
-  baseDomain = 'mempool.space';
+  baseTitle = 'eth.tx.taxi';
+  baseDescription = 'Track Ethereum blocks, transactions, addresses, and live gas conditions on eth.tx.taxi.';
+  baseDomain = 'eth.tx.taxi';
 
   canonicalLink: HTMLLinkElement = document.getElementById('canonical') as HTMLLinkElement;
 
@@ -97,7 +97,7 @@ export class SeoService {
       {return this.baseTitle + ' - Liquid Network';}
     if (this.network === 'liquidtestnet')
       {return this.baseTitle + ' - Liquid Testnet';}
-    return this.baseTitle + ' - ' + (this.network ? this.ucfirst(this.network) : 'Bitcoin') + ' Explorer';
+    return this.baseTitle + ' - Ethereum Explorer';
   }
 
   getDescription(): string {

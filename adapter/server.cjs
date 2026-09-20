@@ -20,8 +20,17 @@ let cachedSnapshot;
 let cachedAt = 0;
 let mempoolSamples = [];
 
+// These mirror the frontend's BigInt filter flags. Keep them below 2^53 so
+// they retain their exact value when serialized through the JSON adapter.
+const ETHEREUM_TRANSACTION_FLAGS = {
+  transfer: 2 ** 48,
+  contractCall: 2 ** 49,
+  tokenTransfer: 2 ** 50,
+};
+
 const contentTypes = {
   '.css': 'text/css; charset=utf-8',
+  '.gz': 'application/gzip',
   '.html': 'text/html; charset=utf-8',
   '.ico': 'image/x-icon',
   '.js': 'application/javascript; charset=utf-8',
@@ -112,12 +121,12 @@ function mapBlock(block) {
 
 function mapTransaction(tx) {
   const gas = number(tx.gas_used || tx.gas_limit);
-  const rate = gwei(tx.gas_price || tx.max_fee_per_gas);
+  const rate = wei(tx.gas_price || tx.max_fee_per_gas);
   const types = new Set(tx.transaction_types || []);
   let flags = 0;
-  if (types.has('coin_transfer')) flags |= 0x10000000;
-  if (types.has('contract_call')) flags |= 0x20000000;
-  if (types.has('token_transfer') || (tx.token_transfers?.length ?? 0) > 0) flags |= 0x40000000;
+  if (types.has('coin_transfer')) flags += ETHEREUM_TRANSACTION_FLAGS.transfer;
+  if (types.has('contract_call')) flags += ETHEREUM_TRANSACTION_FLAGS.contractCall;
+  if (types.has('token_transfer') || (tx.token_transfers?.length ?? 0) > 0) flags += ETHEREUM_TRANSACTION_FLAGS.tokenTransfer;
   return {
     txid: tx.hash,
     fee: wei(tx.fee?.value),
@@ -129,6 +138,18 @@ function mapTransaction(tx) {
   };
 }
 
+function compressTransaction(transaction) {
+  return [
+    transaction.txid,
+    transaction.fee,
+    transaction.vsize,
+    transaction.value,
+    transaction.rate,
+    transaction.flags,
+    transaction.time,
+  ];
+}
+
 function mapTransactionDetail(tx, blockHash) {
   const transaction = mapTransaction(tx);
   const gas = number(tx.gas_used || tx.gas_limit);
@@ -138,6 +159,10 @@ function mapTransactionDetail(tx, blockHash) {
   const rawInput = tx.raw_input || '0x';
   return {
     ...transaction,
+    // Blockscout supplies a timestamp for pending transactions. Preserve it so
+    // the inherited first-seen component does not retry an unavailable
+    // Bitcoin-specific endpoint indefinitely.
+    ...(!confirmed ? { firstSeen: tx.timestamp ? timestamp(tx.timestamp) : Math.floor(Date.now() / 1000) } : {}),
     version: number(tx.type),
     locktime: 0,
     size: Math.max(0, Math.floor(Math.max(rawInput.length - 2, 0) / 2)),
@@ -221,9 +246,11 @@ async function addressTransactions(address) {
   return (response.items || []).map((transaction) => mapTransactionDetail(transaction, transaction.block_hash));
 }
 
-async function blockTransactions(blockId) {
+async function blockTransactions(blockId, start = 0) {
   const response = await providerJson(`/api/v2/blocks/${encodeURIComponent(blockId)}/transactions`);
-  return (response.items || []).map(mapTransaction);
+  return (response.items || [])
+    .slice(start, start + 25)
+    .map((transaction) => mapTransactionDetail(transaction, blockId));
 }
 
 async function snapshot(force = false) {
@@ -251,11 +278,26 @@ async function snapshot(force = false) {
     loadingIndicators: { mempool: 100 },
     blocks: mappedBlocks,
     'mempool-blocks': pendingTransactions.length ? [{ blockSize: gasUsed, blockVSize: Math.ceil(gasUsed / 4), nTx: pendingTransactions.length, medianFee: gweiToWei(average), totalFees: gasFees, feeRange: [slow, slow, average, average, fast, fast, fast].map(gweiToWei), index: 0 }] : [],
-    mempoolInfo: { loaded: true, size: pendingTransactions.length, bytes: gasUsed, usage: gasUsed, maxmempool: Math.max(gasUsed, 1), mempoolminfee: gweiToWei(slow), minrelaytxfee: gweiToWei(slow), total_fee: gasFees },
-    bytesPerSecond: 0,
+    // Ethereum does not have Bitcoin's configurable byte-based mempool limit.
+    // Use a stable gas reference so the pending-gas meter is informative rather
+    // than reporting every non-empty pending set as 100% full.
+    mempoolInfo: { loaded: true, size: pendingTransactions.length, bytes: gasUsed, usage: gasUsed, maxmempool: Math.max(Math.ceil(gasUsed * 1.25), 60_000_000), mempoolminfee: gweiToWei(slow), minrelaytxfee: gweiToWei(slow), total_fee: gasFees },
+    vBytesPerSecond: 0,
     fees: { fastestFee: gweiToWei(fast), halfHourFee: gweiToWei(average), hourFee: gweiToWei(average), economyFee: gweiToWei(slow), minimumFee: gweiToWei(slow) },
-    da: { progressPercent: 100, difficultyChange: 0, estimatedRetargetDate: tip?.timestamp ? tip.timestamp * 1_000 + 12_000 : Date.now() + 12_000, remainingBlocks: 1, remainingTime: 12_000, previousRetarget: 0, nextRetargetHeight: (tip?.height || 0) + 1, timeAvg: 12_000 },
+    da: {
+      progressPercent: 100,
+      difficultyChange: 0,
+      estimatedRetargetDate: tip?.timestamp ? tip.timestamp * 1_000 + 12_000 : Date.now() + 12_000,
+      remainingBlocks: 1,
+      remainingTime: 12_000,
+      previousRetarget: 0,
+      nextRetargetHeight: (tip?.height || 0) + 1,
+      timeAvg: 12_000,
+      adjustedTimeAvg: 12_000,
+      timeOffset: 0,
+    },
     transactions: pendingTransactions.slice(0, 6),
+    projectedTransactions: pendingTransactions,
     'live-2h-chart': liveMempoolSample,
     conversions: { USD: number(stats.coin_price) },
   };
@@ -270,10 +312,10 @@ function respond(res, status, value) {
 
 async function serveStatic(pathname, res) {
   if (pathname.startsWith('/api/')) return false;
-  const requested = pathname === '/' ? '/en-US/index.html' : pathname;
+  const requested = pathname;
   const relative = path.posix.normalize(requested).replace(/^\/+/, '');
   let filePath = path.join(staticRoot, relative);
-  if (!filePath.startsWith(`${staticRoot}${path.sep}`)) return false;
+  if (filePath !== staticRoot && !filePath.startsWith(`${staticRoot}${path.sep}`)) return false;
   try {
     const body = await fs.readFile(filePath);
     res.writeHead(200, { 'content-type': contentTypes[path.extname(filePath)] || 'application/octet-stream', 'cache-control': 'no-store' });
@@ -291,16 +333,22 @@ async function serveStatic(pathname, res) {
   } catch (error) {
     if (error?.code !== 'ENOENT' && error?.code !== 'EISDIR') throw error;
   }
-  filePath = path.join(staticRoot, 'en-US/index.html');
-  try {
-    const body = await fs.readFile(filePath);
-    res.writeHead(200, { 'content-type': contentTypes['.html'], 'cache-control': 'no-store' });
-    res.end(body);
-    return true;
-  } catch (error) {
-    if (error?.code === 'ENOENT') return false;
-    throw error;
+  // Localized builds place an index under en-US, while the default production
+  // build emits it at the static root. Either layout must serve deep links.
+  for (const indexPath of [
+    path.join(staticRoot, 'en-US', 'index.html'),
+    path.join(staticRoot, 'index.html'),
+  ]) {
+    try {
+      const body = await fs.readFile(indexPath);
+      res.writeHead(200, { 'content-type': contentTypes['.html'], 'cache-control': 'no-store' });
+      res.end(body);
+      return true;
+    } catch (error) {
+      if (error?.code !== 'ENOENT' && error?.code !== 'EISDIR') throw error;
+    }
   }
+  return false;
 }
 
 const server = http.createServer(async (req, res) => {
@@ -319,7 +367,9 @@ const server = http.createServer(async (req, res) => {
     if (blockMatch) return respond(res, 200, await blockById(blockMatch[1]));
     const blockSummaryMatch = requestPath.match(/^\/api\/v1\/block\/(0x[a-fA-F0-9]+)\/summary$/);
     if (blockSummaryMatch) return respond(res, 200, await blockTransactions(blockSummaryMatch[1]));
-    const transactionMatch = requestPath.match(/^\/(?:api\/v1\/)?tx\/(0x[a-fA-F0-9]+)$/);
+    const blockTransactionsMatch = requestPath.match(/^\/api\/block\/(0x[a-fA-F0-9]+)\/txs\/(\d+)$/);
+    if (blockTransactionsMatch) return respond(res, 200, await blockTransactions(blockTransactionsMatch[1], Number(blockTransactionsMatch[2])));
+    const transactionMatch = requestPath.match(/^\/(?:api(?:\/v1)?)?\/tx\/(0x[a-fA-F0-9]+)$/);
     if (transactionMatch) return respond(res, 200, await transactionById(transactionMatch[1]));
     const addressTransactionsMatch = requestPath.match(/^\/api\/address\/(0x[a-fA-F0-9]{40})\/txs$/);
     if (addressTransactionsMatch) return respond(res, 200, await addressTransactions(addressTransactionsMatch[1]));
@@ -328,7 +378,25 @@ const server = http.createServer(async (req, res) => {
     const statusMatch = requestPath.match(/^\/api\/tx\/(0x[a-fA-F0-9]+)\/status$/);
     if (statusMatch) return respond(res, 200, (await transactionById(statusMatch[1])).status);
     if (requestPath === '/api/v1/transaction-times') {
-      return respond(res, 200, requestUrl.searchParams.getAll('txId[]').map((id) => data.transactions.find((tx) => tx.txid === id)?.time || 0));
+      return respond(res, 200, requestUrl.searchParams.getAll('txId[]').map((id) => data.transactions.find((tx) => tx.txid === id)?.time || Math.floor(Date.now() / 1000)));
+    }
+    if (requestPath === '/api/txs/outspends') {
+      return respond(res, 200, requestUrl.searchParams.get('txids')?.split(',').filter(Boolean).map(() => [{ spent: false }]) || []);
+    }
+    if (requestPath === '/api/v1/historical-price') {
+      return respond(res, 200, {
+        prices: [{ time: 0, USD: data.conversions.USD, EUR: -1, GBP: -1, CAD: -1, CHF: -1, AUD: -1, JPY: -1 }],
+        exchangeRates: { USDEUR: 0, USDGBP: 0, USDCAD: 0, USDCHF: 0, USDAUD: 0, USDJPY: 0 },
+      });
+    }
+    if (/^\/api\/v1\/cpfp\/0x[a-fA-F0-9]+$/.test(requestPath)) {
+      return respond(res, 200, { ancestors: [], descendants: [], bestDescendant: null });
+    }
+    if (/^\/api\/v1\/tx\/0x[a-fA-F0-9]+\/rbf$/.test(requestPath)) {
+      return respond(res, 200, { replacements: null, replaces: [] });
+    }
+    if (/^\/api\/v1\/mining\/pools(?:\/[^/]+)?$/.test(requestPath)) {
+      return respond(res, 200, []);
     }
     if (requestPath === '/api/v1/mempool') return respond(res, 200, data.mempoolInfo);
     if (requestPath === '/api/v1/statistics/2h') return respond(res, 200, [...mempoolSamples].reverse());
@@ -344,6 +412,46 @@ const wss = new WebSocketServer({ noServer: true });
 wss.on('connection', async (socket) => {
   sockets.add(socket);
   socket.on('close', () => sockets.delete(socket));
+  socket.on('message', async (message) => {
+    try {
+      const request = JSON.parse(String(message));
+      if (request.action === 'ping') {
+        socket.send(JSON.stringify({ pong: true }));
+        return;
+      }
+      if (request.action === 'init') {
+        socket.send(JSON.stringify(await snapshot()));
+        return;
+      }
+      if (typeof request['track-tx'] === 'string' && request['track-tx'] !== 'stop') {
+        const data = await snapshot();
+        const transaction = data.projectedTransactions.find((item) => item.txid === request['track-tx']);
+        // Ethereum's pending pool has no Bitcoin-style package position. A
+        // pending transaction is instead estimated for the next validator slot.
+        socket.send(JSON.stringify({
+          txPosition: {
+            txid: request['track-tx'],
+            position: { block: 0, vsize: transaction?.vsize || 0 },
+            cpfp: null,
+            accelerationPositions: [],
+          },
+        }));
+        return;
+      }
+      if (Number.isInteger(request['track-mempool-block']) && request['track-mempool-block'] >= 0) {
+        const data = await snapshot();
+        socket.send(JSON.stringify({
+          'projected-block-transactions': {
+            index: request['track-mempool-block'],
+            sequence: Date.now(),
+            blockTransactions: data.projectedTransactions.map(compressTransaction),
+          },
+        }));
+      }
+    } catch {
+      // A malformed subscription must not disrupt the dashboard stream.
+    }
+  });
   try { socket.send(JSON.stringify(await snapshot())); } catch { socket.close(); }
 });
 server.on('upgrade', (req, socket, head) => {

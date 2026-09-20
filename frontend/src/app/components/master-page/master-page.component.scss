@@ -315,6 +315,9 @@ nav {
 main {
   transition: 0.2s;
   transition-property: max-width;
+  @media (max-width: 991px) {
+    padding-bottom: 56px;
+  }
 }
 
 // empty sidenav

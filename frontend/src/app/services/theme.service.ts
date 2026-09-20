@@ -20,39 +20,17 @@ export class ThemeService {
   ) {
     let theme = this.stateService.env.customize?.theme || this.storageService.getValue('theme-preference') || 'default';
     // theme preference must be a valid known public theme
-    if (!this.stateService.env.customize?.theme && !['default', 'contrast', 'softsimon', 'nymkappa'].includes(theme)) {
+    if (!this.stateService.env.customize?.theme && !['default', 'original'].includes(theme)) {
       theme = 'default';
       this.storageService.setValue('theme-preference', 'default');
     }
-    if (!this.stateService.env.customize?.theme) {
-      const aprilThemeState = this.storageService.getValue('april-theme');
-      if (this.isAprilFirst()) {
-        if (aprilThemeState !== 'dismissed') {
-          if (aprilThemeState !== 'active') {
-            this.storageService.setValue('april-theme-backup', this.storageService.getValue('theme-preference') || 'default');
-            this.storageService.setValue('april-theme', 'active');
-          }
-          theme = 'nymkappa';
-        }
-      } else if (aprilThemeState === 'active') {
-        theme = this.storageService.getValue('april-theme-backup') || 'default';
-        this.storageService.setValue('theme-preference', theme);
-        this.clearAprilTheme();
-      } else if (aprilThemeState === 'dismissed') {
-        this.clearAprilTheme();
-      }
-    }
+    this.clearAprilTheme();
     this.themeState$ = new BehaviorSubject({ theme, loading: false });
     this.apply(theme);
   }
 
   setTheme(theme: string): void {
-    if (!this.stateService.env.customize?.theme && this.isAprilFirst()) {
-      this.storageService.setValue('april-theme', 'dismissed');
-      this.storageService.removeItem('april-theme-backup');
-    } else {
-      this.clearAprilTheme();
-    }
+    this.clearAprilTheme();
     this.apply(theme);
   }
 
@@ -113,6 +91,9 @@ export class ThemeService {
   }
 
   private getThemeFile(theme: string): string {
+    if (theme === 'original') {
+      return '/resources/mempool-original.css';
+    }
     const themeFiles = (window as any).__env?.THEME_FILES;
     if (themeFiles?.[theme]) {
       return themeFiles[theme];
