@@ -9,8 +9,8 @@ import { Price } from '@app/services/price.service';
 import { StateService } from '@app/services/state.service';
 import { ThemeService } from '@app/services/theme.service';
 import { Subscription } from 'rxjs';
-import { defaultColorFunction, setOpacity, defaultAuditColors, defaultColors, ageColorFunction, contrastColorFunction, contrastAuditColors, contrastColors } from '@components/block-overview-graph/utils';
-import { ActiveFilter, FilterMode, toFlags } from '@app/shared/filters.utils';
+import { defaultColorFunction, setOpacity, defaultAuditColors, defaultColors, ageColorFunction, contrastColorFunction, contrastAuditColors, contrastColors, ethereumCategoryColorFunction } from '@components/block-overview-graph/utils';
+import { ActiveFilter, FilterMode, GradientMode, toFlags } from '@app/shared/filters.utils';
 import { detectWebGL } from '@app/shared/graphs.utils';
 
 const unmatchedOpacity = 0.2;
@@ -54,7 +54,7 @@ export class BlockOverviewGraphComponent implements AfterViewInit, OnDestroy, On
   @Input() excludeFilters: string[] = [];
   @Input() filterFlags: bigint | null = null;
   @Input() filterMode: FilterMode = 'and';
-  @Input() gradientMode: 'fee' | 'age' = 'fee';
+  @Input() gradientMode: GradientMode = 'category';
   @Input() relativeTime: number | null;
   @Input() blockConversion: Price;
   @Input() overrideColors: ((tx: TxView) => Color) | null = null;
@@ -660,7 +660,7 @@ export class BlockOverviewGraphComponent implements AfterViewInit, OnDestroy, On
     }
   }
 
-  getFilterColorFunction(flags: bigint, gradient: 'fee' | 'age'): ((tx: TxView) => Color) {
+  getFilterColorFunction(flags: bigint, gradient: GradientMode): ((tx: TxView) => Color) {
     return (tx: TxView) => {
       let matches = false;
       switch (this.filterMode) {
@@ -673,6 +673,10 @@ export class BlockOverviewGraphComponent implements AfterViewInit, OnDestroy, On
         case 'nor':
           matches = (tx.bigintFlags & flags) === 0n;
           break;
+      }
+      if (gradient === 'category') {
+        const color = ethereumCategoryColorFunction(tx);
+        return matches ? color : setOpacity(color, unmatchedOpacity);
       }
       if (matches) {
         if (this.loadedTheme !== 'contrast' && this.loadedTheme !== 'bukele') {

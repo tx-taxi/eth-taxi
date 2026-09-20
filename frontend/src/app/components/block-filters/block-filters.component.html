@@ -1,10 +1,7 @@
 <div class="block-filters" [class.filters-active]="activeFilters.length > 0" [class.any-mode]="filterMode === 'or'" [class.none-mode]="filterMode === 'nor'" [class.menu-open]="menuOpen" [class.small]="cssWidth < 500" [class.vsmall]="cssWidth < 400" [class.tiny]="cssWidth < 200">
-  <a *ngIf="menuOpen" [routerLink]="['/docs/faq' | relativeUrl]" fragment="how-do-mempool-goggles-work" class="info-badges float-end" i18n-ngbTooltip="Mempool Goggles&reg; tooltip" ngbTooltip="select filter categories to highlight matching transactions">
-    <fa-icon [icon]="['fas', 'info-circle']" [fixedWidth]="true" size="lg"></fa-icon>
-  </a>
   <div class="filter-bar">
-    <button class="menu-toggle" (click)="menuOpen = !menuOpen" title="Mempool Goggles&reg;">
-      <app-svg-images name="goggles" width="100%" height="100%"></app-svg-images>
+    <button class="menu-toggle" (click)="menuOpen = !menuOpen" title="Ethereum transaction filters">
+      <app-svg-images name="ethGoggles" width="100%" height="100%"></app-svg-images>
     </button>
     <div class="active-tags">
       <ng-container *ngFor="let filter of activeFilters;">
@@ -28,8 +25,10 @@
       <div class="filter-element">
         <h5 i18n="mempool-goggles.tint">Tint</h5>
         <div class="btn-group" role="group">
-          <input type="radio" class="btn-check" id="tint-classic" [value]="'fee'" fragment="classic" (click)="setGradientMode('fee')">
-          <label class="btn btn-xs yellow mode-toggle" [class.active]="gradientMode === 'fee'"  for="tint-classic"><ng-container i18n="mempool-goggles.classic">Classic</ng-container></label>
+          <input type="radio" class="btn-check" id="tint-category" [value]="'category'" fragment="category" (click)="setGradientMode('category')">
+          <label class="btn btn-xs green mode-toggle" [class.active]="gradientMode === 'category'" for="tint-category"><ng-container>Category</ng-container></label>
+          <input type="radio" class="btn-check" id="tint-fee" [value]="'fee'" fragment="fee" (click)="setGradientMode('fee')">
+          <label class="btn btn-xs yellow mode-toggle" [class.active]="gradientMode === 'fee'" for="tint-fee"><ng-container>Fee</ng-container></label>
           <input type="radio" class="btn-check" id="tint-age" [value]="'age'" fragment="age" (click)="setGradientMode('age')">
           <label class="btn btn-xs blue mode-toggle" [class.active]="gradientMode === 'age'" for="tint-age"><ng-container i18n="mempool-goggles.age">Age</ng-container></label>
         </div>

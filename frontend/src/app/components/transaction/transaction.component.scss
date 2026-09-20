@@ -85,31 +85,109 @@
 	}
 }
 
-.box.hidden {
-  visibility: hidden;
-  height: 0px;
-  padding-top: 0px;
-  padding-bottom: 0px;
-  margin-top: 0px;
-  margin-bottom: 0px;
+.ethereum-route {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
 }
 
-.graph-container {
-  position: relative;
-  width: 100%;
-  background: var(--stat-box-bg);
-  padding: 10px 0;
-  padding-bottom: 0;
+.ethereum-route-party {
+  min-width: 0;
 }
 
-.toggle-wrapper {
-  width: 100%;
-  text-align: center;
-  margin: 1.25em 0 0;
+.ethereum-route-destination {
+  text-align: right;
+
+  app-truncate {
+    justify-content: flex-end;
+  }
 }
 
-.graph-toggle {
-  margin: auto;
+.ethereum-route-label {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--transparent-fg);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.ethereum-route-value {
+  color: var(--transparent-fg);
+}
+
+.ethereum-route-connector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-width: 0;
+  color: var(--primary);
+}
+
+.ethereum-route-arrow {
+  flex: 0 0 auto;
+}
+
+.ethereum-route-type {
+  flex: 0 0 auto;
+  border-radius: 3px;
+  padding: 0.18rem 0.4rem;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.ethereum-route-type.eth-transfer {
+  background: #627eea;
+}
+
+.ethereum-route-type.contract-call {
+  background: #1b9d92;
+}
+
+.ethereum-route-type.token-transfer {
+  background: #bd7c20;
+}
+
+.ethereum-route-type.contract-deployment {
+  background: #8b6ad8;
+}
+
+.ethereum-route-amount {
+  flex: 0 1 auto;
+  min-width: 0;
+  color: var(--foreground);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 767.98px) {
+  .ethereum-route {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.8rem;
+  }
+
+  .ethereum-route-connector {
+    justify-content: flex-start;
+  }
+
+  .ethereum-route-arrow {
+    transform: rotate(90deg);
+  }
+
+  .ethereum-route-destination {
+    text-align: left;
+
+    app-truncate {
+      justify-content: flex-start;
+    }
+  }
 }
 
 @media (max-width: 767.98px) {
@@ -191,7 +269,7 @@
 	}
 }
 
-.details-button, .flow-toggle, .accelerator-toggle {
+.details-button, .accelerator-toggle {
   margin-top: -5px;
   margin-left: 10px;
 	@media (min-width: 768px){
@@ -226,15 +304,6 @@ h2 .cpfp-beta {
     flex-shrink: 0;
   }
 
-  .title-buttons {
-    flex-shrink: 1;
-    text-align: right;
-    .btn {
-      margin-top: 0;
-      margin-bottom: 8px;
-      margin-left: 8px;
-    }
-  }
 }
 
 .tx-list {

@@ -310,8 +310,42 @@ function respond(res, status, value) {
   res.end(JSON.stringify(value));
 }
 
-async function serveStatic(pathname, res) {
-  if (pathname.startsWith('/api/')) return false;
+function respondJavaScript(res, source) {
+  res.writeHead(200, { 'content-type': 'application/javascript; charset=utf-8', 'cache-control': 'no-store' });
+  res.end(source);
+}
+
+function isApiPath(pathname) {
+  return pathname === '/api' || pathname.startsWith('/api/');
+}
+
+function isSupportedApiPath(pathname) {
+  return new Set([
+    '/api/v1/init-data',
+    '/api/v1/blocks',
+    '/api/v1/txs',
+    '/api/v1/transaction-times',
+    '/api/txs/outspends',
+    '/api/v1/historical-price',
+    '/api/v1/mempool',
+    '/api/v1/statistics/2h',
+    '/api/v1/fees/recommended',
+    '/api/v1/info',
+  ]).has(pathname) || [
+    /^\/api\/v1\/blocks\/\d+$/,
+    /^\/api\/v1\/block\/0x[a-fA-F0-9]+(?:\/summary)?$/,
+    /^\/api\/block\/0x[a-fA-F0-9]+\/txs\/\d+$/,
+    /^\/api(?:\/v1)?\/tx\/0x[a-fA-F0-9]+$/,
+    /^\/api\/tx\/0x[a-fA-F0-9]+\/status$/,
+    /^\/api\/address\/0x[a-fA-F0-9]{40}(?:\/txs)?$/,
+    /^\/api\/v1\/cpfp\/0x[a-fA-F0-9]+$/,
+    /^\/api\/v1\/tx\/0x[a-fA-F0-9]+\/rbf$/,
+    /^\/api\/v1\/mining\/pools(?:\/[^/]+)?$/,
+  ].some((pattern) => pattern.test(pathname));
+}
+
+async function serveStatic(pathname, res, spaFallback = true) {
+  if (isApiPath(pathname)) return false;
   const requested = pathname;
   const relative = path.posix.normalize(requested).replace(/^\/+/, '');
   let filePath = path.join(staticRoot, relative);
@@ -333,6 +367,8 @@ async function serveStatic(pathname, res) {
   } catch (error) {
     if (error?.code !== 'ENOENT' && error?.code !== 'EISDIR') throw error;
   }
+  if (!spaFallback) return false;
+
   // Localized builds place an index under en-US, while the default production
   // build emits it at the static root. Either layout must serve deep links.
   for (const indexPath of [
@@ -356,6 +392,13 @@ const server = http.createServer(async (req, res) => {
     const requestUrl = new URL(req.url, `http://${req.headers.host}`);
     const requestPath = requestUrl.pathname;
     if (requestPath === '/healthz') return respond(res, 200, { ok: true, provider: activeProvider });
+    if (isApiPath(requestPath) && !isSupportedApiPath(requestPath)) {
+      return respond(res, 404, { error: 'Unsupported Ethereum explorer endpoint', path: requestPath });
+    }
+    if (requestPath === '/resources/config.js' || requestPath === '/resources/customize.js') {
+      if (await serveStatic(requestPath, res, false)) return;
+      return respondJavaScript(res, requestPath.endsWith('/config.js') ? 'window.__env = window.__env || {};\n' : '');
+    }
     if (await serveStatic(requestPath, res)) return;
     const data = await snapshot();
     if (requestPath === '/api/v1/init-data') return respond(res, 200, data);

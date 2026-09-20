@@ -71,14 +71,14 @@ export class CustomDashboardComponent implements OnInit, OnDestroy, AfterViewIni
 
   goggleResolution = 82;
   goggleCycle: { index: number, name: string, mode: FilterMode, filters: string[], gradient: GradientMode }[] = [
-    { index: 0, name: $localize`:@@dfc3c34e182ea73c5d784ff7c8135f087992dac1:All`, mode: 'and', filters: [], gradient: 'age' },
-    { index: 1, name: $localize`Consolidation`, mode: 'and', filters: ['consolidation'], gradient: 'fee' },
-    { index: 2, name: $localize`Coinjoin`, mode: 'and', filters: ['coinjoin'], gradient: 'fee' },
-    { index: 3, name: $localize`Data`, mode: 'or', filters: ['inscription', 'fake_pubkey', 'fake_scripthash', 'op_return'], gradient: 'fee' },
+    { index: 0, name: $localize`:@@dfc3c34e182ea73c5d784ff7c8135f087992dac1:All`, mode: 'and', filters: [], gradient: 'category' },
+    { index: 1, name: $localize`ETH transfers`, mode: 'and', filters: ['eth_transfer'], gradient: 'category' },
+    { index: 2, name: $localize`Contract calls`, mode: 'and', filters: ['eth_contract_call'], gradient: 'category' },
+    { index: 3, name: $localize`Token transfers`, mode: 'and', filters: ['eth_token_transfer'], gradient: 'category' },
   ];
   goggleFlags = 0n;
   goggleMode: FilterMode = 'and';
-  gradientMode: GradientMode = 'age';
+  gradientMode: GradientMode = 'category';
   goggleIndex = 0;
 
   private destroy$ = new Subject();

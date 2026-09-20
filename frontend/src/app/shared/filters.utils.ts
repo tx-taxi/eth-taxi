@@ -11,7 +11,7 @@ export interface Filter {
 
 export type FilterMode = 'and' | 'or' | 'nor';
 
-export type GradientMode = 'fee' | 'age';
+export type GradientMode = 'fee' | 'age' | 'category';
 
 export interface ActiveFilter {
   mode: FilterMode,
@@ -125,10 +125,5 @@ export const TransactionFilters: { [key: string]: Filter } = {
 };
 
 export const FilterGroups: { label: string, filters: Filter[]}[] = [
-  { label: $localize`:@@885666551418fd59011ceb09d5c481095940193b:Features`, filters: ['rbf', 'no_rbf', 'v1', 'v2', 'v3', 'nonstandard'] },
-  { label: $localize`Address Types`, filters: ['p2pk', 'p2ms', 'p2pkh', 'p2sh', 'p2wpkh', 'p2wsh', 'p2tr'] },
-  { label: $localize`Behavior`, filters: ['cpfp_parent', 'cpfp_child', 'replacement', 'acceleration'] },
-  { label: $localize`Data`, filters: ['op_return', 'fake_pubkey', 'fake_scripthash', 'inscription', 'annex'] },
-  { label: $localize`Heuristics`, filters: ['coinjoin', 'consolidation', 'batch_payout'] },
-  { label: $localize`Sighash Flags`, filters: ['sighash_all', 'sighash_none', 'sighash_single', 'sighash_default', 'sighash_acp'] },
+  { label: $localize`Ethereum activity`, filters: ['eth_transfer', 'eth_contract_call', 'eth_token_transfer'] },
 ].map(group => ({ label: group.label, filters: group.filters.map(filter => TransactionFilters[filter] || null).filter(f => f != null) }));

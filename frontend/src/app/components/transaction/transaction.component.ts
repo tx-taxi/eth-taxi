@@ -135,15 +135,6 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
   liquidUnblinding = new LiquidUnblinding();
   inputIndex: number;
   outputIndex: number;
-  graphExpanded: boolean = false;
-  graphWidth: number = 1068;
-  graphHeight: number = 360;
-  inOutLimit: number = 150;
-  maxInOut: number = 0;
-  flowPrefSubscription: Subscription;
-  hideFlow: boolean = this.stateService.hideFlow.value;
-  overrideFlowPreference: boolean = null;
-  flowEnabled: boolean;
   isDetailsOpen: boolean = false;
   tooltipPosition: { x: number, y: number };
   isMobile: boolean;
@@ -170,7 +161,41 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
   isMempoolSpaceBuild = this.stateService.isMempoolSpaceBuild;
   partnerCode: string | undefined;
 
-  graphContainer: ElementRef;
+  get ethereumSender(): string {
+    return this.tx?.vin?.[0]?.prevout?.scriptpubkey_address || '';
+  }
+
+  get ethereumRecipient(): string {
+    return this.tx?.vout?.[0]?.scriptpubkey_address || '';
+  }
+
+  get ethereumTransferValue(): number {
+    return this.tx?.vout?.[0]?.value || 0;
+  }
+
+  get ethereumActivity(): string {
+    const flags = this.tx?.flags ? BigInt(this.tx.flags) : 0n;
+    if (flags & TransactionFlags.eth_token_transfer) {
+      return 'Token transfer';
+    }
+    if (!this.ethereumRecipient) {
+      return 'Contract deployment';
+    }
+    if (flags & TransactionFlags.eth_contract_call) {
+      return 'Contract call';
+    }
+    return 'ETH transfer';
+  }
+
+  get ethereumActivityClass(): string {
+    switch (this.ethereumActivity) {
+      case 'Token transfer': return 'token-transfer';
+      case 'Contract deployment': return 'contract-deployment';
+      case 'Contract call': return 'contract-call';
+      default: return 'eth-transfer';
+    }
+  }
+
   private txList: TransactionsListComponent;
 
   @ViewChild('txList')
@@ -178,14 +203,6 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
     if (component) {
       this.txList = component;
       this.txList.setDetailsOpen(this.isDetailsOpen);
-    }
-  }
-
-  @ViewChild('graphContainer')
-  set flowAnchor(element: ElementRef | null | undefined) {
-    if (element) {
-      this.graphContainer = element;
-      setTimeout(() => { this.applyFragment(); }, 0);
     }
   }
 
@@ -258,12 +275,6 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
     );
 
     this.accelerateCtaType = (this.storageService.getValue('accel-cta-type') as 'alert' | 'button') ?? 'button';
-
-    this.setFlowEnabled();
-    this.flowPrefSubscription = this.stateService.hideFlow.subscribe((hide) => {
-      this.hideFlow = !!hide;
-      this.setFlowEnabled();
-    });
 
     this.da$ = this.stateService.difficultyAdjustment$.pipe(
       tap(() => {
@@ -371,9 +382,7 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
         this.isLoadingTx = false;
         this.error = undefined;
         this.waitingForTransaction = false;
-        this.graphExpanded = false;
         this.transactionTime = tx.firstSeen || 0;
-        this.setupGraph();
 
         this.fetchRbfHistory$.next(this.tx.txid);
         this.txRbfInfoSubscription = this.stateService.txRbfInfo$.subscribe((rbfInfo) => {
@@ -704,9 +713,6 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
           this.loadingCachedTx = false;
           this.waitingForTransaction = false;
           this.websocketService.startTrackTransaction(tx.txid);
-          this.graphExpanded = false;
-          this.setupGraph();
-
           if (!tx.status?.confirmed) {
             if (tx.firstSeen) {
               this.transactionTime = tx.firstSeen;
@@ -807,17 +813,7 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
 
-    this.queryParamsSubscription = this.route.queryParams.subscribe((params) => {
-      if (params.showFlow === 'false') {
-        this.overrideFlowPreference = false;
-      } else if (params.showFlow === 'true') {
-        this.overrideFlowPreference = true;
-      } else {
-        this.overrideFlowPreference = null;
-      }
-      this.setFlowEnabled();
-      this.setGraphSize();
-    });
+    this.queryParamsSubscription = this.route.queryParams.subscribe(() => this.setViewportSize());
 
     this.mempoolBlocksSubscription = this.stateService.mempoolBlocks$.subscribe((mempoolBlocks) => {
       this.now = Date.now();
@@ -876,7 +872,7 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    this.setGraphSize();
+    this.setViewportSize();
   }
 
   toggleDetailsFromTxPage(): void {
@@ -1118,11 +1114,6 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
     this.stateService.markBlock$.next({});
   }
 
-  setupGraph() {
-    this.maxInOut = Math.min(this.inOutLimit, Math.max(this.tx?.vin?.length || 1, this.tx?.vout?.length + 1 || 1));
-    this.graphHeight = this.graphExpanded ? this.maxInOut * 15 : Math.min(360, this.maxInOut * 80);
-  }
-
   toggleCpfp() {
     this.cpfpMode = !this.cpfpMode;
     if (this.cpfpInfo?.cluster) {
@@ -1162,31 +1153,6 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
     return fragmentParams.toString() || null;
   }
 
-  toggleGraph() {
-    const showFlow = !this.flowEnabled;
-    this.stateService.hideFlow.next(!showFlow);
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { showFlow: showFlow },
-      queryParamsHandling: 'merge',
-      fragment: 'flow'
-    });
-  }
-
-  setFlowEnabled() {
-    this.flowEnabled = (this.overrideFlowPreference != null ? this.overrideFlowPreference : !this.hideFlow);
-  }
-
-  expandGraph() {
-    this.graphExpanded = true;
-    this.graphHeight = this.maxInOut * 15;
-  }
-
-  collapseGraph() {
-    this.graphExpanded = false;
-    this.graphHeight = Math.min(360, this.maxInOut * 80);
-  }
-
   // simulate normal anchor fragment behavior
   applyFragment(): void {
     const anchor = Array.from(this.fragmentParams.entries()).find(([frag, value]) => value === '');
@@ -1215,16 +1181,9 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   @HostListener('window:resize', ['$event'])
-  setGraphSize(): void {
-    this.isMobile = window.innerWidth < 850;
-    if (this.graphContainer?.nativeElement && this.stateService.isBrowser) {
-      setTimeout(() => {
-        if (this.graphContainer?.nativeElement?.clientWidth) {
-          this.graphWidth = this.graphContainer.nativeElement.clientWidth;
-        } else {
-          setTimeout(() => { this.setGraphSize(); }, 1);
-        }
-      }, 1);
+  setViewportSize(): void {
+    if (this.stateService.isBrowser) {
+      this.isMobile = window.innerWidth < 850;
     }
   }
 
@@ -1278,7 +1237,6 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
     this.txReplacedSubscription.unsubscribe();
     this.txRbfInfoSubscription.unsubscribe();
     this.queryParamsSubscription.unsubscribe();
-    this.flowPrefSubscription.unsubscribe();
     this.urlFragmentSubscription.unsubscribe();
     this.mempoolBlocksSubscription.unsubscribe();
     this.mempoolPositionSubscription.unsubscribe();

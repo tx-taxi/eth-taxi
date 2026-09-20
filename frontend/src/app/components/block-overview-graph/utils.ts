@@ -1,6 +1,14 @@
 import { feeLevels, defaultMempoolFeeColors, contrastMempoolFeeColors } from '@app/app.constants';
 import { Color } from '@components/block-overview-graph/sprite-types';
 import TxView from '@components/block-overview-graph/tx-view';
+import { TransactionFlags } from '@app/shared/filters.utils';
+
+const ethereumCategoryColors = {
+  transfer: hexToColor('627eea'),
+  contractCall: hexToColor('2ec4b6'),
+  tokenTransfer: hexToColor('f2b84b'),
+  fallback: hexToColor('68738d'),
+};
 
 export function hexToColor(hex: string): Color {
   return {
@@ -50,6 +58,21 @@ export function setOpacity(color: Color, opacity: number): Color {
     ...color,
     a: opacity
   };
+}
+
+export function ethereumCategoryColorFunction(tx: TxView): Color {
+  const flags = tx.bigintFlags || 0n;
+
+  if ((flags & TransactionFlags.eth_token_transfer) !== 0n) {
+    return ethereumCategoryColors.tokenTransfer;
+  }
+  if ((flags & TransactionFlags.eth_contract_call) !== 0n) {
+    return ethereumCategoryColors.contractCall;
+  }
+  if ((flags & TransactionFlags.eth_transfer) !== 0n) {
+    return ethereumCategoryColors.transfer;
+  }
+  return ethereumCategoryColors.fallback;
 }
 
 interface ColorPalette {
