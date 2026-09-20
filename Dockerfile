@@ -1,6 +1,9 @@
 FROM node:24-bookworm-slim AS frontend-builder
 
 WORKDIR /app/frontend
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends rsync \
+    && rm -rf /var/lib/apt/lists/*
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci
 COPY frontend ./
