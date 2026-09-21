@@ -1,0 +1,136 @@
+<section class="asf" aria-label="Account state flow">
+  <div class="asf-map">
+    <section class="asf-node">
+      <span class="asf-node-label">{{ sourceLabel }}</span>
+      <ng-container *ngIf="source as sourceActor; else unknownSource">
+        <ng-container *ngTemplateOutlet="identity; context: { $implicit: sourceActor }"></ng-container>
+      </ng-container>
+      <ng-template #unknownSource><span class="asf-empty">Unknown account</span></ng-template>
+    </section>
+
+    <section class="asf-path" aria-label="Execution flow">
+      <span class="asf-line asf-line--before" aria-hidden="true"></span>
+      <ol class="asf-stages">
+        <li
+          *ngFor="let step of steps; trackBy: trackStep"
+          class="asf-stage"
+          [class]="'asf-stage asf-stage--' + step.kind"
+          [style.--state-accent]="step.accent || null"
+        >
+          <a *ngIf="step.href; else plainStep" class="asf-stage-link" [href]="step.href" [title]="step.detail || step.label">
+            <span class="asf-stage-label">{{ step.label }}</span>
+            <span *ngIf="step.detail" class="asf-stage-detail">{{ step.detail }}</span>
+          </a>
+          <ng-template #plainStep>
+            <span class="asf-stage-label" [title]="step.detail || step.label">{{ step.label }}</span>
+            <span *ngIf="step.detail" class="asf-stage-detail">{{ step.detail }}</span>
+          </ng-template>
+        </li>
+      </ol>
+      <span class="asf-line asf-line--after" aria-hidden="true"></span>
+    </section>
+
+    <section class="asf-node asf-node--target">
+      <span class="asf-node-label">{{ targetLabel }}</span>
+      <ng-container *ngIf="target as targetActor; else unknownTarget">
+        <ng-container *ngTemplateOutlet="identity; context: { $implicit: targetActor }"></ng-container>
+      </ng-container>
+      <ng-template #unknownTarget><span class="asf-empty">No external target</span></ng-template>
+    </section>
+  </div>
+
+  <div *ngIf="assetFlows.length" class="asf-graph" aria-label="Observed asset flow">
+    <tx-bowtie-graph
+      [tx]="tx"
+      [cached]="true"
+      [width]="graphWidth"
+      [height]="graphHeight"
+      [lineLimit]="24"
+      [maxCombinedWeight]="graphMaxCombinedWeight"
+      [maxStrands]="assetFlows.length"
+      [network]="network"
+      [tooltip]="false"
+      [connectors]="false"
+      [inputIndex]="null"
+      [outputIndex]="null"
+      [assetFlows]="assetFlows"
+    ></tx-bowtie-graph>
+  </div>
+
+  <section *ngIf="changes.length || stateNotice" class="asf-list" aria-labelledby="state-changes">
+    <div class="asf-list-head">
+      <span id="state-changes">Observed changes</span>
+      <span *ngIf="changes.length">{{ changes.length | number }} events</span>
+    </div>
+
+    <div *ngIf="changes.length" class="asf-list-labels" aria-hidden="true">
+      <span>Accounts</span>
+      <span>Observed change</span>
+      <span>Effect</span>
+    </div>
+
+    <article
+      *ngFor="let change of visibleChanges; trackBy: trackChange"
+      class="asf-row"
+      [class]="'asf-row asf-row--' + change.kind"
+      [style.--state-accent]="change.accent || null"
+    >
+      <div class="asf-actors">
+        <ng-container *ngTemplateOutlet="identity; context: { $implicit: change.actor, compact: true }"></ng-container>
+        <span *ngIf="change.counterpart" class="asf-arrow" aria-hidden="true">&rarr;</span>
+        <ng-container *ngIf="change.counterpart as counterpart">
+          <ng-container *ngTemplateOutlet="identity; context: { $implicit: counterpart, compact: true }"></ng-container>
+        </ng-container>
+      </div>
+
+      <div class="asf-row-copy">
+        <span class="asf-row-label">{{ change.label }}</span>
+        <span *ngIf="change.detail" class="asf-row-detail">{{ change.detail }}</span>
+      </div>
+
+      <div class="asf-result">
+        <ng-container *ngIf="change.asset as asset">
+          <span class="asf-token" [style.--state-accent]="asset.accent || change.accent || null">
+            <span class="asf-token-logo" aria-hidden="true">
+              <img *ngIf="asset.iconUrl && !imageFailed(asset)" [src]="asset.iconUrl" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" (error)="onImageError(asset)">
+              <span *ngIf="!asset.iconUrl || imageFailed(asset)">{{ initials(asset) }}</span>
+            </span>
+            <a *ngIf="asset.href; else assetText" [href]="asset.href">{{ asset.symbol || asset.label }}</a>
+            <ng-template #assetText><span>{{ asset.symbol || asset.label }}</span></ng-template>
+          </span>
+        </ng-container>
+        <span *ngIf="change.value" class="asf-row-value" [title]="change.value">{{ change.value }}</span>
+      </div>
+    </article>
+
+    <button
+      *ngIf="hiddenChangeCount || showAllChanges"
+      type="button"
+      class="asf-list-toggle"
+      (click)="toggleChanges()"
+    >
+      {{ showAllChanges ? 'Show fewer events' : 'Show ' + hiddenChangeCount + ' more events' }}
+    </button>
+
+    <p *ngIf="stateNotice" class="asf-notice">{{ stateNotice }}</p>
+  </section>
+</section>
+
+<ng-template #identity let-actor let-compact="compact">
+  <div class="asf-id" [class.asf-id--compact]="compact">
+    <span class="asf-id-logo" aria-hidden="true">
+      <img *ngIf="actor.iconUrl && !imageFailed(actor)" [src]="actor.iconUrl" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" (error)="onImageError(actor)">
+      <span *ngIf="!actor.iconUrl || imageFailed(actor)">{{ initials(actor) }}</span>
+    </span>
+    <span class="asf-id-copy">
+      <a *ngIf="actor.href; else identityText" class="asf-id-label" [href]="actor.href" [title]="actor.address || actor.label">{{ actor.label }}</a>
+      <ng-template #identityText><span class="asf-id-label" [title]="actor.address || actor.label">{{ actor.label }}</span></ng-template>
+      <span *ngIf="actor.detail" class="asf-id-detail" [title]="actor.address || actor.detail">{{ actor.detail }}</span>
+    </span>
+    <span *ngIf="actor.badges?.length && !compact" class="asf-id-badges">
+      <span *ngFor="let badge of actor.badges" class="asf-id-badge" [class]="'asf-id-badge asf-id-badge--' + badge.tone">
+        {{ badge.label }}
+      </span>
+    </span>
+  </div>
+</ng-template>

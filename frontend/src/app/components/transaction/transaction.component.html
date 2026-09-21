@@ -122,152 +122,24 @@
       <br>
     </ng-container>
 
-    <section class="ethereum-account-flow-section" aria-labelledby="flow">
+    <section *ngIf="tx?.ethereum" class="ethereum-account-flow-section" aria-labelledby="state">
       <div class="title">
-        <h2 id="flow" class="anchor">From &amp; To</h2>
+        <h2 id="state" class="anchor">State</h2>
       </div>
 
       <div class="box ethereum-account-flow">
-        <div class="ethereum-account-flow__primary">
-          <div class="ethereum-account-flow__party">
-            <span class="ethereum-account-flow__label">From</span>
-          <ng-container *ngIf="tx?.ethereum?.from as sender; else rawEthereumSender">
-            <app-ethereum-identity
-              [entity]="sender"
-              [compact]="true"
-              [link]="ethereumIdentityLink(sender)"
-            ></app-ethereum-identity>
-          </ng-container>
-          <ng-template #rawEthereumSender>
-            <ng-container *ngIf="ethereumSender; else unknownSender">
-            <app-truncate [text]="ethereumSender" [lastChars]="8" [link]="['/address/' | relativeUrl, ethereumSender]">
-              <app-clipboard [text]="ethereumSender"></app-clipboard>
-            </app-truncate>
-            </ng-container>
-          </ng-template>
-            <ng-template #unknownSender><span class="ethereum-account-flow__value">Unknown sender</span></ng-template>
-          </div>
-
-          <div class="ethereum-account-flow__action">
-            <span class="ethereum-account-flow__connector" aria-hidden="true">
-              <fa-icon class="ethereum-account-flow__arrow" [icon]="['fas', 'arrow-alt-circle-right']" [fixedWidth]="true"></fa-icon>
-            </span>
-            <span class="ethereum-account-flow__type" [ngClass]="ethereumActivityClass">{{ ethereumActivity }}</span>
-            <span *ngIf="ethereumFlowMethod as method" class="ethereum-account-flow__method" [title]="method">{{ method }}</span>
-            <a
-              *ngIf="ethereumBlockLink(tx?.status?.block_height) as blockLink; else nextSlotEstimate"
-              class="ethereum-account-flow__block"
-              [href]="blockLink"
-            >
-              Block {{ tx?.status?.block_height | number }}
-            </a>
-            <ng-template #nextSlotEstimate>
-              <span class="ethereum-account-flow__slot">Next slot estimate</span>
-            </ng-template>
-          <ng-container *ngIf="ethereumValueWei as valueWei; else fallbackTransferAmount">
-              <span *ngIf="valueWei !== '0'" class="ethereum-account-flow__amount" [title]="formatEthereumQuantity(valueWei, '18', 36)">
-              {{ formatEthereumQuantity(valueWei, '18') }} ETH
-            </span>
-          </ng-container>
-          <ng-template #fallbackTransferAmount>
-              <app-amount *ngIf="tx?.vout?.[0]?.value > 0" class="ethereum-account-flow__amount" [satoshis]="tx.vout[0].value" [noFiat]="true" [ignoreViewMode]="true"></app-amount>
-          </ng-template>
-            <span *ngIf="tx?.ethereum?.hasError" class="ethereum-account-flow__failed">Reverted</span>
-          </div>
-
-          <div class="ethereum-account-flow__party ethereum-account-flow__destination">
-            <span class="ethereum-account-flow__label">To</span>
-          <ng-container *ngIf="tx?.ethereum?.to as recipient; else createdContract">
-            <app-ethereum-identity
-              [entity]="recipient"
-              [compact]="true"
-              [link]="ethereumIdentityLink(recipient)"
-            ></app-ethereum-identity>
-          </ng-container>
-          <ng-template #createdContract>
-            <ng-container *ngIf="tx?.ethereum?.createdContract as contract; else rawEthereumRecipient">
-              <app-ethereum-identity
-                [entity]="contract"
-                [compact]="true"
-                [link]="ethereumIdentityLink(contract)"
-              ></app-ethereum-identity>
-            </ng-container>
-          </ng-template>
-          <ng-template #rawEthereumRecipient>
-            <ng-container *ngIf="ethereumRecipient; else contractCreation">
-            <app-truncate [text]="ethereumRecipient" [lastChars]="8" [link]="['/address/' | relativeUrl, ethereumRecipient]">
-              <app-clipboard [text]="ethereumRecipient"></app-clipboard>
-            </app-truncate>
-            </ng-container>
-          </ng-template>
-            <ng-template #contractCreation><span class="ethereum-account-flow__value">New contract</span></ng-template>
-          </div>
-        </div>
-
-        <div *ngIf="ethereumAssetFlows.length > 1" class="ethereum-account-flow__diagram" aria-label="Asset transfer flow">
-          <tx-bowtie-graph
-            [tx]="tx"
-            [cached]="true"
-            [width]="ethereumFlowGraphWidth"
-            [height]="ethereumFlowGraphHeight"
-            [lineLimit]="32"
-            [maxCombinedWeight]="ethereumFlowMaxCombinedWeight"
-            [maxStrands]="ethereumAssetFlows.length"
-            [network]="network"
-            [tooltip]="false"
-            [connectors]="false"
-            [inputIndex]="null"
-            [outputIndex]="null"
-            [assetFlows]="ethereumAssetFlows"
-          ></tx-bowtie-graph>
-        </div>
-
-        <div *ngIf="tx?.ethereum?.tokenTransfers?.length" class="ethereum-account-flow__assets" aria-label="Token movements">
-          <div class="ethereum-account-flow__assets-heading">
-            <span>Token movements</span>
-            <span>{{ tx.ethereum.tokenTransfers.length | number }}</span>
-          </div>
-          <article
-            *ngFor="let transfer of ethereumVisibleTokenTransfers"
-            class="ethereum-token-transfer"
-            [style.--ethereum-token-accent]="ethereumTokenAccent(transfer.token)"
-          >
-            <div class="ethereum-token-transfer__asset">
-              <app-ethereum-identity
-                [entity]="transfer.token"
-                [compact]="true"
-                [link]="ethereumTokenLink(transfer.token.address)"
-              ></app-ethereum-identity>
-              <span class="ethereum-token-transfer__amount" [title]="ethereumTransferExactAmount(transfer)">
-                {{ ethereumTransferAmount(transfer) }}
-              </span>
-            </div>
-
-            <div class="ethereum-token-transfer__parties">
-              <app-ethereum-identity
-                [entity]="transfer.from"
-                [compact]="true"
-                [link]="ethereumIdentityLink(transfer.from)"
-              ></app-ethereum-identity>
-              <fa-icon class="ethereum-token-transfer__arrow" [icon]="['fas', 'arrow-alt-circle-right']" [fixedWidth]="true"></fa-icon>
-              <app-ethereum-identity
-                *ngIf="transfer.to as recipient; else createdTokenContract"
-                [entity]="recipient"
-                [compact]="true"
-                [link]="ethereumIdentityLink(recipient)"
-              ></app-ethereum-identity>
-              <ng-template #createdTokenContract><span class="ethereum-token-transfer__missing">Contract creation</span></ng-template>
-            </div>
-          </article>
-          <button
-            *ngIf="ethereumHiddenTokenTransferCount || showAllEthereumTokenTransfers"
-            type="button"
-            class="ethereum-token-transfer__toggle"
-            (click)="toggleEthereumTokenTransfers()"
-          >
-            {{ showAllEthereumTokenTransfers ? 'Show fewer movements' : 'Show ' + ethereumHiddenTokenTransferCount + ' more movements' }}
-          </button>
-        </div>
+        <app-account-state-flow
+          [tx]="tx"
+          [network]="network"
+          [isMobile]="isMobile"
+          [source]="ethereumStateSource"
+          [target]="ethereumStateTarget"
+          [targetLabel]="ethereumStateTargetLabel"
+          [steps]="ethereumStateSteps"
+          [changes]="ethereumStateChanges"
+          [assetFlows]="ethereumAssetFlows"
+          [stateNotice]="ethereumStateNotice"
+        ></app-account-state-flow>
       </div>
     </section>
 
