@@ -201,6 +201,11 @@
                   "glob": "eth-favicon.svg",
                   "input": "src/resources",
                   "output": "/resources"
+                },
+                {
+                  "glob": "mempool-original.css",
+                  "input": "src/resources",
+                  "output": "/resources"
                 }
               ],
               "fileReplacements": [
