@@ -47,6 +47,12 @@ export class MiningPoolComponent implements OnInit, OnDestroy {
     return `/resources/mining-pools/${this.slug}${this.useLightLogo ? '.light' : ''}.svg`;
   }
 
+  get shouldRenderLogo(): boolean {
+    // Ethereum block producers are validator addresses, not named mining
+    // pools. Rendering a fabricated pool asset here creates a broken image.
+    return this.slug !== 'ethereum-validator';
+  }
+
   get logoAlt(): string {
     return this.name ? `Logo of ${this.name} mining pool` : 'Mining pool logo';
   }

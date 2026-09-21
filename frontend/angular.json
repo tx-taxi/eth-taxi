@@ -196,7 +196,12 @@
             "production": {
               "assets": [
                 "src/favicon.ico",
-                "src/robots.txt"
+                "src/robots.txt",
+                {
+                  "glob": "eth-favicon.svg",
+                  "input": "src/resources",
+                  "output": "/resources"
+                }
               ],
               "fileReplacements": [
                 {

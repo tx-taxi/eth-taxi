@@ -13,6 +13,7 @@ import { BlockSizesWeightsGraphComponent } from '@components/block-sizes-weights
 import { FeeDistributionGraphComponent } from '@components/fee-distribution-graph/fee-distribution-graph.component';
 import { IncomingTransactionsGraphComponent } from '@components/incoming-transactions-graph/incoming-transactions-graph.component';
 import { EthereumGasMarketGraphComponent } from '@components/ethereum-gas-market-graph/ethereum-gas-market-graph.component';
+import { EthereumTokenComponent } from '@components/ethereum-token/ethereum-token.component';
 import { MempoolGraphComponent } from '@components/mempool-graph/mempool-graph.component';
 import { LbtcPegsGraphComponent } from '@components/lbtc-pegs-graph/lbtc-pegs-graph.component';
 import { ReservesSupplyStatsComponent } from '@components/liquid-reserves-audit/reserves-supply-stats/reserves-supply-stats.component';
@@ -76,6 +77,7 @@ import { AsmStylerPipe } from '@app/shared/pipes/asm-styler/asm-styler.pipe';
     FeeDistributionGraphComponent,
     IncomingTransactionsGraphComponent,
     EthereumGasMarketGraphComponent,
+    EthereumTokenComponent,
     MempoolGraphComponent,
     LbtcPegsGraphComponent,
     ReservesSupplyStatsComponent,

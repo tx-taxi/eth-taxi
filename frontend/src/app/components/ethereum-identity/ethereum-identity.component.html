@@ -1,0 +1,60 @@
+<div
+  class="ethereum-identity"
+  [class.ethereum-identity--compact]="compact"
+  [class.ethereum-identity--flagged]="entity?.isScam"
+>
+  <div class="ethereum-identity__logo" aria-hidden="true">
+    <img
+      *ngIf="iconUrl && !imageFailed"
+      [src]="iconUrl"
+      alt=""
+      loading="lazy"
+      decoding="async"
+      referrerpolicy="no-referrer"
+      (error)="onImageError()"
+    >
+    <span *ngIf="!iconUrl || imageFailed">{{ initials }}</span>
+  </div>
+
+  <div class="ethereum-identity__content">
+    <a
+      *ngIf="link; else unlinkedIdentity"
+      class="ethereum-identity__labels ethereum-identity__link"
+      [href]="link"
+      [attr.aria-label]="accessibleLabel"
+    >
+      <span class="ethereum-identity__primary">{{ primaryLabel }}</span>
+      <span *ngIf="secondaryLabel" class="ethereum-identity__secondary" [title]="entity?.address || secondaryLabel">
+        {{ secondaryLabel }}
+      </span>
+    </a>
+
+    <ng-template #unlinkedIdentity>
+      <span class="ethereum-identity__labels">
+        <span class="ethereum-identity__primary">{{ primaryLabel }}</span>
+        <span *ngIf="secondaryLabel" class="ethereum-identity__secondary" [title]="entity?.address || secondaryLabel">
+          {{ secondaryLabel }}
+        </span>
+      </span>
+    </ng-template>
+
+    <span *ngIf="entity?.tokenSymbol && entity?.tokenSymbol !== primaryLabel" class="ethereum-identity__symbol">
+      {{ entity?.tokenSymbol }}
+    </span>
+
+    <span class="ethereum-identity__badges" *ngIf="entity?.isVerified || entity?.proxyType || entity?.isContract || entity?.isScam">
+      <span *ngIf="entity?.isVerified" class="ethereum-identity__badge ethereum-identity__badge--verified" aria-label="Verified entity">
+        Verified
+      </span>
+      <span *ngIf="entity?.proxyType" class="ethereum-identity__badge ethereum-identity__badge--proxy" [attr.aria-label]="proxyLabel" [title]="proxyLabel">
+        Proxy
+      </span>
+      <span *ngIf="entity?.isContract" class="ethereum-identity__badge ethereum-identity__badge--contract" aria-label="Smart contract">
+        Contract
+      </span>
+      <span *ngIf="entity?.isScam" class="ethereum-identity__badge ethereum-identity__badge--scam" [attr.aria-label]="scamLabel" [title]="scamLabel">
+        Scam
+      </span>
+    </span>
+  </div>
+</div>

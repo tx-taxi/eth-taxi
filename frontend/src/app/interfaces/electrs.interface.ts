@@ -1,6 +1,7 @@
 import { Price } from '@app/services/price.service';
 import { IChannel } from '@interfaces/node-api.interface';
 import { ParsedTaproot } from '../shared/transaction.utils';
+import { EthereumAddressMetadata, EthereumTransactionMetadata } from './ethereum-api.interface';
 
 export interface Transaction {
   txid: string;
@@ -35,6 +36,7 @@ export interface Transaction {
   flags?: bigint;
   largeInput?: boolean;
   largeOutput?: boolean;
+  ethereum?: EthereumTransactionMetadata;
 }
 
 export interface TransactionChannels {
@@ -148,6 +150,7 @@ export interface Address {
   chain_stats: ChainStats;
   mempool_stats: MempoolStats;
   is_pubkey?: boolean;
+  ethereum?: EthereumAddressMetadata;
 }
 
 export interface ScriptHash {

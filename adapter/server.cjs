@@ -69,6 +69,184 @@ function gwei(value) {
   }
 }
 
+function decimalString(value, fallback = '0') {
+  try {
+    const parsed = BigInt(value ?? fallback);
+    return parsed >= 0n ? parsed.toString() : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function nullableString(value) {
+  return value === undefined || value === null || value === '' ? null : String(value);
+}
+
+function safeIconUrl(value) {
+  if (typeof value !== 'string') return null;
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' ? url.href : null;
+  } catch {
+    return null;
+  }
+}
+
+function tagNames(entity) {
+  const tags = [
+    ...(Array.isArray(entity?.metadata?.tags) ? entity.metadata.tags : []),
+    ...(Array.isArray(entity?.public_tags) ? entity.public_tags : []),
+  ];
+  return Array.from(new Set(tags
+    .map((tag) => typeof tag === 'string' ? tag : tag?.name)
+    .filter((tag) => typeof tag === 'string' && tag.length > 0)))
+    .slice(0, 4);
+}
+
+function mapEthereumToken(token, fallbackAddress = '') {
+  if (!token) return null;
+  return {
+    address: token.address_hash || token.address || fallbackAddress,
+    name: nullableString(token.name),
+    symbol: nullableString(token.symbol),
+    type: nullableString(token.type) || 'Token',
+    decimals: nullableString(token.decimals),
+    iconUrl: safeIconUrl(token.icon_url),
+    totalSupply: nullableString(token.total_supply),
+    circulatingSupply: nullableString(token.circulating_supply),
+    holdersCount: nullableString(token.holders_count),
+    exchangeRate: nullableString(token.exchange_rate),
+    marketCap: nullableString(token.circulating_market_cap || token.market_cap),
+    volume24h: nullableString(token.volume_24h),
+    reputation: nullableString(token.reputation),
+  };
+}
+
+function mapEthereumIdentity(entity, fallbackAddress = '') {
+  const tags = tagNames(entity);
+  const nameTag = (entity?.metadata?.tags || []).find((tag) => tag?.tagType === 'name')?.name;
+  const token = mapEthereumToken(entity?.token, entity?.hash || entity?.address_hash || fallbackAddress);
+  return {
+    address: entity?.hash || entity?.address_hash || entity?.address || fallbackAddress,
+    name: nullableString(entity?.name || nameTag || token?.name),
+    ensName: nullableString(entity?.ens_domain_name),
+    iconUrl: token?.iconUrl || null,
+    isContract: Boolean(entity?.is_contract),
+    isVerified: Boolean(entity?.is_verified),
+    isScam: Boolean(entity?.is_scam),
+    reputation: nullableString(entity?.reputation),
+    proxyType: nullableString(entity?.proxy_type),
+    implementationAddress: nullableString(entity?.implementations?.[0]?.address_hash),
+    tags,
+  };
+}
+
+function mapEthereumTokenTransfer(transfer) {
+  const token = mapEthereumToken(transfer?.token, transfer?.token?.address_hash || '');
+  return {
+    transactionHash: nullableString(transfer?.transaction_hash) || '',
+    logIndex: nullableString(transfer?.log_index),
+    blockNumber: nullableString(transfer?.block_number),
+    timestamp: nullableString(transfer?.timestamp),
+    from: mapEthereumIdentity(transfer?.from),
+    to: transfer?.to ? mapEthereumIdentity(transfer.to) : null,
+    token: token || {
+      address: '',
+      name: null,
+      symbol: null,
+      type: 'Token',
+      decimals: null,
+      iconUrl: null,
+      totalSupply: null,
+      circulatingSupply: null,
+      holdersCount: null,
+      exchangeRate: null,
+      marketCap: null,
+      volume24h: null,
+      reputation: null,
+    },
+    tokenId: nullableString(transfer?.token_id),
+    value: decimalString(transfer?.total?.value ?? transfer?.value),
+    type: nullableString(transfer?.type) || 'token_transfer',
+    method: nullableString(transfer?.method),
+  };
+}
+
+function mapEthereumTokenBalance(balance) {
+  const token = mapEthereumToken(balance?.token, balance?.token?.address_hash || '');
+  if (!token?.address) return null;
+  return {
+    token,
+    value: decimalString(balance?.value),
+  };
+}
+
+function mapDecodedInput(input) {
+  if (!input || typeof input !== 'object') return null;
+  return {
+    methodCall: nullableString(input.method_call),
+    methodId: nullableString(input.method_id),
+    parameters: (Array.isArray(input.parameters) ? input.parameters : []).map((parameter) => ({
+      name: nullableString(parameter?.name) || '',
+      type: nullableString(parameter?.type) || '',
+      value: parameter?.value,
+    })),
+  };
+}
+
+function mapEthereumTransactionMetadata(tx, blockHash) {
+  return {
+    hash: tx.hash || '',
+    status: nullableString(tx.status) || 'unknown',
+    result: nullableString(tx.result),
+    blockNumber: nullableString(tx.block_number),
+    blockHash: nullableString(blockHash || tx.block_hash),
+    blockTimestamp: nullableString(tx.timestamp),
+    confirmations: nullableString(tx.confirmations),
+    transactionIndex: nullableString(tx.position),
+    from: mapEthereumIdentity(tx.from),
+    to: tx.to ? mapEthereumIdentity(tx.to) : null,
+    createdContract: tx.created_contract ? mapEthereumIdentity(tx.created_contract) : null,
+    valueWei: decimalString(tx.value),
+    feeWei: tx.fee?.value === undefined ? null : decimalString(tx.fee.value),
+    gasLimit: decimalString(tx.gas_limit),
+    gasUsed: tx.gas_used === undefined ? null : decimalString(tx.gas_used),
+    gasPriceWei: tx.gas_price === undefined ? null : decimalString(tx.gas_price),
+    maxFeePerGasWei: tx.max_fee_per_gas === undefined ? null : decimalString(tx.max_fee_per_gas),
+    maxPriorityFeePerGasWei: tx.max_priority_fee_per_gas === undefined ? null : decimalString(tx.max_priority_fee_per_gas),
+    baseFeePerGasWei: tx.base_fee_per_gas === undefined ? null : decimalString(tx.base_fee_per_gas),
+    burntFeeWei: tx.transaction_burnt_fee === undefined ? null : decimalString(tx.transaction_burnt_fee),
+    priorityFeeWei: tx.priority_fee === undefined ? null : decimalString(tx.priority_fee),
+    nonce: decimalString(tx.nonce),
+    type: nullableString(tx.type),
+    method: nullableString(tx.method),
+    input: nullableString(tx.raw_input) || '0x',
+    decodedInput: mapDecodedInput(tx.decoded_input),
+    tokenTransfers: (Array.isArray(tx.token_transfers) ? tx.token_transfers : []).map(mapEthereumTokenTransfer),
+    tokenTransfersOverflow: Boolean(tx.token_transfers_overflow),
+    revertReason: nullableString(tx.revert_reason),
+    hasError: Boolean(tx.has_error || tx.has_error_in_internal_transactions || tx.status === 'error' || tx.result === 'error'),
+  };
+}
+
+function mapEthereumAddressMetadata(details, counters, address, tokenBalances = []) {
+  return {
+    identity: mapEthereumIdentity(details, address),
+    token: mapEthereumToken(details?.token, address),
+    balanceWei: decimalString(details?.coin_balance),
+    exchangeRate: nullableString(details?.exchange_rate),
+    creatorAddress: nullableString(details?.creator_address_hash),
+    creationTransactionHash: nullableString(details?.creation_tx_hash),
+    counters: {
+      transactions: nullableString(counters?.transactions_count),
+      tokenTransfers: nullableString(counters?.token_transfers_count),
+      internalTransactions: nullableString(counters?.internal_transactions_count),
+      gasUsed: nullableString(counters?.gas_usage_count),
+    },
+    tokenBalances: tokenBalances.map(mapEthereumTokenBalance).filter(Boolean).slice(0, 12),
+  };
+}
+
 function gweiToWei(value) {
   return Math.round(number(value) * 1_000_000_000);
 }
@@ -165,6 +343,7 @@ function mapTransactionDetail(tx, blockHash) {
   const rawInput = tx.raw_input || '0x';
   return {
     ...transaction,
+    ethereum: mapEthereumTransactionMetadata(tx, blockHash),
     // Blockscout supplies a timestamp for pending transactions. Preserve it so
     // the inherited first-seen component does not retry an unavailable
     // Bitcoin-specific endpoint indefinitely.
@@ -292,18 +471,21 @@ async function transactionById(id) {
 }
 
 async function addressById(address) {
-  const [details, transactions] = await Promise.all([
+  const [details, transactions, counters, tokens] = await Promise.all([
     providerJson(`/api/v2/addresses/${encodeURIComponent(address)}`),
     providerJson(`/api/v2/addresses/${encodeURIComponent(address)}/transactions`),
+    providerJson(`/api/v2/addresses/${encodeURIComponent(address)}/counters`).catch(() => ({})),
+    providerJson(`/api/v2/addresses/${encodeURIComponent(address)}/tokens`).catch(() => ({ items: [] })),
   ]);
   const balance = wei(details.coin_balance);
-  const transactionCount = (transactions.items || []).length;
+  const transactionCount = number(counters.transactions_count, (transactions.items || []).length);
   return {
     // Marks this non-UTXO compatibility view so the frontend suppresses BTC-only rows.
     electrum: true,
     address: details.hash || address,
     chain_stats: { funded_txo_count: 0, funded_txo_sum: balance, spent_txo_count: 0, spent_txo_sum: 0, tx_count: transactionCount },
     mempool_stats: { funded_txo_count: 0, funded_txo_sum: 0, spent_txo_count: 0, spent_txo_sum: 0, tx_count: 0 },
+    ethereum: mapEthereumAddressMetadata(details, counters, address, tokens.items || []),
   };
 }
 
@@ -317,6 +499,33 @@ async function blockTransactions(blockId, start = 0) {
   return (response.items || [])
     .slice(start, start + 25)
     .map((transaction) => mapTransactionDetail(transaction, blockId));
+}
+
+async function ethereumAddressMetadata(address) {
+  const [details, counters, tokens] = await Promise.all([
+    providerJson(`/api/v2/addresses/${encodeURIComponent(address)}`),
+    providerJson(`/api/v2/addresses/${encodeURIComponent(address)}/counters`).catch(() => ({})),
+    providerJson(`/api/v2/addresses/${encodeURIComponent(address)}/tokens`).catch(() => ({ items: [] })),
+  ]);
+  return mapEthereumAddressMetadata(details, counters, address, tokens.items || []);
+}
+
+async function ethereumToken(address) {
+  const token = await providerJson(`/api/v2/tokens/${encodeURIComponent(address)}`);
+  return mapEthereumToken(token, address);
+}
+
+async function ethereumTokenTransfers(address, searchParams) {
+  const query = new URLSearchParams();
+  for (const key of ['block_number', 'index', 'items_count']) {
+    const value = searchParams.get(key);
+    if (value && /^[0-9]+$/.test(value)) query.set(key, value);
+  }
+  const response = await providerJson(`/api/v2/tokens/${encodeURIComponent(address)}/transfers${query.size ? `?${query}` : ''}`);
+  return {
+    items: (response.items || []).map(mapEthereumTokenTransfer),
+    nextPageParams: response.next_page_params || null,
+  };
 }
 
 async function snapshot(force = false) {
@@ -411,6 +620,9 @@ function isSupportedApiPath(pathname) {
     /^\/api(?:\/v1)?\/tx\/0x[a-fA-F0-9]+$/,
     /^\/api\/tx\/0x[a-fA-F0-9]+\/status$/,
     /^\/api\/address\/0x[a-fA-F0-9]{40}(?:\/txs)?$/,
+    /^\/api\/v1\/ethereum\/address\/0x[a-fA-F0-9]{40}$/,
+    /^\/api\/v1\/ethereum\/token\/0x[a-fA-F0-9]{40}(?:\/transfers)?$/,
+    /^\/api\/v1\/ethereum\/transaction\/0x[a-fA-F0-9]+$/,
     /^\/api\/v1\/cpfp\/0x[a-fA-F0-9]+$/,
     /^\/api\/v1\/tx\/0x[a-fA-F0-9]+\/rbf$/,
     /^\/api\/v1\/mining\/pools(?:\/[^/]+)?$/,
@@ -473,6 +685,22 @@ const server = http.createServer(async (req, res) => {
       return respondJavaScript(res, requestPath.endsWith('/config.js') ? 'window.__env = window.__env || {};\n' : '');
     }
     if (await serveStatic(requestPath, res)) return;
+    const ethereumAddressMatch = requestPath.match(/^\/api\/v1\/ethereum\/address\/(0x[a-fA-F0-9]{40})$/);
+    if (ethereumAddressMatch) return respond(res, 200, await ethereumAddressMetadata(ethereumAddressMatch[1]));
+    const ethereumTokenTransfersMatch = requestPath.match(/^\/api\/v1\/ethereum\/token\/(0x[a-fA-F0-9]{40})\/transfers$/);
+    if (ethereumTokenTransfersMatch) return respond(res, 200, await ethereumTokenTransfers(ethereumTokenTransfersMatch[1], requestUrl.searchParams));
+    const ethereumTokenMatch = requestPath.match(/^\/api\/v1\/ethereum\/token\/(0x[a-fA-F0-9]{40})$/);
+    if (ethereumTokenMatch) return respond(res, 200, await ethereumToken(ethereumTokenMatch[1]));
+    const ethereumTransactionMatch = requestPath.match(/^\/api\/v1\/ethereum\/transaction\/(0x[a-fA-F0-9]+)$/);
+    if (ethereumTransactionMatch) return respond(res, 200, (await transactionById(ethereumTransactionMatch[1])).ethereum);
+    const transactionMatch = requestPath.match(/^\/(?:api(?:\/v1)?)?\/tx\/(0x[a-fA-F0-9]+)$/);
+    if (transactionMatch) return respond(res, 200, await transactionById(transactionMatch[1]));
+    const addressTransactionsMatch = requestPath.match(/^\/api\/address\/(0x[a-fA-F0-9]{40})\/txs$/);
+    if (addressTransactionsMatch) return respond(res, 200, await addressTransactions(addressTransactionsMatch[1]));
+    const addressMatch = requestPath.match(/^\/api\/address\/(0x[a-fA-F0-9]{40})$/);
+    if (addressMatch) return respond(res, 200, await addressById(addressMatch[1]));
+    const statusMatch = requestPath.match(/^\/api\/tx\/(0x[a-fA-F0-9]+)\/status$/);
+    if (statusMatch) return respond(res, 200, (await transactionById(statusMatch[1])).status);
     const data = await snapshot();
     if (requestPath === '/api/v1/init-data') return respond(res, 200, data);
     if (requestPath === '/api/v1/blocks') return respond(res, 200, data.blocks);
@@ -485,14 +713,6 @@ const server = http.createServer(async (req, res) => {
     if (blockSummaryMatch) return respond(res, 200, await blockTransactions(blockSummaryMatch[1]));
     const blockTransactionsMatch = requestPath.match(/^\/api\/block\/(0x[a-fA-F0-9]+)\/txs\/(\d+)$/);
     if (blockTransactionsMatch) return respond(res, 200, await blockTransactions(blockTransactionsMatch[1], Number(blockTransactionsMatch[2])));
-    const transactionMatch = requestPath.match(/^\/(?:api(?:\/v1)?)?\/tx\/(0x[a-fA-F0-9]+)$/);
-    if (transactionMatch) return respond(res, 200, await transactionById(transactionMatch[1]));
-    const addressTransactionsMatch = requestPath.match(/^\/api\/address\/(0x[a-fA-F0-9]{40})\/txs$/);
-    if (addressTransactionsMatch) return respond(res, 200, await addressTransactions(addressTransactionsMatch[1]));
-    const addressMatch = requestPath.match(/^\/api\/address\/(0x[a-fA-F0-9]{40})$/);
-    if (addressMatch) return respond(res, 200, await addressById(addressMatch[1]));
-    const statusMatch = requestPath.match(/^\/api\/tx\/(0x[a-fA-F0-9]+)\/status$/);
-    if (statusMatch) return respond(res, 200, (await transactionById(statusMatch[1])).status);
     if (requestPath === '/api/v1/transaction-times') {
       return respond(res, 200, requestUrl.searchParams.getAll('txId[]').map((id) => data.transactions.find((tx) => tx.txid === id)?.time || Math.floor(Date.now() / 1000)));
     }

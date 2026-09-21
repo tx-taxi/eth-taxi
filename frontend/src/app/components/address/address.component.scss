@@ -94,6 +94,153 @@ h1 {
   }
 }
 
+.ethereum-address-profile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  margin: 0 0 1rem;
+  padding: 0.75rem 0 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.ethereum-address-meta {
+  display: flex;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.6rem 1rem;
+  min-width: 0;
+}
+
+.ethereum-address-meta__item {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  color: var(--transparent-fg);
+  font-size: 0.75rem;
+  line-height: 1.2;
+}
+
+.ethereum-address-meta__item strong {
+  overflow: hidden;
+  color: var(--fg);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ethereum-address-meta__link {
+  max-width: 12rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.ethereum-address-meta__link:hover strong,
+.ethereum-address-meta__link:focus-visible strong {
+  color: var(--link-hover-color);
+  text-decoration: underline;
+}
+
+.ethereum-address-meta__link:focus-visible {
+  border-radius: 2px;
+  outline: 2px solid var(--info);
+  outline-offset: 3px;
+}
+
+.ethereum-address-tokens {
+  margin: 0 0 1rem;
+}
+
+.ethereum-address-tokens__heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.ethereum-address-tokens__heading h2 {
+  margin: 0;
+  color: var(--title-fg);
+  font-size: 1.125rem;
+  line-height: 1.2;
+}
+
+.ethereum-address-tokens__heading span {
+  color: var(--transparent-fg);
+  font-size: 0.75rem;
+}
+
+.ethereum-address-tokens__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  border-top: 1px solid var(--border-subtle);
+  border-left: 1px solid var(--border-subtle);
+}
+
+.ethereum-address-token {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 0.7rem 0.85rem;
+  border-right: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--stat-box-bg);
+  color: inherit;
+  text-decoration: none;
+}
+
+.ethereum-address-token:nth-child(even) {
+  background: var(--box-bg);
+}
+
+.ethereum-address-token:hover,
+.ethereum-address-token:focus-visible {
+  background: color-mix(in srgb, var(--primary) 9%, var(--stat-box-bg));
+}
+
+.ethereum-address-token:focus-visible {
+  outline: 2px solid var(--info);
+  outline-offset: -2px;
+}
+
+.ethereum-address-token app-ethereum-identity {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ethereum-address-token strong {
+  flex: 0 1 auto;
+  max-width: 55%;
+  overflow: hidden;
+  color: var(--title-fg);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 767.98px) {
+  .ethereum-address-profile {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .ethereum-address-meta {
+    justify-content: flex-start;
+  }
+
+  .ethereum-address-tokens__list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .title-tx {
   h2 {
     line-height: 1;

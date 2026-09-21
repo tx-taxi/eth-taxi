@@ -104,15 +104,23 @@
                         </ng-template>
                       </ng-template>
                       <ng-template #defaultAddress>
-                        <app-address-text
-                          *ngIf="vin.prevout.scriptpubkey_address; else vinScriptPubkeyType"
-                          [address]="vin.prevout.scriptpubkey_address"
-                          [similarity]="similarityMatches.get(tx.txid)?.get(vin.prevout.scriptpubkey_address)"
-                        ></app-address-text>
+                        <app-ethereum-identity
+                          *ngIf="tx.ethereum?.from as sender; else defaultVinAddress"
+                          [entity]="sender"
+                          [compact]="true"
+                          [link]="'/address/' + sender.address"
+                        ></app-ethereum-identity>
+                        <ng-template #defaultVinAddress>
+                          <app-address-text
+                            *ngIf="vin.prevout.scriptpubkey_address; else vinScriptPubkeyType"
+                            [address]="vin.prevout.scriptpubkey_address"
+                            [similarity]="similarityMatches.get(tx.txid)?.get(vin.prevout.scriptpubkey_address)"
+                          ></app-address-text>
+                        </ng-template>
                         <ng-template #vinScriptPubkeyType>
                           {{ vin.prevout.scriptpubkey_type?.toUpperCase() }}
                         </ng-template>
-                        <div>
+                        <div *ngIf="!tx.ethereum">
                           <app-address-labels  [vin]="vin" [channel]="tx._channels && tx._channels.inputs[vindex] ? tx._channels.inputs[vindex] : null"></app-address-labels>
                         </div>
                       </ng-template>
@@ -329,11 +337,19 @@
                 'sigged': selectedSig && selectedSig.txIndex === i && sigHighlights.vout[vindex],
               }">
                 <td class="address-cell">
-                  <app-address-text
-                    *ngIf="vout.scriptpubkey_address; else pubkey_type"
-                    [address]="vout.scriptpubkey_address"
-                    [similarity]="similarityMatches.get(tx.txid)?.get(vout.scriptpubkey_address)"
-                  ></app-address-text>
+                  <app-ethereum-identity
+                    *ngIf="tx.ethereum?.to as recipient; else defaultVoutAddress"
+                    [entity]="recipient"
+                    [compact]="true"
+                    [link]="'/address/' + recipient.address"
+                  ></app-ethereum-identity>
+                  <ng-template #defaultVoutAddress>
+                    <app-address-text
+                      *ngIf="vout.scriptpubkey_address; else pubkey_type"
+                      [address]="vout.scriptpubkey_address"
+                      [similarity]="similarityMatches.get(tx.txid)?.get(vout.scriptpubkey_address)"
+                    ></app-address-text>
+                  </ng-template>
                   <ng-template #pubkey_type>
                     <ng-container *ngIf="vout.scriptpubkey_type === 'p2pk'; else scriptpubkey_type">
                       P2PK <a class="address p2pk-address" [routerLink]="['/address/' | relativeUrl, vout.scriptpubkey.slice(2, -2)]" title="{{ vout.scriptpubkey.slice(2, -2) }}">
@@ -341,7 +357,7 @@
                       </a>
                     </ng-container>
                   </ng-template>
-                  <div>
+                  <div *ngIf="!tx.ethereum">
                     <app-address-labels [vout]="vout" [channel]="tx._channels && tx._channels.outputs[vindex] ? tx._channels.outputs[vindex] : null"></app-address-labels>
                   </div>
                   <ng-template #scriptpubkey_type>
@@ -396,7 +412,22 @@
                     </ng-template>
                   </ng-template>
                   <ng-template #defaultOutput>
-                    <app-amount [blockConversion]="tx.price" [satoshis]="vout.value"></app-amount>
+                    <ng-container *ngIf="tx.ethereum?.tokenTransfers?.[0] as transfer; else nativeAmount">
+                      <span class="ethereum-list-token-amount" [title]="formatEthereumTransferAmount(transfer, 36)">
+                        {{ formatEthereumTransferAmount(transfer) }} {{ transfer.token.symbol || 'tokens' }}
+                      </span>
+                      <span *ngIf="tx.ethereum.tokenTransfers.length > 1" class="ethereum-list-token-extra">
+                        +{{ tx.ethereum.tokenTransfers.length - 1 }}
+                      </span>
+                    </ng-container>
+                    <ng-template #nativeAmount>
+                      <ng-container *ngIf="ethereumListSummary(tx) as activity; else nativeEthAmount">
+                        <span class="ethereum-list-activity">{{ activity }}</span>
+                      </ng-container>
+                      <ng-template #nativeEthAmount>
+                        <app-amount [blockConversion]="tx.price" [satoshis]="vout.value"></app-amount>
+                      </ng-template>
+                    </ng-template>
                   </ng-template>
                 </td>
                 <td class="arrow-td">
@@ -543,7 +574,7 @@
           </ng-template>
         </button>
         <ng-template #viewingAddress>
-          <button type="button" class="btn btn-sm mt-2 ms-2" (click)="switchCurrency()" [ngClass]="{'btn-success': tx['addressValue'] >= 0, 'btn-danger': tx['addressValue'] < 0}">
+          <button *ngIf="!tx.ethereum" type="button" class="btn btn-sm mt-2 ms-2" (click)="switchCurrency()" [ngClass]="{'btn-success': tx['addressValue'] >= 0, 'btn-danger': tx['addressValue'] < 0}">
             <app-amount [blockConversion]="tx.price" [satoshis]="tx['addressValue']" [addPlus]="true" [unitStyle]="{color: '#ffffffbb'}"></app-amount>
           </button>
         </ng-template>

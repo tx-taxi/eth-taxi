@@ -13,6 +13,7 @@ import { SeoService } from '@app/services/seo.service';
 import { AddressInformation } from '@interfaces/node-api.interface';
 import { AddressTypeInfo } from '@app/shared/address-utils';
 import { extractTapLeaves, fillTapTree, convertTextToBuffer, PsbtKeyValue } from '@app/shared/transaction.utils';
+import { RelativeUrlPipe } from '@app/shared/pipes/relative-url/relative-url.pipe';
 
 class AddressStats implements ChainStats {
   address: string;
@@ -150,7 +151,68 @@ export class AddressComponent implements OnInit, OnDestroy {
     private apiService: ApiService,
     private seoService: SeoService,
     private formBuilder: UntypedFormBuilder,
+    private relativeUrlPipe: RelativeUrlPipe,
   ) { }
+
+  get ethereumAddressTokenLink(): string | null {
+    const tokenAddress = this.address?.ethereum?.token?.address;
+    return this.ethereumTokenLink(tokenAddress);
+  }
+
+  ethereumAddressLink(address: string | null | undefined): string | null {
+    return address ? `${this.relativeUrlPipe.transform('/address/')}${address}` : null;
+  }
+
+  ethereumTokenLink(address: string | null | undefined): string | null {
+    return address ? `${this.relativeUrlPipe.transform('/token/')}${address}` : null;
+  }
+
+  abbreviateEthereumAddress(address: string | null | undefined): string {
+    if (!address || address.length <= 16) {
+      return address || '';
+    }
+    return `${address.slice(0, 8)}...${address.slice(-6)}`;
+  }
+
+  formatEthereumTokenAmount(value: string | null | undefined, decimals: string | null | undefined, maxFractionDigits = 8): string {
+    const normalizedValue = this.normalizeEthereumInteger(value);
+    const decimalPlaces = this.parseEthereumDecimals(decimals);
+    if (normalizedValue === null || decimalPlaces === null) {
+      return 'Unavailable';
+    }
+
+    const amount = BigInt(normalizedValue);
+    if (decimalPlaces === 0) {
+      return this.groupEthereumInteger(amount.toString());
+    }
+
+    const divisor = 10n ** BigInt(decimalPlaces);
+    const whole = amount / divisor;
+    const remainder = amount % divisor;
+    let fraction = remainder.toString().padStart(decimalPlaces, '0').replace(/0+$/, '');
+    if (fraction.length > maxFractionDigits) {
+      fraction = fraction.slice(0, maxFractionDigits).replace(/0+$/, '');
+    }
+    return fraction ? `${this.groupEthereumInteger(whole.toString())}.${fraction}` : this.groupEthereumInteger(whole.toString());
+  }
+
+  private normalizeEthereumInteger(value: string | null | undefined): string | null {
+    const normalized = value?.trim();
+    return normalized && /^\d+$/.test(normalized) ? BigInt(normalized).toString() : null;
+  }
+
+  private parseEthereumDecimals(value: string | null | undefined): number | null {
+    const normalized = value?.trim();
+    if (!normalized || !/^\d+$/.test(normalized)) {
+      return 0;
+    }
+    const decimals = BigInt(normalized);
+    return decimals <= 255n ? Number(decimals) : null;
+  }
+
+  private groupEthereumInteger(value: string): string {
+    return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
 
   ngOnInit(): void {
     this.network = this.stateService.network;

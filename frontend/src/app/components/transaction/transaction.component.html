@@ -124,48 +124,122 @@
 
     <section class="ethereum-route-section" aria-labelledby="flow">
       <div class="title">
-        <h2 id="flow" class="anchor">Transaction route</h2>
+        <h2 id="flow" class="anchor">From &amp; To</h2>
       </div>
 
       <div class="box ethereum-route">
         <div class="ethereum-route-party">
           <span class="ethereum-route-label">From</span>
-          <ng-container *ngIf="ethereumSender; else unknownSender">
+          <ng-container *ngIf="tx?.ethereum?.from as sender; else rawEthereumSender">
+            <app-ethereum-identity
+              [entity]="sender"
+              [compact]="true"
+              [link]="ethereumIdentityLink(sender)"
+            ></app-ethereum-identity>
+          </ng-container>
+          <ng-template #rawEthereumSender>
+            <ng-container *ngIf="ethereumSender; else unknownSender">
             <app-truncate [text]="ethereumSender" [lastChars]="8" [link]="['/address/' | relativeUrl, ethereumSender]">
               <app-clipboard [text]="ethereumSender"></app-clipboard>
             </app-truncate>
-          </ng-container>
+            </ng-container>
+          </ng-template>
           <ng-template #unknownSender><span class="ethereum-route-value">Unknown sender</span></ng-template>
         </div>
 
         <div class="ethereum-route-connector">
           <fa-icon class="ethereum-route-arrow" [icon]="['fas', 'arrow-alt-circle-right']" [fixedWidth]="true"></fa-icon>
           <span class="ethereum-route-type" [ngClass]="ethereumActivityClass">{{ ethereumActivity }}</span>
-          <app-amount *ngIf="ethereumTransferValue > 0" class="ethereum-route-amount" [satoshis]="ethereumTransferValue" [noFiat]="true" [ignoreViewMode]="true"></app-amount>
+          <ng-container *ngIf="ethereumValueWei as valueWei; else fallbackTransferAmount">
+            <span *ngIf="valueWei !== '0'" class="ethereum-route-amount" [title]="formatEthereumQuantity(valueWei, '18', 36)">
+              {{ formatEthereumQuantity(valueWei, '18') }} ETH
+            </span>
+          </ng-container>
+          <ng-template #fallbackTransferAmount>
+            <app-amount *ngIf="tx?.vout?.[0]?.value > 0" class="ethereum-route-amount" [satoshis]="tx.vout[0].value" [noFiat]="true" [ignoreViewMode]="true"></app-amount>
+          </ng-template>
         </div>
 
         <div class="ethereum-route-party ethereum-route-destination">
           <span class="ethereum-route-label">To</span>
-          <ng-container *ngIf="ethereumRecipient; else contractCreation">
+          <ng-container *ngIf="tx?.ethereum?.to as recipient; else createdContract">
+            <app-ethereum-identity
+              [entity]="recipient"
+              [compact]="true"
+              [link]="ethereumIdentityLink(recipient)"
+            ></app-ethereum-identity>
+          </ng-container>
+          <ng-template #createdContract>
+            <ng-container *ngIf="tx?.ethereum?.createdContract as contract; else rawEthereumRecipient">
+              <app-ethereum-identity
+                [entity]="contract"
+                [compact]="true"
+                [link]="ethereumIdentityLink(contract)"
+              ></app-ethereum-identity>
+            </ng-container>
+          </ng-template>
+          <ng-template #rawEthereumRecipient>
+            <ng-container *ngIf="ethereumRecipient; else contractCreation">
             <app-truncate [text]="ethereumRecipient" [lastChars]="8" [link]="['/address/' | relativeUrl, ethereumRecipient]">
               <app-clipboard [text]="ethereumRecipient"></app-clipboard>
             </app-truncate>
-          </ng-container>
+            </ng-container>
+          </ng-template>
           <ng-template #contractCreation><span class="ethereum-route-value">New contract</span></ng-template>
         </div>
       </div>
     </section>
 
-    <br>
-
-    <div class="subtitle-block">
+    <section *ngIf="tx?.ethereum?.tokenTransfers?.length" class="ethereum-token-transfer-section" aria-labelledby="token-transfers">
       <div class="title">
-        <h2>From &amp; To</h2>
+        <h2 id="token-transfers">Token transfers</h2>
       </div>
-    </div>
 
+      <div class="box ethereum-token-transfers">
+        <article *ngFor="let transfer of tx.ethereum.tokenTransfers" class="ethereum-token-transfer">
+          <div class="ethereum-token-transfer__asset">
+            <app-ethereum-identity
+              [entity]="transfer.token"
+              [compact]="true"
+              [link]="ethereumTokenLink(transfer.token.address)"
+            ></app-ethereum-identity>
+            <span class="ethereum-token-transfer__amount" [title]="ethereumTransferExactAmount(transfer)">
+              {{ formatEthereumQuantity(transfer.value, transfer.token.decimals) }} {{ transfer.token.symbol || 'tokens' }}
+            </span>
+          </div>
 
-    <app-transactions-list #txList [transactions]="[tx]" [cached]="isCached" [errorUnblinded]="errorUnblinded" [inputIndex]="inputIndex" [outputIndex]="outputIndex" [transactionPage]="true"></app-transactions-list>
+          <div class="ethereum-token-transfer__parties">
+            <app-ethereum-identity
+              [entity]="transfer.from"
+              [compact]="true"
+              [link]="ethereumIdentityLink(transfer.from)"
+            ></app-ethereum-identity>
+            <fa-icon class="ethereum-token-transfer__arrow" [icon]="['fas', 'arrow-alt-circle-right']" [fixedWidth]="true"></fa-icon>
+            <app-ethereum-identity
+              *ngIf="transfer.to as recipient; else createdTokenContract"
+              [entity]="recipient"
+              [compact]="true"
+              [link]="ethereumIdentityLink(recipient)"
+            ></app-ethereum-identity>
+            <ng-template #createdTokenContract><span class="ethereum-token-transfer__missing">Contract creation</span></ng-template>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <ng-container *ngIf="!tx?.ethereum">
+      <br>
+
+      <div class="subtitle-block">
+        <div class="title">
+          <h2>From &amp; To</h2>
+        </div>
+      </div>
+
+      <app-transactions-list #txList [transactions]="[tx]" [cached]="isCached" [errorUnblinded]="errorUnblinded" [inputIndex]="inputIndex" [outputIndex]="outputIndex" [transactionPage]="true"></app-transactions-list>
+    </ng-container>
+
+    <br>
 
     <div class="title text-start">
       <h2 i18n="transaction.details|Transaction Details">Details</h2>
@@ -181,7 +255,15 @@
               </tr>
               <tr>
                 <td>Gas used</td>
-                <td>&lrm;{{ tx.weight / 4 | number }} gas</td>
+                <td>&lrm;{{ tx?.ethereum?.gasUsed ? formatEthereumInteger(tx.ethereum.gasUsed) : (tx.weight / 4 | number) }} gas</td>
+              </tr>
+              <tr *ngIf="tx?.ethereum?.gasLimit">
+                <td>Gas limit</td>
+                <td>&lrm;{{ formatEthereumInteger(tx.ethereum.gasLimit) }} gas</td>
+              </tr>
+              <tr *ngIf="tx?.ethereum?.feeWei">
+                <td>Transaction fee</td>
+                <td>&lrm;{{ formatEthereumQuantity(tx.ethereum.feeWei, '18') }} ETH</td>
               </tr>
             </tbody>
           </table>
@@ -191,15 +273,23 @@
             <tbody>
               <tr>
                 <td>Transaction type</td>
-                <td [innerHTML]="'&lrm;' + (tx.version | number)"></td>
+                <td>&lrm;Type {{ tx?.ethereum?.type || tx.version }}</td>
               </tr>
               <tr>
                 <td>Nonce</td>
-                <td>&lrm;{{ tx.vin[0]?.sequence | number }}</td>
+                <td>&lrm;{{ tx?.ethereum?.nonce ? formatEthereumInteger(tx.ethereum.nonce) : (tx.vin[0]?.sequence | number) }}</td>
               </tr>
               <tr>
                 <td>Method</td>
-                <td>{{ tx.vin[0]?.scriptsig_asm || 'Transfer' }}</td>
+                <td class="ethereum-detail-method">{{ ethereumMethod() }}</td>
+              </tr>
+              <tr *ngIf="tx?.ethereum?.gasPriceWei">
+                <td>Gas price</td>
+                <td>&lrm;{{ formatEthereumQuantity(tx.ethereum.gasPriceWei, '9', 4) }} gwei</td>
+              </tr>
+              <tr *ngIf="tx?.ethereum?.revertReason">
+                <td>Revert reason</td>
+                <td class="ethereum-detail-error">{{ tx.ethereum.revertReason }}</td>
               </tr>
             </tbody>
           </table>

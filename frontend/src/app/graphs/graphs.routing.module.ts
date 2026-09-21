@@ -25,6 +25,7 @@ import { AccelerationsListComponent } from '@components/acceleration/acceleratio
 import { AddressComponent } from '@components/address/address.component';
 import { WalletComponent } from '@components/wallet/wallet.component';
 import { CalculatorComponent } from '@components/calculator/calculator.component';
+import { EthereumTokenComponent } from '@components/ethereum-token/ethereum-token.component';
 
 const browserWindow = window || {};
 // @ts-ignore
@@ -85,6 +86,14 @@ const routes: Routes = [
             component: MempoolBlockComponent,
           },
         ]
+      },
+      {
+        path: 'token/:id',
+        component: EthereumTokenComponent,
+        data: {
+          ogImage: true,
+          networkSpecific: true,
+        }
       },
       {
         path: 'address/:id',

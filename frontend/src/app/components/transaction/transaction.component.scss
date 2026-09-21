@@ -167,6 +167,78 @@
   white-space: nowrap;
 }
 
+.ethereum-token-transfer-section {
+  margin-top: 1.5rem;
+}
+
+.ethereum-token-transfers {
+  padding: 0;
+}
+
+.ethereum-token-transfer {
+  display: grid;
+  grid-template-columns: minmax(13rem, 0.9fr) minmax(0, 1.6fr);
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.ethereum-token-transfer:last-child {
+  border-bottom: 0;
+}
+
+.ethereum-token-transfer:nth-child(even) {
+  background: var(--stat-box-bg);
+}
+
+.ethereum-token-transfer__asset,
+.ethereum-token-transfer__parties {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.ethereum-token-transfer__asset {
+  justify-content: space-between;
+}
+
+.ethereum-token-transfer__parties {
+  justify-content: flex-end;
+}
+
+.ethereum-token-transfer__amount {
+  flex: 0 1 auto;
+  overflow: hidden;
+  color: var(--title-fg);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ethereum-token-transfer__arrow {
+  flex: 0 0 auto;
+  color: var(--primary);
+}
+
+.ethereum-token-transfer__missing {
+  color: var(--transparent-fg);
+  font-size: 0.8125rem;
+}
+
+.ethereum-detail-method,
+.ethereum-detail-error {
+  overflow-wrap: anywhere;
+}
+
+.ethereum-detail-error {
+  color: var(--red);
+}
+
 @media (max-width: 767.98px) {
   .ethereum-route {
     grid-template-columns: minmax(0, 1fr);
@@ -187,6 +259,36 @@
     app-truncate {
       justify-content: flex-start;
     }
+  }
+
+  .ethereum-token-transfer {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.7rem;
+  }
+
+  .ethereum-token-transfer__parties {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 460px) {
+  .ethereum-token-transfer__asset,
+  .ethereum-token-transfer__parties {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .ethereum-token-transfer__asset {
+    justify-content: flex-start;
+  }
+
+  .ethereum-token-transfer__amount {
+    max-width: 100%;
+    text-align: left;
+  }
+
+  .ethereum-token-transfer__parties .ethereum-token-transfer__arrow {
+    transform: rotate(90deg);
   }
 }
 

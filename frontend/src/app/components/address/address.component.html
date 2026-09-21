@@ -17,6 +17,53 @@
   <div class="clearfix"></div>
 
   <ng-template [ngIf]="!isLoadingAddress && !error">
+    <ng-container *ngIf="address?.ethereum as ethereum">
+    <section class="ethereum-address-profile" aria-label="Ethereum address metadata">
+      <app-ethereum-identity
+        [entity]="ethereum.identity"
+        [link]="ethereumAddressTokenLink"
+      ></app-ethereum-identity>
+
+      <div class="ethereum-address-meta">
+        <a *ngIf="ethereum.creatorAddress" class="ethereum-address-meta__item ethereum-address-meta__link" [href]="ethereumAddressLink(ethereum.creatorAddress)">
+          <span>Created by</span>
+          <strong [title]="ethereum.creatorAddress">{{ abbreviateEthereumAddress(ethereum.creatorAddress) }}</strong>
+        </a>
+        <span *ngIf="ethereum.counters.transactions !== undefined" class="ethereum-address-meta__item">
+          <span>Transactions</span>
+          <strong>{{ ethereum.counters.transactions | number }}</strong>
+        </span>
+        <span *ngIf="ethereum.counters.tokenTransfers !== undefined" class="ethereum-address-meta__item">
+          <span>Token transfers</span>
+          <strong>{{ ethereum.counters.tokenTransfers | number }}</strong>
+        </span>
+        <span *ngIf="ethereum.counters.internalTransactions !== undefined" class="ethereum-address-meta__item">
+          <span>Internal calls</span>
+          <strong>{{ ethereum.counters.internalTransactions | number }}</strong>
+        </span>
+        <span *ngIf="ethereum.counters.gasUsed !== undefined" class="ethereum-address-meta__item">
+          <span>Gas used</span>
+          <strong>{{ ethereum.counters.gasUsed | number }}</strong>
+        </span>
+      </div>
+    </section>
+
+    <section *ngIf="ethereum.tokenBalances.length" class="ethereum-address-tokens" aria-labelledby="token-balances">
+      <div class="ethereum-address-tokens__heading">
+        <h2 id="token-balances">Token balances</h2>
+        <span>{{ ethereum.tokenBalances.length }} shown</span>
+      </div>
+      <div class="ethereum-address-tokens__list">
+        <a *ngFor="let balance of ethereum.tokenBalances" class="ethereum-address-token" [href]="ethereumTokenLink(balance.token.address)">
+          <app-ethereum-identity [entity]="balance.token" [compact]="true"></app-ethereum-identity>
+          <strong [title]="formatEthereumTokenAmount(balance.value, balance.token.decimals, 36)">
+            {{ formatEthereumTokenAmount(balance.value, balance.token.decimals) }} {{ balance.token.symbol || 'tokens' }}
+          </strong>
+        </a>
+      </div>
+    </section>
+    </ng-container>
+
     <div class="box">
 
       <div class="row">

@@ -1,4 +1,4 @@
-<img class="mining-pool-logo" [ngClass]="logoClass" [src]="logoSrc" [alt]="logoAlt" [style]="logoStyle" (error)="onImageError($event)">
+<img *ngIf="shouldRenderLogo" class="mining-pool-logo" [ngClass]="logoClass" [src]="logoSrc" [alt]="logoAlt" [style]="logoStyle" (error)="onImageError($event)">
 
 @if (showName) {
   @if (searchText) {

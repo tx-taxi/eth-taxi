@@ -18,6 +18,7 @@ import { ADDRESS_SIMILARITY_THRESHOLD, AddressMatch, AddressSimilarity, AddressT
 import { processInputSignatures, Sighash, SigInfo, SighashLabels, parseTaproot } from '@app/shared/transaction.utils';
 import { ActivatedRoute } from '@angular/router';
 import { SighashFlag } from '@app/shared/transaction.utils';
+import { EthereumTokenTransfer } from '@interfaces/ethereum-api.interface';
 
 @Component({
   selector: 'app-transactions-list',
@@ -192,6 +193,54 @@ export class TransactionsListComponent implements OnInit, OnChanges, OnDestroy {
     });
 
     this.updateAddressSimilarities();
+  }
+
+  formatEthereumTransferAmount(transfer: EthereumTokenTransfer, maxFractionDigits = 8): string {
+    const normalizedValue = this.normalizeEthereumInteger(transfer.value);
+    const decimalPlaces = this.parseEthereumDecimals(transfer.token.decimals);
+    if (normalizedValue === null || decimalPlaces === null) {
+      return 'Unavailable';
+    }
+
+    const amount = BigInt(normalizedValue);
+    if (decimalPlaces === 0) {
+      return this.groupEthereumInteger(amount.toString());
+    }
+
+    const divisor = 10n ** BigInt(decimalPlaces);
+    const whole = amount / divisor;
+    const remainder = amount % divisor;
+    let fraction = remainder.toString().padStart(decimalPlaces, '0').replace(/0+$/, '');
+    if (fraction.length > maxFractionDigits) {
+      fraction = fraction.slice(0, maxFractionDigits).replace(/0+$/, '');
+    }
+    return fraction ? `${this.groupEthereumInteger(whole.toString())}.${fraction}` : this.groupEthereumInteger(whole.toString());
+  }
+
+  ethereumListSummary(tx: Transaction): string | null {
+    const ethereum = tx.ethereum;
+    if (!ethereum || ethereum.valueWei !== '0') {
+      return null;
+    }
+    return ethereum.decodedInput?.methodCall || ethereum.method || (ethereum.createdContract && !ethereum.to ? 'Contract deployment' : 'Contract call');
+  }
+
+  private normalizeEthereumInteger(value: string | null | undefined): string | null {
+    const normalized = value?.trim();
+    return normalized && /^\d+$/.test(normalized) ? BigInt(normalized).toString() : null;
+  }
+
+  private parseEthereumDecimals(value: string | null | undefined): number | null {
+    const normalized = value?.trim();
+    if (!normalized || !/^\d+$/.test(normalized)) {
+      return 0;
+    }
+    const decimals = BigInt(normalized);
+    return decimals <= 255n ? Number(decimals) : null;
+  }
+
+  private groupEthereumInteger(value: string): string {
+    return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
 
   refreshPrice(): void {

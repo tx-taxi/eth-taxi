@@ -114,6 +114,7 @@ import { PendingStatsComponent } from '@components/acceleration/pending-stats/pe
 import { AccelerationStatsComponent } from '@components/acceleration/acceleration-stats/acceleration-stats.component';
 import { AccelerationSparklesComponent } from '@components/acceleration/sparkles/acceleration-sparkles.component';
 import { OrdDataComponent } from '@components/ord-data/ord-data.component';
+import { EthereumIdentityComponent } from '@components/ethereum-identity/ethereum-identity.component';
 
 import { BlockViewComponent } from '@components/block-view/block-view.component';
 import { EightBlocksComponent } from '@components/eight-blocks/eight-blocks.component';
@@ -252,6 +253,7 @@ import { GithubLogin } from '@components/github-login.component/github-login.com
     PendingStatsComponent,
     AccelerationSparklesComponent,
     OrdDataComponent,
+    EthereumIdentityComponent,
     HttpErrorComponent,
     TwitterWidgetComponent,
     SimpleProofWidgetComponent,
@@ -397,6 +399,7 @@ import { GithubLogin } from '@components/github-login.component/github-login.com
     PendingStatsComponent,
     AccelerationSparklesComponent,
     OrdDataComponent,
+    EthereumIdentityComponent,
     HttpErrorComponent,
     TwitterWidgetComponent,
     SimpleProofWidgetComponent,

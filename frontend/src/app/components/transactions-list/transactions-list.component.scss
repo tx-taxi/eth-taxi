@@ -314,9 +314,42 @@ h2 {
 }
 
 .grey-info-text {
-	color: var(--grey);
-	font-style: italic;
-	font-size: 12px;
+  color: var(--grey);
+  font-style: italic;
+  font-size: 12px;
+}
+
+.ethereum-list-token-amount {
+  display: inline-block;
+  max-width: calc(100% - 1.5rem);
+  overflow: hidden;
+  color: var(--title-fg);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+  white-space: nowrap;
+}
+
+.ethereum-list-token-extra {
+  color: var(--transparent-fg);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.ethereum-list-activity {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--primary) 38%, transparent);
+  border-radius: 3px;
+  padding: 0.125rem 0.35rem;
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  color: var(--title-fg);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+  white-space: nowrap;
 }
 
 .tx-link {
