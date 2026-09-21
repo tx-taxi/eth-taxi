@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { DocsComponent } from '@app/docs/docs/docs.component';
 
 const browserWindow = window || {};
-// @ts-ignore
+// @ts-expect-error Runtime configuration is injected before Angular bootstraps.
 const browserWindowEnv = browserWindow.__env || {};
 
 let routes: Routes = [];
@@ -16,7 +16,11 @@ if (browserWindowEnv.BASE_MODULE && browserWindowEnv.BASE_MODULE === 'liquid') {
       pathMatch: 'full'
     },
     {
-      path: 'api/:type',
+      path: 'api/rest',
+      component: DocsComponent
+    },
+    {
+      path: 'api/websocket',
       component: DocsComponent
     },
     {
@@ -38,17 +42,26 @@ if (browserWindowEnv.BASE_MODULE && browserWindowEnv.BASE_MODULE === 'liquid') {
       redirectTo: 'faq'
     },
     {
-      path: 'api/:type',
-      component: DocsComponent
-    },
-    {
       path: 'faq',
-      data: { networks: ['bitcoin'] },
+      data: { networks: ['ethereum'] },
       component: DocsComponent
     },
     {
       path: 'api',
       redirectTo: 'api/rest'
+    },
+    {
+      path: 'api/electrs',
+      redirectTo: 'faq',
+      pathMatch: 'full'
+    },
+    {
+      path: 'api/rest',
+      component: DocsComponent
+    },
+    {
+      path: 'api/websocket',
+      component: DocsComponent
     },
     {
       path: '**',

@@ -1,9 +1,10 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Env, StateService } from '@app/services/state.service';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
-import { restApiDocsData, wsApiDocsData, electrumApiDocsData } from '@app/docs/api-docs/api-docs-data';
-import { faqData } from '@app/docs/api-docs/api-docs-data';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import {
+  EthereumDocItem,
+  ethereumGuideData,
+  ethereumRestData,
+  ethereumWebsocketData,
+} from '@app/docs/api-docs/ethereum-docs-data';
 
 @Component({
   selector: 'app-api-docs-nav',
@@ -12,49 +13,21 @@ import { faqData } from '@app/docs/api-docs/api-docs-data';
   standalone: false,
 })
 export class ApiDocsNavComponent implements OnInit {
+  @Input() whichTab: 'faq' | 'rest' | 'websocket';
+  @Output() navLinkClickEvent = new EventEmitter<{ event: Event; fragment: string }>();
 
-  @Input() network: any;
-  @Input() whichTab: string;
-  @Output() navLinkClickEvent: EventEmitter<any> = new EventEmitter();
-  private destroy$: Subject<any> = new Subject<any>();
-  env: Env;
-  tabData: any[];
-  auditEnabled: boolean;
-  officialMempoolInstance: boolean;
-  isMempoolSpaceBuild: boolean;
-  runningElectrs: boolean;
-
-  constructor(
-    private stateService: StateService
-  ) { }
+  tabData: EthereumDocItem[] = [];
 
   ngOnInit(): void {
-    this.env = this.stateService.env;
-    this.officialMempoolInstance = this.env.OFFICIAL_MEMPOOL_SPACE;
-    this.isMempoolSpaceBuild = this.stateService.isMempoolSpaceBuild;
-    this.stateService.backend$.pipe(takeUntil(this.destroy$)).subscribe((backend) => {
-      this.runningElectrs = !!(backend == 'esplora');
-    });
-    this.auditEnabled = this.env.AUDIT;
-    if (this.whichTab === 'rest') {
-      this.tabData = restApiDocsData;
-    } else if (this.whichTab === 'websocket') {
-      this.tabData = wsApiDocsData;
-    } else if (this.whichTab === 'faq') {
-      this.tabData = faqData;
-    } else if (this.whichTab === 'electrs') {
-      this.tabData = electrumApiDocsData;
-    }
+    this.tabData = this.whichTab === 'rest'
+      ? ethereumRestData
+      : this.whichTab === 'websocket'
+        ? ethereumWebsocketData
+        : ethereumGuideData;
   }
 
-  navLinkClick(event, fragment) {
+  navLinkClick(event: Event, fragment: string): void {
     event.preventDefault();
-    this.navLinkClickEvent.emit({event: event, fragment: fragment});
+    this.navLinkClickEvent.emit({ event, fragment });
   }
-
-  ngOnDestroy(): void {
-    this.destroy$.next(true);
-    this.destroy$.complete();
-  }
-
 }

@@ -17,7 +17,6 @@ export class DocsComponent implements OnInit {
   env: Env;
   showWebSocketTab = true;
   showFaqTab = true;
-  showElectrsTab = true;
 
   @HostBinding('attr.dir') dir = 'ltr';
 
@@ -32,8 +31,7 @@ export class DocsComponent implements OnInit {
   ngOnInit(): void {
     this.websocket.want(['blocks']);
     this.env = this.stateService.env;
-    this.showFaqTab = ( this.env.BASE_MODULE === 'mempool' ) ? true : false;
-    this.showElectrsTab = this.stateService.env.OFFICIAL_MEMPOOL_SPACE;
+    this.showFaqTab = true;
 
     document.querySelector<HTMLElement>( 'html' ).style.scrollBehavior = 'smooth';
   }
@@ -44,8 +42,8 @@ export class DocsComponent implements OnInit {
 
     if (url[0].path === 'faq' ) {
       this.activeTab = 0;
-      this.seoService.setTitle($localize`:@@meta.title.docs.faq:FAQ`);
-      this.seoService.setDescription($localize`:@@meta.description.docs.faq:Get answers to common questions like: What is a mempool? Why isn't my transaction confirming? How can I run my own instance of The Mempool Open Source Project? And more.`);
+      this.seoService.setTitle('Ethereum Guide');
+      this.seoService.setDescription('Understand Ethereum transactions, gas, account activity, confirmations, and the data shown by eth.tx.taxi.');
       this.ogService.setManualOgImage('faq.jpg');
     } else if( url[1].path === 'rest' ) {
       this.activeTab = 1;
@@ -53,7 +51,7 @@ export class DocsComponent implements OnInit {
       if (this.stateService.network === 'liquid' || this.stateService.network === 'liquidtestnet' ) {
         this.seoService.setDescription($localize`:@@meta.description.docs.rest-liquid:Documentation for the liquid.network REST API service: get info on addresses, transactions, assets, blocks, and more.`);
       } else {
-        this.seoService.setDescription($localize`:@@meta.description.docs.rest-bitcoin:Documentation for the mempool.space REST API service: get info on addresses, transactions, blocks, fees, mining, the Lightning network, and more.`);
+        this.seoService.setDescription('Documentation for the eth.tx.taxi REST API: blocks, transactions, accounts, tokens, gas estimates, and explorer state.');
       }
     } else if( url[1].path === 'websocket' ) {
       this.activeTab = 2;
@@ -61,12 +59,10 @@ export class DocsComponent implements OnInit {
       if( this.stateService.network === 'liquid' || this.stateService.network === 'liquidtestnet' ) {
         this.seoService.setDescription($localize`:@@meta.description.docs.websocket-liquid:Documentation for the liquid.network WebSocket API service: get real-time info on blocks, mempools, transactions, addresses, and more.`);
       } else {
-        this.seoService.setDescription($localize`:@@meta.description.docs.websocket-bitcoin:Documentation for the mempool.space WebSocket API service: get real-time info on blocks, mempools, transactions, addresses, and more.`);
+        this.seoService.setDescription('Documentation for the eth.tx.taxi WebSocket API: live Ethereum blocks, pending transactions, accounts, and transaction status.');
       }
     } else {
-      this.activeTab = 3;
-      this.seoService.setTitle($localize`:@@meta.title.docs.electrum:Electrum RPC`);
-      this.seoService.setDescription($localize`:@@meta.description.docs.electrumrpc:Documentation for our Electrum RPC interface: get instant, convenient, and reliable access to an Esplora instance.`);
+      this.activeTab = 0;
     }
   }
 
