@@ -24,6 +24,7 @@ const transactionSubscriptions = new Map();
 const transactionStreamSignatures = new Map();
 const addressSubscriptions = new Map();
 const addressTransactionSnapshots = new Map();
+const rpcBlockFeeCache = new Map();
 let activeProvider = providers[0];
 let activeRpcProvider = rpcProviders[0];
 let cachedSnapshot;
@@ -534,8 +535,13 @@ function mapBlock(block) {
   };
 }
 
-function mapRpcBlock(block) {
-  const baseFee = hexNumber(block?.baseFeePerGas);
+function mapRpcBlock(block, feeMetrics = null) {
+  const baseFeeWei = hexBigInt(block?.baseFeePerGas);
+  const gasUsedWei = hexBigInt(block?.gasUsed);
+  const burntFeeWei = gasUsedWei * baseFeeWei;
+  const totalFeesWei = feeMetrics?.totalFees ?? burntFeeWei;
+  const validatorRewardWei = feeMetrics?.validatorReward ?? 0n;
+  const baseFee = Number(baseFeeWei);
   const transactionCount = Array.isArray(block?.transactions) ? block.transactions.length : 0;
   return {
     id: block?.hash || '',
@@ -551,8 +557,8 @@ function mapRpcBlock(block) {
     weight: hexNumber(block?.gasUsed),
     previousblockhash: block?.parentHash || '',
     extras: {
-      reward: 0,
-      totalFees: 0,
+      reward: wei(validatorRewardWei.toString()),
+      totalFees: wei(totalFeesWei.toString()),
       medianFee: baseFee,
       minFee: baseFee,
       maxFee: baseFee,
@@ -560,6 +566,31 @@ function mapRpcBlock(block) {
       pool: { id: 0, name: block?.miner || 'Unknown validator', slug: 'ethereum-validator' },
     },
   };
+}
+
+async function rpcBlockFeeMetrics(block) {
+  const blockHash = block?.hash;
+  if (!blockHash) return { totalFees: 0n, validatorReward: 0n };
+  const cached = rpcBlockFeeCache.get(blockHash);
+  if (cached) return cached;
+
+  const burntFee = hexBigInt(block.gasUsed) * hexBigInt(block.baseFeePerGas);
+  let metrics = { totalFees: burntFee, validatorReward: 0n };
+  try {
+    const receipts = await rpcJson('eth_getBlockReceipts', [blockHash], { requireResult: true });
+    const totalFees = receipts.reduce((sum, receipt) => sum + (hexBigInt(receipt?.gasUsed) * hexBigInt(receipt?.effectiveGasPrice)), 0n);
+    metrics = {
+      totalFees,
+      validatorReward: totalFees > burntFee ? totalFees - burntFee : 0n,
+    };
+  } catch {
+    // A few public RPC providers do not expose block receipts. The burned base
+    // fee is still a truthful non-zero lower bound until a richer source wins.
+  }
+
+  rpcBlockFeeCache.set(blockHash, metrics);
+  if (rpcBlockFeeCache.size > 48) rpcBlockFeeCache.delete(rpcBlockFeeCache.keys().next().value);
+  return metrics;
 }
 
 function mapTransaction(tx) {
@@ -862,7 +893,7 @@ async function blockById(id) {
       isHash ? [id, false] : [`0x${Number(id).toString(16)}`, false],
       { requireResult: true },
     );
-    return mapRpcBlock(block);
+    return mapRpcBlock(block, await rpcBlockFeeMetrics(block));
   }
 }
 
@@ -1029,7 +1060,8 @@ async function rpcSnapshot() {
     rpcJson('eth_gasPrice').catch(() => null),
     rpcJson('eth_getBlockByNumber', ['pending', true]).catch(() => null),
   ]);
-  const mappedBlocks = blocks.map(mapRpcBlock).reverse();
+  const feeMetrics = await Promise.all(blocks.map((block) => rpcBlockFeeMetrics(block)));
+  const mappedBlocks = blocks.map((block, index) => mapRpcBlock(block, feeMetrics[index])).reverse();
   const pendingRaw = Array.isArray(pendingBlock?.transactions) ? pendingBlock.transactions.slice(0, 150) : [];
   const pendingItems = pendingRaw.map((transaction) => mapRpcTransaction(transaction, null, pendingBlock, tipHeight, true));
   const pendingTransactions = pendingItems.map(mapTransaction);
