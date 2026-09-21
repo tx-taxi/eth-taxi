@@ -287,6 +287,39 @@ function mapEthereumAddressMetadata(details, counters, address, tokenBalances = 
       gasUsed: nullableString(counters?.gas_usage_count),
     },
     tokenBalances: tokenBalances.map(mapEthereumTokenBalance).filter(Boolean).slice(0, 12),
+    historyUnavailable: false,
+  };
+}
+
+function ethereumAddressResponse(address, ethereum, transactionCount = 0) {
+  const balance = wei(ethereum.balanceWei);
+  return {
+    // Marks this non-UTXO compatibility view so the frontend suppresses BTC-only rows.
+    electrum: true,
+    address,
+    chain_stats: { funded_txo_count: 0, funded_txo_sum: balance, spent_txo_count: 0, spent_txo_sum: 0, tx_count: transactionCount },
+    mempool_stats: { funded_txo_count: 0, funded_txo_sum: 0, spent_txo_count: 0, spent_txo_sum: 0, tx_count: 0 },
+    ethereum,
+  };
+}
+
+async function rpcAddressMetadata(address) {
+  const [balance, code] = await Promise.all([
+    rpcJson('eth_getBalance', [address, 'latest'], { requireResult: true }),
+    rpcJson('eth_getCode', [address, 'latest'], { requireResult: true }),
+  ]);
+  return {
+    identity: mapEthereumIdentity({ hash: address, is_contract: code !== '0x' }, address),
+    token: null,
+    balanceWei: hexDecimalString(balance),
+    exchangeRate: null,
+    creatorAddress: null,
+    creationTransactionHash: null,
+    // A JSON-RPC endpoint has no address-history index. Avoid presenting an
+    // account nonce as a total transaction count or an empty list as history.
+    counters: {},
+    tokenBalances: [],
+    historyUnavailable: true,
   };
 }
 
@@ -851,27 +884,30 @@ async function transactionById(id) {
 }
 
 async function addressById(address) {
-  const [details, transactions, counters, tokens] = await Promise.all([
-    providerJson(`/api/v2/addresses/${encodeURIComponent(address)}`),
-    providerJson(`/api/v2/addresses/${encodeURIComponent(address)}/transactions`),
-    providerJson(`/api/v2/addresses/${encodeURIComponent(address)}/counters`).catch(() => ({})),
-    providerJson(`/api/v2/addresses/${encodeURIComponent(address)}/tokens`).catch(() => ({ items: [] })),
-  ]);
-  const balance = wei(details.coin_balance);
-  const transactionCount = number(counters.transactions_count, (transactions.items || []).length);
-  return {
-    // Marks this non-UTXO compatibility view so the frontend suppresses BTC-only rows.
-    electrum: true,
-    address: details.hash || address,
-    chain_stats: { funded_txo_count: 0, funded_txo_sum: balance, spent_txo_count: 0, spent_txo_sum: 0, tx_count: transactionCount },
-    mempool_stats: { funded_txo_count: 0, funded_txo_sum: 0, spent_txo_count: 0, spent_txo_sum: 0, tx_count: 0 },
-    ethereum: mapEthereumAddressMetadata(details, counters, address, tokens.items || []),
-  };
+  try {
+    const [details, transactions, counters, tokens] = await Promise.all([
+      providerJson(`/api/v2/addresses/${encodeURIComponent(address)}`),
+      providerJson(`/api/v2/addresses/${encodeURIComponent(address)}/transactions`),
+      providerJson(`/api/v2/addresses/${encodeURIComponent(address)}/counters`).catch(() => ({})),
+      providerJson(`/api/v2/addresses/${encodeURIComponent(address)}/tokens`).catch(() => ({ items: [] })),
+    ]);
+    const ethereum = mapEthereumAddressMetadata(details, counters, address, tokens.items || []);
+    return ethereumAddressResponse(details.hash || address, ethereum, number(counters.transactions_count, (transactions.items || []).length));
+  } catch {
+    return ethereumAddressResponse(address, await rpcAddressMetadata(address));
+  }
 }
 
 async function addressTransactions(address) {
-  const response = await providerJson(`/api/v2/addresses/${encodeURIComponent(address)}/transactions`);
-  return (response.items || []).map((transaction) => mapTransactionDetail(transaction, transaction.block_hash));
+  try {
+    const response = await providerJson(`/api/v2/addresses/${encodeURIComponent(address)}/transactions`);
+    return (response.items || []).map((transaction) => mapTransactionDetail(transaction, transaction.block_hash));
+  } catch {
+    // Standard JSON-RPC exposes balances and contract code but not an address
+    // history index. The frontend receives `historyUnavailable` from the
+    // companion address response and can state that distinction plainly.
+    return [];
+  }
 }
 
 async function blockTransactions(blockId, start = 0) {
@@ -895,12 +931,16 @@ async function blockTransactions(blockId, start = 0) {
 }
 
 async function ethereumAddressMetadata(address) {
-  const [details, counters, tokens] = await Promise.all([
-    providerJson(`/api/v2/addresses/${encodeURIComponent(address)}`),
-    providerJson(`/api/v2/addresses/${encodeURIComponent(address)}/counters`).catch(() => ({})),
-    providerJson(`/api/v2/addresses/${encodeURIComponent(address)}/tokens`).catch(() => ({ items: [] })),
-  ]);
-  return mapEthereumAddressMetadata(details, counters, address, tokens.items || []);
+  try {
+    const [details, counters, tokens] = await Promise.all([
+      providerJson(`/api/v2/addresses/${encodeURIComponent(address)}`),
+      providerJson(`/api/v2/addresses/${encodeURIComponent(address)}/counters`).catch(() => ({})),
+      providerJson(`/api/v2/addresses/${encodeURIComponent(address)}/tokens`).catch(() => ({ items: [] })),
+    ]);
+    return mapEthereumAddressMetadata(details, counters, address, tokens.items || []);
+  } catch {
+    return rpcAddressMetadata(address);
+  }
 }
 
 async function ethereumToken(address) {
