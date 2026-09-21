@@ -1218,6 +1218,11 @@ function respond(res, status, value) {
   res.end(JSON.stringify(value));
 }
 
+function respondText(res, status, value) {
+  res.writeHead(status, { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store' });
+  res.end(value);
+}
+
 function respondJavaScript(res, source) {
   res.writeHead(200, { 'content-type': 'application/javascript; charset=utf-8', 'cache-control': 'no-store' });
   res.end(source);
@@ -1241,6 +1246,7 @@ function isSupportedApiPath(pathname) {
     '/api/v1/info',
   ]).has(pathname) || [
     /^\/api\/v1\/blocks\/\d+$/,
+    /^\/api\/block-height\/\d+$/,
     /^\/api\/v1\/block\/0x[a-fA-F0-9]+(?:\/summary)?$/,
     /^\/api\/block\/0x[a-fA-F0-9]+\/txs\/\d+$/,
     /^\/api(?:\/v1)?\/tx\/0x[a-fA-F0-9]+$/,
@@ -1329,6 +1335,11 @@ const server = http.createServer(async (req, res) => {
     if (statusMatch) return respond(res, 200, (await transactionById(statusMatch[1])).status);
     const blocksMatch = requestPath.match(/^\/api\/v1\/blocks\/(\d+)$/);
     if (blocksMatch) return respond(res, 200, await blocksEndingAt(Number(blocksMatch[1])));
+    const blockHeightMatch = requestPath.match(/^\/api\/block-height\/(\d+)$/);
+    if (blockHeightMatch) {
+      const block = await blockById(blockHeightMatch[1]);
+      return respondText(res, 200, block.id);
+    }
     const blockMatch = requestPath.match(/^\/api\/v1\/block\/(0x[a-fA-F0-9]+)$/);
     if (blockMatch) return respond(res, 200, await blockById(blockMatch[1]));
     const blockSummaryMatch = requestPath.match(/^\/api\/v1\/block\/(0x[a-fA-F0-9]+)\/summary$/);
