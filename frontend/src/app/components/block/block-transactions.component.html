@@ -8,16 +8,18 @@
 </div>
 <div class="clearfix"></div>
 
-<app-transactions-list *ngIf="transactions$ | async as transactions; else loading" [transactions]="transactions" [paginated]="true" [blockTime]="timestamp"></app-transactions-list>
+<ng-container *ngIf="transactions$ | async as transactions; else loading">
+  <app-transactions-list *ngIf="!transactionsError" [transactions]="transactions" [paginated]="true" [blockTime]="timestamp"></app-transactions-list>
+</ng-container>
 
-<ng-template [ngIf]="transactionsError">
-  <br>
-  <app-http-error [error]="transactionsError">
-    <span i18n="error.general-loading-data">Error loading data.</span>
-  </app-http-error>
-  <br>
-  <br>
-</ng-template>
+<div *ngIf="transactionsError" class="block-transactions-unavailable" role="status">
+  <strong>Transactions are temporarily unavailable</strong>
+  <span>The block summary is current, but its transaction rows could not be loaded.</span>
+  <button type="button" (click)="retryTransactions()">
+    <fa-icon [icon]="['fas', 'redo-alt']" [fixedWidth]="true"></fa-icon>
+    Retry transactions
+  </button>
+</div>
 
 <ng-template #loading>
   <div class="tx-skeleton">

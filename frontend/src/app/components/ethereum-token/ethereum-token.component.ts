@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { forkJoin, Subscription } from 'rxjs';
+import { forkJoin, of, Subscription } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 import { EthereumIdentityEntity } from '@components/ethereum-identity/ethereum-identity.component';
 import {
@@ -29,6 +30,9 @@ export class EthereumTokenComponent implements OnInit, OnDestroy {
   tokenAddress = '';
   isLoading = true;
   errorMessage = '';
+  transfersUnavailable = false;
+  transfersRecentOnly = false;
+  showAllTransfers = false;
   logoFailed = false;
 
   private routeSubscription?: Subscription;
@@ -70,15 +74,31 @@ export class EthereumTokenComponent implements OnInit, OnDestroy {
   }
 
   formatTransferAmount(transfer: EthereumTokenTransfer): string {
-    return this.formatUnits(transfer.value, transfer.token.decimals, 8);
+    return this.formatUnits(transfer.value, this.transferDecimals(transfer), 8);
   }
 
   transferExactAmount(transfer: EthereumTokenTransfer): string {
-    return this.formatUnits(transfer.value, transfer.token.decimals);
+    return this.formatUnits(transfer.value, this.transferDecimals(transfer));
+  }
+
+  transferSymbol(transfer: EthereumTokenTransfer): string {
+    return transfer.token.symbol?.trim() || this.token?.symbol?.trim() || 'tokens';
   }
 
   formatSupply(value: string | null | undefined): string {
     return this.formatUnits(value, this.token?.decimals, 4);
+  }
+
+  formatCompactSupply(value: string | null | undefined): string {
+    const fullValue = this.formatUnits(value, this.token?.decimals, 4).replace(/,/g, '');
+    const numericValue = Number(fullValue);
+    if (!Number.isFinite(numericValue)) {
+      return this.formatSupply(value);
+    }
+    return new Intl.NumberFormat(undefined, {
+      notation: 'compact',
+      maximumFractionDigits: 2,
+    }).format(numericValue);
   }
 
   exactSupply(value: string | null | undefined): string {
@@ -116,11 +136,26 @@ export class EthereumTokenComponent implements OnInit, OnDestroy {
     return `${item.transfer.transactionHash}:${item.transfer.logIndex || index}`;
   }
 
+  get visibleTransfers(): EthereumTokenTransferView[] {
+    return this.showAllTransfers ? this.transfers : this.transfers.slice(0, 20);
+  }
+
+  get hiddenTransferCount(): number {
+    return Math.max(0, this.transfers.length - 20);
+  }
+
+  toggleTransfers(): void {
+    this.showAllTransfers = !this.showAllTransfers;
+  }
+
   private loadToken(): void {
     this.loadSubscription?.unsubscribe();
     this.token = null;
     this.transfers = [];
     this.errorMessage = '';
+    this.transfersUnavailable = false;
+    this.transfersRecentOnly = false;
+    this.showAllTransfers = false;
     this.logoFailed = false;
 
     if (!this.tokenAddress) {
@@ -134,10 +169,22 @@ export class EthereumTokenComponent implements OnInit, OnDestroy {
     this.changeDetectorRef.markForCheck();
     this.loadSubscription = forkJoin({
       token: this.ethereumApiService.getToken$(this.tokenAddress),
-      transfers: this.ethereumApiService.getTokenTransfers$(this.tokenAddress),
+      transfers: this.ethereumApiService.getTokenTransfers$(this.tokenAddress).pipe(
+        catchError(() => {
+          this.transfersUnavailable = true;
+          return of({
+            items: [],
+            nextPageParams: null,
+            historyUnavailable: true,
+            recentOnly: true,
+          });
+        }),
+      ),
     }).subscribe({
       next: ({ token, transfers }) => {
         this.token = token;
+        this.transfersUnavailable = this.transfersUnavailable || transfers.historyUnavailable === true || token.historyUnavailable === true;
+        this.transfersRecentOnly = transfers.recentOnly === true || token.recentOnly === true;
         this.transfers = transfers.items.map((transfer) => ({
           transfer,
           from: this.toIdentityEntity(transfer.from),
@@ -168,6 +215,10 @@ export class EthereumTokenComponent implements OnInit, OnDestroy {
       reputation: identity.reputation,
       proxyType: identity.proxyType,
     };
+  }
+
+  private transferDecimals(transfer: EthereumTokenTransfer): string | null | undefined {
+    return transfer.token.decimals ?? this.token?.decimals;
   }
 
   private formatUnits(

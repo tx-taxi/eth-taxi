@@ -1,8 +1,9 @@
 <form [class]="{hamburgerOpen: hamburgerOpen}" [formGroup]="searchForm" (submit)="searchForm.valid && search()" novalidate>
   <div class="d-flex">
     <div class="search-box-container me-2">
-      <input #searchInput (focus)="focus$.next($any($event).target.value)" (click)="click$.next($any($event).target.value)" formControlName="searchText" type="text" class="form-control" placeholder="Search an Ethereum block, transaction, or address" aria-label="Search Ethereum">
+      <input #searchInput (focus)="focus$.next($any($event).target.value)" (click)="click$.next($any($event).target.value)" formControlName="searchText" type="text" class="form-control" placeholder="Search an Ethereum block, transaction, or address" aria-label="Search Ethereum" [attr.aria-invalid]="searchError ? 'true' : null" [attr.aria-describedby]="searchError ? 'ethereum-search-error' : null">
       <app-search-results #searchResults [hidden]="dropdownHidden" [results]="typeAhead$ | async" (selectedResult)="selectedResult($event)"></app-search-results>
+      <div *ngIf="searchError" id="ethereum-search-error" class="search-error" role="alert">{{ searchError }}</div>
     </div>
     <div>
       <button [disabled]="isSearching" type="submit" class="btn btn-purple search-submit">

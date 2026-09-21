@@ -180,6 +180,22 @@
   white-space: nowrap;
 }
 
+.token-metric__value {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+}
+
+.token-metric__value > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.token-metric__unit {
+  flex: 0 0 auto;
+}
+
 .token-transfers {
   display: flex;
   flex-direction: column;
@@ -207,6 +223,15 @@
 
 .transfer-list {
   border-top: 1px solid var(--border-subtle);
+}
+
+.token-history-scope {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-subtle);
+  background: var(--stat-box-bg);
+  color: var(--transparent-fg);
+  font-size: 0.8125rem;
+  line-height: 1.45;
 }
 
 .transfer-row {
@@ -286,6 +311,43 @@
   border-bottom: 1px solid var(--border-subtle);
   color: var(--transparent-fg);
   text-align: center;
+}
+
+.token-empty--degraded {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.token-empty--degraded strong {
+  color: var(--title-fg);
+  font-size: 0.875rem;
+}
+
+.token-empty--degraded span {
+  font-size: 0.8125rem;
+}
+
+.transfer-list__toggle {
+  width: 100%;
+  min-height: 2.75rem;
+  border: 0;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--box-bg);
+  color: var(--link-color);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.transfer-list__toggle:hover,
+.transfer-list__toggle:focus-visible {
+  background: color-mix(in srgb, var(--primary) 8%, var(--box-bg));
+  color: var(--link-hover-color);
+}
+
+.transfer-list__toggle:focus-visible {
+  outline: 2px solid var(--info);
+  outline-offset: -2px;
 }
 
 @keyframes token-spin {

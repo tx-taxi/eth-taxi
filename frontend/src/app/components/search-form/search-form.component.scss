@@ -61,3 +61,23 @@ input:focus {
   box-shadow: none;
   border-color: transparent;
 }
+
+input[aria-invalid='true'] {
+  border-color: var(--bs-danger, #dc3545);
+}
+
+.search-error {
+  position: absolute;
+  z-index: 1050;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 107, 121, 0.55);
+  border-radius: 4px;
+  background: #171927;
+  color: #ff9aa5;
+  font-size: 12px;
+  line-height: 1.35;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.32);
+}

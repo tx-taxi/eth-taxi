@@ -27,6 +27,8 @@ export interface EthereumToken {
   volume24h?: string | null;
   reputation?: string | null;
   palette?: string[];
+  historyUnavailable?: boolean;
+  recentOnly?: boolean;
 }
 
 export interface EthereumTokenTransfer {
@@ -109,6 +111,7 @@ export interface EthereumAddressMetadata {
   creationTransactionHash?: string | null;
   counters: EthereumAddressCounters;
   tokenBalances: EthereumTokenBalance[];
+  historyUnavailable?: boolean;
 }
 
 export type EthereumPaginationValue = string | number | boolean;
@@ -117,4 +120,6 @@ export type EthereumPaginationParams = Record<string, EthereumPaginationValue>;
 export interface EthereumPaginatedTransferResponse {
   items: EthereumTokenTransfer[];
   nextPageParams?: EthereumPaginationParams | null;
+  historyUnavailable?: boolean;
+  recentOnly?: boolean;
 }

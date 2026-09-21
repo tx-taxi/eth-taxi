@@ -61,25 +61,35 @@
       </div>
       <div *ngIf="token.totalSupply" class="token-metric">
         <span class="token-metric__label">Total supply</span>
-        <strong [title]="exactSupply(token.totalSupply)">{{ formatSupply(token.totalSupply) }} {{ token.symbol }}</strong>
+        <strong class="token-metric__value" [title]="exactSupply(token.totalSupply) + ' ' + token.symbol">
+          <span>{{ formatCompactSupply(token.totalSupply) }}</span>
+          <span class="token-metric__unit">{{ token.symbol }}</span>
+        </strong>
       </div>
       <div *ngIf="token.circulatingSupply" class="token-metric">
         <span class="token-metric__label">Circulating supply</span>
-        <strong [title]="exactSupply(token.circulatingSupply)">{{ formatSupply(token.circulatingSupply) }} {{ token.symbol }}</strong>
+        <strong class="token-metric__value" [title]="exactSupply(token.circulatingSupply) + ' ' + token.symbol">
+          <span>{{ formatCompactSupply(token.circulatingSupply) }}</span>
+          <span class="token-metric__unit">{{ token.symbol }}</span>
+        </strong>
       </div>
     </section>
 
     <section class="token-transfers" aria-labelledby="token-transfers-heading">
       <div class="section-heading">
-        <h2 id="token-transfers-heading">Latest transfers</h2>
+        <h2 id="token-transfers-heading">{{ transfers.length && (transfersRecentOnly || transfersUnavailable) ? 'Recent transfer sample' : 'Transfer history' }}</h2>
         <span>{{ transfers.length }} shown</span>
       </div>
 
+      <div *ngIf="transfers.length && (transfersRecentOnly || transfersUnavailable)" class="token-history-scope" role="status">
+        This is a bounded recent sample from Ethereum RPC. Complete indexed transfer history is temporarily unavailable.
+      </div>
+
       <div *ngIf="transfers.length; else noTransfers" class="transfer-list">
-        <article *ngFor="let item of transfers; trackBy: trackTransfer" class="transfer-row">
+        <article *ngFor="let item of visibleTransfers; trackBy: trackTransfer" class="transfer-row">
           <div class="transfer-primary">
             <a class="transfer-amount" [routerLink]="['/tx', item.transfer.transactionHash]" [title]="transferExactAmount(item.transfer)">
-              {{ formatTransferAmount(item.transfer) }} {{ item.transfer.token.symbol || token.symbol }}
+              {{ formatTransferAmount(item.transfer) }} {{ transferSymbol(item.transfer) }}
             </a>
             <span class="transfer-kind">{{ item.transfer.method || item.transfer.type }}</span>
           </div>
@@ -117,10 +127,24 @@
             </time>
           </div>
         </article>
+        <button
+          *ngIf="hiddenTransferCount || showAllTransfers"
+          type="button"
+          class="transfer-list__toggle"
+          (click)="toggleTransfers()"
+        >
+          {{ showAllTransfers ? 'Show fewer transfers' : 'Show ' + hiddenTransferCount + ' more transfers' }}
+        </button>
       </div>
 
       <ng-template #noTransfers>
-        <div class="token-empty">No transfers were returned for this token.</div>
+        <div *ngIf="transfersUnavailable; else emptyTransferHistory" class="token-empty token-empty--degraded" role="status">
+          <strong>Transfer history is temporarily unavailable</strong>
+          <span>Token metadata is current, but the indexed transfer feed could not be loaded.</span>
+        </div>
+        <ng-template #emptyTransferHistory>
+          <div class="token-empty">No transfers were found for this token.</div>
+        </ng-template>
       </ng-template>
     </section>
   </ng-container>

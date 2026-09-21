@@ -69,6 +69,13 @@ const DUPLICATE_TX_BLOCKS: Record<string, [number, number]> = {
 
 const ETHEREUM_NATIVE_PALETTE = ['#5269d6', '#8ea2ff', '#c7d2ff'];
 const FALLBACK_TOKEN_PALETTE = ['#167f94', '#38b6cd', '#a9e9f3'];
+const KNOWN_ETHEREUM_TOKENS: Record<string, Partial<EthereumToken>> = {
+  '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48': { name: 'USD Coin', symbol: 'USDC', decimals: '6' },
+  '0xdac17f958d2ee523a2206206994597c13d831ec7': { name: 'Tether USD', symbol: 'USDT', decimals: '6' },
+  '0x6b175474e89094c44da98b954eedeac495271d0f': { name: 'Dai Stablecoin', symbol: 'DAI', decimals: '18' },
+  '0x514910771af9ca656af840dff83e8264ecf986ca': { name: 'Chainlink', symbol: 'LINK', decimals: '18' },
+  '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599': { name: 'Wrapped BTC', symbol: 'WBTC', decimals: '8' },
+};
 
 @Component({
   selector: 'app-transaction',
@@ -149,6 +156,7 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
   notAcceleratedOnLoad: boolean = null;
   duplicateTxBlocks: [number, number] | undefined;
   ethereumAssetFlows: AssetFlow[] = [];
+  showAllEthereumTokenTransfers = false;
 
   featuresEnabled: boolean;
   segwitEnabled: boolean;
@@ -260,7 +268,30 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ethereumTransferExactAmount(transfer: EthereumTokenTransfer): string {
-    return this.formatEthereumQuantity(transfer.value, transfer.token.decimals, 36);
+    if (!transfer.token.decimals) {
+      return `${this.formatEthereumInteger(transfer.value)} raw units; token precision unavailable`;
+    }
+    return `${this.formatEthereumQuantity(transfer.value, transfer.token.decimals, 36)} ${transfer.token.symbol || 'tokens'}`;
+  }
+
+  ethereumTransferAmount(transfer: EthereumTokenTransfer): string {
+    if (!transfer.token.decimals) {
+      return `${this.formatEthereumInteger(transfer.value)} raw units`;
+    }
+    return `${this.formatEthereumQuantity(transfer.value, transfer.token.decimals)} ${transfer.token.symbol || 'tokens'}`;
+  }
+
+  get ethereumVisibleTokenTransfers(): EthereumTokenTransfer[] {
+    const transfers = this.tx?.ethereum?.tokenTransfers || [];
+    return this.showAllEthereumTokenTransfers ? transfers : transfers.slice(0, 20);
+  }
+
+  get ethereumHiddenTokenTransferCount(): number {
+    return Math.max(0, (this.tx?.ethereum?.tokenTransfers?.length || 0) - 20);
+  }
+
+  toggleEthereumTokenTransfers(): void {
+    this.showAllEthereumTokenTransfers = !this.showAllEthereumTokenTransfers;
   }
 
   ethereumTokenAccent(token: EthereumToken | null | undefined): string {
@@ -287,17 +318,37 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
+    this.showAllEthereumTokenTransfers = false;
+    this.tx.ethereum.tokenTransfers = (this.tx.ethereum.tokenTransfers || []).map((transfer) => {
+      const known = KNOWN_ETHEREUM_TOKENS[transfer.token.address?.toLowerCase()];
+      return known ? {
+        ...transfer,
+        token: {
+          ...transfer.token,
+          name: transfer.token.name || known.name,
+          symbol: transfer.token.symbol || known.symbol,
+          decimals: transfer.token.decimals || known.decimals,
+        },
+      } : transfer;
+    });
+
     const flows: AssetFlow[] = [];
     if (this.ethereumValueWei && this.ethereumValueWei !== '0') {
       flows.push({ id: 'eth', palette: ETHEREUM_NATIVE_PALETTE });
     }
+    const seenAssets = new Set<string>();
     for (const transfer of this.tx.ethereum.tokenTransfers || []) {
+      const assetId = transfer.token.address?.toLowerCase() || `unknown:${transfer.logIndex || flows.length}`;
+      if (seenAssets.has(assetId)) {
+        continue;
+      }
+      seenAssets.add(assetId);
       flows.push({
-        id: `${transfer.token.address}:${transfer.logIndex || flows.length}`,
+        id: assetId,
         palette: transfer.token.palette?.length ? transfer.token.palette : FALLBACK_TOKEN_PALETTE,
       });
     }
-    this.ethereumAssetFlows = flows.slice(0, 32);
+    this.ethereumAssetFlows = flows.slice(0, 16);
   }
 
   private normalizeEthereumInteger(value: string | null | undefined): string | null {

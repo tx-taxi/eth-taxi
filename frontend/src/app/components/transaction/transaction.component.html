@@ -204,7 +204,7 @@
           </div>
         </div>
 
-        <div *ngIf="ethereumAssetFlows.length" class="ethereum-account-flow__diagram" aria-label="Asset transfer flow">
+        <div *ngIf="ethereumAssetFlows.length > 1" class="ethereum-account-flow__diagram" aria-label="Asset transfer flow">
           <tx-bowtie-graph
             [tx]="tx"
             [cached]="true"
@@ -223,9 +223,12 @@
         </div>
 
         <div *ngIf="tx?.ethereum?.tokenTransfers?.length" class="ethereum-account-flow__assets" aria-label="Token movements">
-          <div class="ethereum-account-flow__assets-heading">Token movements</div>
+          <div class="ethereum-account-flow__assets-heading">
+            <span>Token movements</span>
+            <span>{{ tx.ethereum.tokenTransfers.length | number }}</span>
+          </div>
           <article
-            *ngFor="let transfer of tx.ethereum.tokenTransfers"
+            *ngFor="let transfer of ethereumVisibleTokenTransfers"
             class="ethereum-token-transfer"
             [style.--ethereum-token-accent]="ethereumTokenAccent(transfer.token)"
           >
@@ -236,7 +239,7 @@
                 [link]="ethereumTokenLink(transfer.token.address)"
               ></app-ethereum-identity>
               <span class="ethereum-token-transfer__amount" [title]="ethereumTransferExactAmount(transfer)">
-                {{ formatEthereumQuantity(transfer.value, transfer.token.decimals) }} {{ transfer.token.symbol || 'tokens' }}
+                {{ ethereumTransferAmount(transfer) }}
               </span>
             </div>
 
@@ -256,6 +259,14 @@
               <ng-template #createdTokenContract><span class="ethereum-token-transfer__missing">Contract creation</span></ng-template>
             </div>
           </article>
+          <button
+            *ngIf="ethereumHiddenTokenTransferCount || showAllEthereumTokenTransfers"
+            type="button"
+            class="ethereum-token-transfer__toggle"
+            (click)="toggleEthereumTokenTransfers()"
+          >
+            {{ showAllEthereumTokenTransfers ? 'Show fewer movements' : 'Show ' + ethereumHiddenTokenTransferCount + ' more movements' }}
+          </button>
         </div>
       </div>
     </section>

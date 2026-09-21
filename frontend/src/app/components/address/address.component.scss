@@ -153,6 +153,66 @@ h1 {
   margin: 0 0 1rem;
 }
 
+.ethereum-address-history-state {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.125rem;
+  border: 1px solid var(--border-subtle);
+  background: var(--stat-box-bg);
+  color: var(--transparent-fg);
+
+  fa-icon {
+    flex: 0 0 auto;
+    margin-top: 0.1rem;
+    color: var(--info);
+  }
+
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+  }
+
+  strong {
+    color: var(--title-fg);
+    font-size: 0.875rem;
+  }
+
+  span {
+    max-width: 64ch;
+    font-size: 0.8125rem;
+    line-height: 1.45;
+  }
+}
+
+.ethereum-address-history-state__retry {
+  align-self: flex-start;
+  margin-top: 0.4rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--link-color);
+  font-size: 0.8125rem;
+  font-weight: 600;
+
+  fa-icon {
+    margin-right: 0.25rem;
+    color: currentColor;
+  }
+}
+
+.ethereum-address-history-state__retry:hover,
+.ethereum-address-history-state__retry:focus-visible {
+  color: var(--link-hover-color);
+}
+
+.ethereum-address-history-state__retry:focus-visible {
+  outline: 2px solid var(--info);
+  outline-offset: 3px;
+}
+
 .ethereum-address-tokens__heading {
   display: flex;
   align-items: baseline;

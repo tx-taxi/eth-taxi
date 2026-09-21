@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { StateService } from '@app/services/state.service';
 import { Transaction, Vout } from '@interfaces/electrs.interface';
-import { Observable, Subscription, catchError, combineLatest, map, of, startWith, switchMap, tap } from 'rxjs';
+import { Observable, Subject, Subscription, catchError, combineLatest, map, of, startWith, switchMap, tap, timeout } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ElectrsApiService } from '@app/services/electrs-api.service';
 import { PreloadService } from '@app/services/preload.service';
@@ -31,6 +31,7 @@ export class BlockTransactionsComponent implements OnInit {
   transactionSubscription: Subscription;
   txsLoadingStatus$: Observable<number>;
   nextBlockTxListSubscription: Subscription;
+  private retryTransactions$ = new Subject<void>();
 
   constructor(
     private stateService: StateService,
@@ -40,18 +41,24 @@ export class BlockTransactionsComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.transactions$ = combineLatest([this.block$, this.route.queryParams]).pipe(
+    this.transactions$ = combineLatest([
+      this.block$,
+      this.route.queryParams,
+      this.retryTransactions$.pipe(startWith(undefined)),
+    ]).pipe(
       tap(([_, queryParams]) => {
         this.page = +queryParams['page'] || 1;
+        this.transactionsError = null;
       }),
       switchMap(([block, _]) => this.electrsApiService.getBlockTransactions$(block.id, (this.page - 1) * this.itemsPerPage)
         .pipe(
-          startWith(null),
+          timeout({ first: 1200 }),
           catchError((err) => {
             this.transactionsError = err;
             return of([]);
-        }))
-      ),
+          }),
+          startWith(null),
+        )),
       tap((transactions: Transaction[]) => {
         // The block API doesn't contain the block rewards on Liquid
         if (this.stateService.isLiquid() && transactions && transactions[0] && transactions[0].vin[0].is_coinbase) {
@@ -71,5 +78,9 @@ export class BlockTransactionsComponent implements OnInit {
   pageChange(page: number, target: HTMLElement): void {
     target.scrollIntoView(); // works for chrome
     this.router.navigate([], { queryParams: { page: page }, queryParamsHandling: 'merge' });
+  }
+
+  retryTransactions(): void {
+    this.retryTransactions$.next();
   }
 }

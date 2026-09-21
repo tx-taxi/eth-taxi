@@ -129,6 +129,16 @@ export class BlockComponent implements OnInit, OnDestroy {
     return this.showAudit || this.block?.stale;
   }
 
+  formatEthereumWei(value: number | null | undefined): string {
+    if (!Number.isFinite(value)) {
+      return 'Unavailable';
+    }
+    return new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 8,
+    }).format(value / 1_000_000_000_000_000_000);
+  }
+
   ngOnInit(): void {
     this.websocketService.want(['blocks', 'mempool-blocks']);
     this.network = this.stateService.network;
@@ -217,27 +227,24 @@ export class BlockComponent implements OnInit, OnDestroy {
 
           let blockInCache: BlockExtended;
           if (isBlockHeight) {
-            blockInCache = this.latestBlocks.find((block) => block.height === parseInt(blockHash, 10));
+            const requestedHeight = parseInt(blockHash, 10);
+            blockInCache = this.latestBlocks.find((block) => block.height === requestedHeight);
             if (blockInCache) {
               return of(blockInCache);
             }
-            return this.electrsApiService.getBlockHashFromHeight$(parseInt(blockHash, 10))
+            return this.apiService.getBlocks$(requestedHeight)
               .pipe(
-                switchMap((hash) => {
-                  this.blockHash = hash;
+                map((blocks) => {
+                  const block = blocks.find((candidate) => candidate.height === requestedHeight);
+                  if (!block) {
+                    throw new Error(`Ethereum block ${requestedHeight} was not returned by the provider`);
+                  }
+                  this.blockHash = block.id;
                   this.location.replaceState(
-                    this.router.createUrlTree([(this.network ? '/' + this.network : '') + '/block/', hash]).toString()
+                    this.router.createUrlTree([(this.network ? '/' + this.network : '') + '/block/', block.id]).toString()
                   );
                   this.seoService.updateCanonical(this.location.path());
-                  return this.apiService.getBlock$(hash).pipe(
-                    catchError((err) => {
-                      this.error = err;
-                      this.isLoadingBlock = false;
-                      this.isLoadingOverview = false;
-                      this.seoService.logSoft404();
-                      return EMPTY;
-                    })
-                  );
+                  return block;
                 }),
                 catchError((err) => {
                   this.error = err;

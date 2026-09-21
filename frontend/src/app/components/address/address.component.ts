@@ -159,6 +159,19 @@ export class AddressComponent implements OnInit, OnDestroy {
     return this.ethereumTokenLink(tokenAddress);
   }
 
+  get ethereumHistoryUnavailable(): boolean {
+    return this.address?.ethereum?.historyUnavailable === true;
+  }
+
+  get hasEthereumFiatConversion(): boolean {
+    const exchangeRate = Number(this.address?.ethereum?.exchangeRate);
+    return Number.isFinite(exchangeRate) && exchangeRate > 0;
+  }
+
+  retryEthereumHistory(): void {
+    window.location.reload();
+  }
+
   ethereumAddressLink(address: string | null | undefined): string | null {
     return address ? `${this.relativeUrlPipe.transform('/address/')}${address}` : null;
   }
@@ -420,6 +433,9 @@ export class AddressComponent implements OnInit, OnDestroy {
 
     this.blockTxSubscription = this.stateService.blockTransactions$
       .subscribe((transaction) => {
+        if (!this.transactions || !this.chainStats || !this.mempoolStats) {
+          return;
+        }
         const tx = this.transactions.find((t) => t.txid === transaction.txid);
         if (tx) {
           tx.status = transaction.status;

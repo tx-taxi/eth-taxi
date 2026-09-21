@@ -142,19 +142,13 @@
         <tr>
           <td i18n="block.total-fees|Total fees in a block">Total fees</td>
           <td>
-            <app-amount [satoshis]="block.extras.totalFees" digitsInfo="1.2-3" [noFiat]="true"></app-amount>
-            <span class="fiat">
-              <app-fiat [blockConversion]="blockConversion" [value]="block.extras.totalFees" digitsInfo="1.0-0"></app-fiat>
-            </span>
+            &lrm;{{ formatEthereumWei(block.extras.totalFees) }} ETH
           </td>
         </tr>
         <tr>
           <td>Validator reward</td>
           <td>
-            <app-amount [satoshis]="block.extras.reward" digitsInfo="1.2-3" [noFiat]="true"></app-amount>
-            <span class="fiat">
-              <app-fiat [blockConversion]="blockConversion" [value]="block.extras.reward" digitsInfo="1.0-0"></app-fiat>
-            </span>
+            &lrm;{{ formatEthereumWei(block.extras.reward) }} ETH
           </td>
         </tr>
       </ng-template>

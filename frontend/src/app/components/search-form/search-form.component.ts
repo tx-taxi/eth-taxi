@@ -29,6 +29,7 @@ export class SearchFormComponent implements OnInit {
   typeAhead$: Observable<any>;
   searchForm: UntypedFormGroup;
   dropdownHidden = false;
+  searchError = '';
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event) {
@@ -109,6 +110,7 @@ export class SearchFormComponent implements OnInit {
         return text.trim();
       }),
       tap((text) => {
+        this.searchError = '';
         this.stateService.searchText$.next(text);
       }),
       distinctUntilChanged(),
@@ -265,13 +267,18 @@ export class SearchFormComponent implements OnInit {
     const searchText = result || this.searchForm.value.searchText.trim();
     if (searchText) {
       this.isSearching = true;
+      this.searchError = '';
 
       if (!this.regexTransaction.test(searchText) && this.regexAddress.test(searchText)) {
         this.navigate('/address/', searchText);
       } else if (this.regexBlockhash.test(searchText)) {
         this.navigate('/block/', searchText);
       } else if (this.regexBlockheight.test(searchText)) {
-        parseInt(searchText) <= this.stateService.latestBlockHeight ? this.navigate('/block/', searchText) : this.isSearching = false;
+        if (parseInt(searchText) <= this.stateService.latestBlockHeight) {
+          this.navigate('/block/', searchText);
+        } else {
+          this.showSearchError('That block has not been produced yet.');
+        }
       } else if (this.regexTransaction.test(searchText)) {
         const matches = this.regexTransaction.exec(searchText);
         if (this.network === 'liquid' || this.network === 'liquidtestnet') {
@@ -296,17 +303,23 @@ export class SearchFormComponent implements OnInit {
         this.regexDate.test(searchText) ? timestamp = Math.floor(new Date(searchText).getTime() / 1000) : timestamp = searchText;
         // Check if timestamp is too far in the future or before the genesis block
         if (timestamp > Math.floor(Date.now() / 1000)) {
-          this.isSearching = false;
+          this.showSearchError('Enter a date or timestamp that is not in the future.');
           return;
         }
         this.apiService.getBlockDataFromTimestamp$(timestamp).subscribe(
           (data) => { this.navigate('/block/', data.hash); },
-          (error) => { console.log(error); this.isSearching = false; }
+          () => { this.showSearchError('No Ethereum block was found for that time.'); }
         );
       } else {
-        this.isSearching = false;
+        this.showSearchError('Enter an Ethereum address, transaction hash, or block number.');
       }
     }
+  }
+
+  private showSearchError(message: string): void {
+    this.isSearching = false;
+    this.dropdownHidden = true;
+    this.searchError = message;
   }
 
 
@@ -319,6 +332,7 @@ export class SearchFormComponent implements OnInit {
       this.searchForm.setValue({
         searchText: '',
       });
+      this.searchError = '';
       this.isSearching = false;
     }
   }

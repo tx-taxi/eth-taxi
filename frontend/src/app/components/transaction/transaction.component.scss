@@ -241,6 +241,10 @@
 }
 
 .ethereum-account-flow__assets-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
   padding: 0.6rem 1rem;
   color: var(--transparent-fg);
   font-size: 0.75rem;
@@ -256,12 +260,34 @@
   gap: 1rem;
   min-width: 0;
   padding: 0.85rem 1rem;
-  border-left: 3px solid var(--ethereum-token-accent, transparent);
+  border-left: 1px solid var(--ethereum-token-accent, var(--border-subtle));
   border-bottom: 1px solid var(--border-subtle);
 }
 
 .ethereum-token-transfer:last-child {
   border-bottom: 0;
+}
+
+.ethereum-token-transfer__toggle {
+  width: 100%;
+  min-height: 2.75rem;
+  border: 0;
+  border-top: 1px solid var(--border-subtle);
+  background: var(--box-bg);
+  color: var(--link-color);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.ethereum-token-transfer__toggle:hover,
+.ethereum-token-transfer__toggle:focus-visible {
+  background: color-mix(in srgb, var(--primary) 8%, var(--box-bg));
+  color: var(--link-hover-color);
+}
+
+.ethereum-token-transfer__toggle:focus-visible {
+  outline: 2px solid var(--info);
+  outline-offset: -2px;
 }
 
 .ethereum-token-transfer:nth-child(even) {
