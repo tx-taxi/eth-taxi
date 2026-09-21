@@ -208,6 +208,10 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
     return address ? `${this.relativeUrlPipe.transform('/token/')}${address}` : null;
   }
 
+  ethereumBlockLink(height: number | null | undefined): string | null {
+    return height != null ? `${this.relativeUrlPipe.transform('/block/')}${height}` : null;
+  }
+
   formatEthereumQuantity(value: string | null | undefined, decimals: string | null | undefined = '18', maxFractionDigits = 8): string {
     const normalizedValue = this.normalizeEthereumInteger(value);
     const decimalPlaces = this.parseEthereumDecimals(decimals);
@@ -239,6 +243,11 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ethereumMethod(): string {
     return this.tx?.ethereum?.decodedInput?.methodCall || this.tx?.ethereum?.method || this.tx?.vin?.[0]?.scriptsig_asm || 'Transfer';
+  }
+
+  get ethereumFlowMethod(): string | null {
+    const method = this.ethereumMethod();
+    return /^(transfer|coin transfer|contract call)$/i.test(method) ? null : method;
   }
 
   ethereumIdentityLink(identity: EthereumIdentity | null | undefined): string | null {

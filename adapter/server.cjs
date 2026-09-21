@@ -16,12 +16,17 @@ const providers = (process.env.ETH_PROVIDER_URLS || 'https://eth.blockscout.com,
   .filter(Boolean);
 const sockets = new Set();
 const mempoolBlockSubscriptions = new Map();
+const transactionSubscriptions = new Map();
+const transactionStreamSignatures = new Map();
+const addressSubscriptions = new Map();
+const addressTransactionSnapshots = new Map();
 let activeProvider = providers[0];
 let cachedSnapshot;
 let cachedAt = 0;
 let mempoolSamples = [];
 let lastBroadcastSignature = '';
 let lastBroadcastAt = 0;
+let pollInFlight = false;
 
 const POLL_INTERVAL_MS = Math.max(3_000, Number(process.env.ETH_POLL_INTERVAL_MS || 6_000));
 const HEARTBEAT_INTERVAL_MS = 30_000;
@@ -433,7 +438,128 @@ function sendProjectedBlock(socket, data, index) {
   socket.send(JSON.stringify(projectedBlockPayload(data, index)));
 }
 
-function broadcastSnapshot(data) {
+function sendSocket(socket, payload) {
+  if (socket.readyState !== socket.OPEN) return false;
+  try {
+    socket.send(JSON.stringify(payload));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function transactionStreamSignature(transaction) {
+  const status = transaction?.status || {};
+  const ethereum = transaction?.ethereum || {};
+  const tokenTransfers = (ethereum.tokenTransfers || [])
+    .map((transfer) => `${transfer.transactionHash}:${transfer.logIndex}:${transfer.value}:${transfer.token?.address}`)
+    .join(',');
+  return [
+    transaction?.txid,
+    status.confirmed ? 'confirmed' : 'pending',
+    status.block_height || '',
+    ethereum.confirmations || '',
+    ethereum.status || '',
+    ethereum.result || '',
+    transaction?.fee || 0,
+    transaction?.vsize || 0,
+    transaction?.value || 0,
+    tokenTransfers,
+  ].join('|');
+}
+
+async function streamTrackedTransaction(socket, txid, force = false) {
+  const signatures = transactionStreamSignatures.get(socket);
+  if (!signatures) return;
+
+  try {
+    const transaction = await transactionById(txid);
+    const signature = transactionStreamSignature(transaction);
+    if (force || signatures.get(txid) !== signature) {
+      signatures.set(txid, signature);
+      // `tx` is the established mempool websocket event. Reusing it keeps the
+      // transaction page's existing state and change-detection path intact.
+      sendSocket(socket, { tx: transaction });
+    }
+  } catch {
+    // Public explorers can lag a just-broadcast transaction. Keep the
+    // subscription alive and try again on the next source update.
+  }
+}
+
+function addressTransactionSignature(transaction) {
+  const status = transaction?.status || {};
+  const ethereum = transaction?.ethereum || {};
+  return [
+    transaction?.txid,
+    status.confirmed ? 'confirmed' : 'pending',
+    status.block_height || '',
+    ethereum.confirmations || '',
+    ethereum.status || '',
+    ethereum.result || '',
+  ].join('|');
+}
+
+async function primeAddressSubscription(socket, address) {
+  const snapshots = addressTransactionSnapshots.get(socket);
+  if (!snapshots) return;
+
+  try {
+    const transactions = await addressTransactions(address);
+    snapshots.set(address, new Map(transactions.map((transaction) => [transaction.txid, addressTransactionSignature(transaction)])));
+  } catch {
+    // The address page already has its normal initial HTTP fetch. Failing to
+    // prime a live subscription must not change that page into an error state.
+  }
+}
+
+async function streamAddressSubscription(socket, address) {
+  const snapshots = addressTransactionSnapshots.get(socket);
+  if (!snapshots) return;
+
+  try {
+    const transactions = await addressTransactions(address);
+    const previous = snapshots.get(address) || new Map();
+    const next = new Map();
+
+    for (const transaction of transactions) {
+      const signature = addressTransactionSignature(transaction);
+      const previousSignature = previous.get(transaction.txid);
+      next.set(transaction.txid, signature);
+
+      if (!previousSignature) {
+        sendSocket(socket, transaction.status?.confirmed
+          ? { 'block-transactions': [transaction] }
+          : { 'address-transactions': [transaction] });
+      } else if (previousSignature !== signature && transaction.status?.confirmed) {
+        // A tracked pending transaction was included in a block. The inherited
+        // address component already knows how to replace its pending status.
+        sendSocket(socket, { 'block-transactions': [transaction] });
+      }
+    }
+
+    // Do not synthesize removals from a paginated public-explorer response.
+    // A newly seen transaction can push an older pending item off the page.
+    snapshots.set(address, next);
+  } catch {
+    // Retain the last successful state and retry after the next source update.
+  }
+}
+
+async function streamSubscriptions() {
+  const streams = [];
+  for (const socket of sockets) {
+    for (const txid of transactionSubscriptions.get(socket) || []) {
+      streams.push(streamTrackedTransaction(socket, txid));
+    }
+    for (const address of addressSubscriptions.get(socket) || []) {
+      streams.push(streamAddressSubscription(socket, address));
+    }
+  }
+  await Promise.allSettled(streams);
+}
+
+async function broadcastSnapshot(data) {
   const encoded = JSON.stringify(data);
   for (const socket of sockets) {
     if (socket.readyState !== socket.OPEN) continue;
@@ -447,6 +573,7 @@ function broadcastSnapshot(data) {
       // removes the subscription state.
     }
   }
+  await streamSubscriptions();
 }
 
 async function blocksEndingAt(height) {
@@ -748,10 +875,20 @@ const wss = new WebSocketServer({ noServer: true });
 wss.on('connection', async (socket) => {
   sockets.add(socket);
   const trackedMempoolBlocks = new Set();
+  const trackedTransactions = new Set();
+  const trackedAddresses = new Set();
   mempoolBlockSubscriptions.set(socket, trackedMempoolBlocks);
+  transactionSubscriptions.set(socket, trackedTransactions);
+  transactionStreamSignatures.set(socket, new Map());
+  addressSubscriptions.set(socket, trackedAddresses);
+  addressTransactionSnapshots.set(socket, new Map());
   socket.on('close', () => {
     sockets.delete(socket);
     mempoolBlockSubscriptions.delete(socket);
+    transactionSubscriptions.delete(socket);
+    transactionStreamSignatures.delete(socket);
+    addressSubscriptions.delete(socket);
+    addressTransactionSnapshots.delete(socket);
   });
   socket.on('message', async (message) => {
     try {
@@ -764,19 +901,42 @@ wss.on('connection', async (socket) => {
         socket.send(JSON.stringify(await snapshot()));
         return;
       }
+      if (request['track-tx'] === 'stop') {
+        trackedTransactions.clear();
+        transactionStreamSignatures.get(socket)?.clear();
+        return;
+      }
       if (typeof request['track-tx'] === 'string' && request['track-tx'] !== 'stop') {
         const data = await snapshot();
-        const transaction = data.projectedTransactions.find((item) => item.txid === request['track-tx']);
+        const txid = request['track-tx'];
+        const transaction = data.projectedTransactions.find((item) => item.txid === txid);
+        trackedTransactions.add(txid);
         // Ethereum's pending pool has no Bitcoin-style package position. A
         // pending transaction is instead estimated for the next validator slot.
         socket.send(JSON.stringify({
           txPosition: {
-            txid: request['track-tx'],
+            txid,
             position: { block: 0, vsize: transaction?.vsize || 0 },
             cpfp: null,
             accelerationPositions: [],
           },
         }));
+        await streamTrackedTransaction(socket, txid, true);
+        return;
+      }
+      if (request['track-address'] === 'stop') {
+        trackedAddresses.clear();
+        addressTransactionSnapshots.get(socket)?.clear();
+        return;
+      }
+      if (typeof request['track-address'] === 'string' && /^0x[a-fA-F0-9]{40}$/.test(request['track-address'])) {
+        const address = request['track-address'];
+        // The shared client tracks one address view at a time. Replacing the
+        // previous subscription prevents stale pages from consuming provider IO.
+        trackedAddresses.clear();
+        trackedAddresses.add(address);
+        addressTransactionSnapshots.get(socket)?.clear();
+        await primeAddressSubscription(socket, address);
         return;
       }
       if (Number.isInteger(request['track-mempool-block']) && request['track-mempool-block'] >= 0) {
@@ -800,7 +960,8 @@ server.on('upgrade', (req, socket, head) => {
   wss.handleUpgrade(req, socket, head, (client) => wss.emit('connection', client, req));
 });
 setInterval(async () => {
-  if (!sockets.size) return;
+  if (!sockets.size || pollInFlight) return;
+  pollInFlight = true;
   try {
     const data = await snapshot(true);
     const signature = snapshotSignature(data);
@@ -808,9 +969,10 @@ setInterval(async () => {
     if (signature !== lastBroadcastSignature || now - lastBroadcastAt >= HEARTBEAT_INTERVAL_MS) {
       lastBroadcastSignature = signature;
       lastBroadcastAt = now;
-      broadcastSnapshot(data);
+      await broadcastSnapshot(data);
     }
   } catch { /* Retain the last good provider response. */ }
+  finally { pollInFlight = false; }
 }, POLL_INTERVAL_MS).unref();
 
 server.listen(port, host, () => console.log(`ETH adapter listening on http://${host}:${port}`));
