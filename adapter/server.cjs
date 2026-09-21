@@ -39,6 +39,8 @@ const POLL_INTERVAL_MS = Math.max(3_000, Number(process.env.ETH_POLL_INTERVAL_MS
 const HEARTBEAT_INTERVAL_MS = 30_000;
 const EXPLORER_RATE_LIMIT_COOLDOWN_MS = 15 * 60_000;
 const ERC20_TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
+const RPC_TOKEN_TRANSFER_BLOCK_SPAN = 2;
+const RPC_TOKEN_TRANSFER_LIMIT = 100;
 
 // These mirror the frontend's BigInt filter flags. Keep them below 2^53 so
 // they retain their exact value when serialized through the JSON adapter.
@@ -385,6 +387,80 @@ function rpcTokenTransfers(receipt, blockTimestamp) {
         type: isNft ? 'ERC-721' : 'ERC-20',
       };
     });
+}
+
+function decodeRpcAbiString(value) {
+  if (typeof value !== 'string' || !/^0x[\da-f]*$/i.test(value) || value.length <= 2) return null;
+  const payload = value.slice(2);
+  const word = (offset) => payload.slice(offset * 2, (offset + 32) * 2);
+  const dynamicOffset = Number(hexBigInt(`0x${word(0)}`));
+  if (Number.isSafeInteger(dynamicOffset) && dynamicOffset >= 0 && word(dynamicOffset).length === 64) {
+    const length = Number(hexBigInt(`0x${word(dynamicOffset)}`));
+    const content = payload.slice((dynamicOffset + 32) * 2, (dynamicOffset + 32 + length) * 2);
+    if (content.length === length * 2) {
+      const decoded = Buffer.from(content, 'hex').toString('utf8').replace(/\0/g, '').trim();
+      if (decoded) return decoded;
+    }
+  }
+  return Buffer.from(word(0), 'hex').toString('utf8').replace(/\0/g, '').trim() || null;
+}
+
+async function rpcTokenMetadata(address) {
+  const call = (data) => rpcJson('eth_call', [{ to: address, data }, 'latest'], { requireResult: true });
+  const [nameResult, symbolResult, decimalsResult, totalSupplyResult] = await Promise.all([
+    call('0x06fdde03').catch(() => null),
+    call('0x95d89b41').catch(() => null),
+    call('0x313ce567').catch(() => null),
+    call('0x18160ddd').catch(() => null),
+  ]);
+  return mapEthereumToken({
+    address_hash: address,
+    name: decodeRpcAbiString(nameResult),
+    symbol: decodeRpcAbiString(symbolResult),
+    type: 'ERC-20',
+    decimals: decimalsResult ? hexDecimalString(decimalsResult) : null,
+    total_supply: totalSupplyResult ? hexDecimalString(totalSupplyResult) : null,
+  }, address);
+}
+
+function mapRpcTokenTransfer(log, token) {
+  const isNft = log?.topics?.length >= 4;
+  return {
+    transactionHash: log?.transactionHash || '',
+    logIndex: hexDecimalString(log?.logIndex),
+    blockNumber: hexDecimalString(log?.blockNumber),
+    timestamp: null,
+    from: mapEthereumIdentity(rpcIdentity(rpcTopicAddress(log?.topics?.[1]))),
+    to: mapEthereumIdentity(rpcIdentity(rpcTopicAddress(log?.topics?.[2]))),
+    token,
+    tokenId: isNft ? hexDecimalString(log.topics[3]) : null,
+    value: isNft ? '1' : hexDecimalString(log?.data),
+    type: isNft ? 'ERC-721' : 'ERC-20',
+    method: null,
+  };
+}
+
+async function rpcRecentTokenTransfers(address, searchParams) {
+  const [token, tipHex] = await Promise.all([
+    rpcTokenMetadata(address),
+    rpcJson('eth_blockNumber', [], { requireResult: true }),
+  ]);
+  const tip = hexNumber(tipHex);
+  const from = Math.max(0, tip - RPC_TOKEN_TRANSFER_BLOCK_SPAN + 1);
+  const logs = await rpcJson('eth_getLogs', [{
+    address,
+    fromBlock: `0x${from.toString(16)}`,
+    toBlock: 'latest',
+    topics: [ERC20_TRANSFER_TOPIC],
+  }], { requireResult: true });
+  const requestedCount = number(searchParams.get('items_count'), RPC_TOKEN_TRANSFER_LIMIT);
+  const limit = Math.min(Math.max(requestedCount, 1), RPC_TOKEN_TRANSFER_LIMIT);
+  return {
+    items: (Array.isArray(logs) ? logs : []).slice(-limit).reverse().map((log) => mapRpcTokenTransfer(log, token)),
+    nextPageParams: null,
+    historyUnavailable: true,
+    recentOnly: true,
+  };
 }
 
 function mapRpcTransaction(tx, receipt, block, tipHeight = 0, pending = false) {
@@ -975,21 +1051,31 @@ async function ethereumAddressMetadata(address) {
 }
 
 async function ethereumToken(address) {
-  const token = await providerJson(`/api/v2/tokens/${encodeURIComponent(address)}`);
-  return mapEthereumToken(token, address);
+  try {
+    const token = await providerJson(`/api/v2/tokens/${encodeURIComponent(address)}`);
+    return mapEthereumToken(token, address);
+  } catch {
+    return rpcTokenMetadata(address);
+  }
 }
 
 async function ethereumTokenTransfers(address, searchParams) {
-  const query = new URLSearchParams();
-  for (const key of ['block_number', 'index', 'items_count']) {
-    const value = searchParams.get(key);
-    if (value && /^[0-9]+$/.test(value)) query.set(key, value);
+  try {
+    const query = new URLSearchParams();
+    for (const key of ['block_number', 'index', 'items_count']) {
+      const value = searchParams.get(key);
+      if (value && /^[0-9]+$/.test(value)) query.set(key, value);
+    }
+    const response = await providerJson(`/api/v2/tokens/${encodeURIComponent(address)}/transfers${query.size ? `?${query}` : ''}`);
+    return {
+      items: (response.items || []).map(mapEthereumTokenTransfer),
+      nextPageParams: response.next_page_params || null,
+      historyUnavailable: false,
+      recentOnly: false,
+    };
+  } catch {
+    return rpcRecentTokenTransfers(address, searchParams);
   }
-  const response = await providerJson(`/api/v2/tokens/${encodeURIComponent(address)}/transfers${query.size ? `?${query}` : ''}`);
-  return {
-    items: (response.items || []).map(mapEthereumTokenTransfer),
-    nextPageParams: response.next_page_params || null,
-  };
 }
 
 async function blockscoutSnapshot() {
