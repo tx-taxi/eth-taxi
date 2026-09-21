@@ -268,17 +268,46 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ethereumTransferExactAmount(transfer: EthereumTokenTransfer): string {
-    if (!transfer.token.decimals) {
+    if (!this.ethereumTransferHasPrecision(transfer)) {
       return `${this.formatEthereumInteger(transfer.value)} raw units; token precision unavailable`;
     }
     return `${this.formatEthereumQuantity(transfer.value, transfer.token.decimals, 36)} ${transfer.token.symbol || 'tokens'}`;
   }
 
   ethereumTransferAmount(transfer: EthereumTokenTransfer): string {
-    if (!transfer.token.decimals) {
-      return `${this.formatEthereumInteger(transfer.value)} raw units`;
+    if (!this.ethereumTransferHasPrecision(transfer)) {
+      return `${this.formatEthereumRawUnits(transfer.value)} raw units`;
     }
     return `${this.formatEthereumQuantity(transfer.value, transfer.token.decimals)} ${transfer.token.symbol || 'tokens'}`;
+  }
+
+  private ethereumTransferHasPrecision(transfer: EthereumTokenTransfer): boolean {
+    return this.parseEthereumDecimals(transfer.token.decimals) !== null;
+  }
+
+  private formatEthereumRawUnits(value: string | null | undefined): string {
+    const normalized = this.normalizeEthereumInteger(value);
+    if (normalized === null) {
+      return 'Unavailable';
+    }
+
+    const amount = BigInt(normalized);
+    const units = [
+      { divisor: 1_000_000_000_000_000n, suffix: 'Q' },
+      { divisor: 1_000_000_000_000n, suffix: 'T' },
+      { divisor: 1_000_000_000n, suffix: 'B' },
+      { divisor: 1_000_000n, suffix: 'M' },
+      { divisor: 1_000n, suffix: 'K' },
+    ];
+    const unit = units.find(({ divisor }) => amount >= divisor);
+    if (!unit) {
+      return normalized;
+    }
+
+    const whole = amount / unit.divisor;
+    const remainder = (amount % unit.divisor) * 1_000n / unit.divisor;
+    const fraction = remainder.toString().padStart(3, '0').replace(/0+$/, '');
+    return `${this.formatEthereumInteger(whole.toString())}${fraction ? `.${fraction}` : ''}${unit.suffix}`;
   }
 
   get ethereumVisibleTokenTransfers(): EthereumTokenTransfer[] {
