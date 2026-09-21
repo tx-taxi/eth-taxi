@@ -198,8 +198,11 @@ export class TransactionsListComponent implements OnInit, OnChanges, OnDestroy {
   formatEthereumTransferAmount(transfer: EthereumTokenTransfer, maxFractionDigits = 8): string {
     const normalizedValue = this.normalizeEthereumInteger(transfer.value);
     const decimalPlaces = this.parseEthereumDecimals(transfer.token.decimals);
-    if (normalizedValue === null || decimalPlaces === null) {
+    if (normalizedValue === null) {
       return 'Unavailable';
+    }
+    if (decimalPlaces === null) {
+      return this.formatEthereumRawUnits(normalizedValue);
     }
 
     const amount = BigInt(normalizedValue);
@@ -215,6 +218,24 @@ export class TransactionsListComponent implements OnInit, OnChanges, OnDestroy {
       fraction = fraction.slice(0, maxFractionDigits).replace(/0+$/, '');
     }
     return fraction ? `${this.groupEthereumInteger(whole.toString())}.${fraction}` : this.groupEthereumInteger(whole.toString());
+  }
+
+  ethereumTransferLabel(transfer: EthereumTokenTransfer): string {
+    const amount = this.formatEthereumTransferAmount(transfer);
+    if (amount === 'Unavailable') return amount;
+    if (this.parseEthereumDecimals(transfer.token.decimals) === null) {
+      return `${amount} raw units`;
+    }
+    return `${amount} ${transfer.token.symbol || 'tokens'}`;
+  }
+
+  ethereumTransferTitle(transfer: EthereumTokenTransfer): string {
+    const normalizedValue = this.normalizeEthereumInteger(transfer.value);
+    if (normalizedValue === null) return 'Unavailable';
+    if (this.parseEthereumDecimals(transfer.token.decimals) === null) {
+      return `${this.groupEthereumInteger(normalizedValue)} raw units`;
+    }
+    return this.ethereumTransferLabel(transfer);
   }
 
   ethereumListSummary(tx: Transaction): string | null {
@@ -233,7 +254,7 @@ export class TransactionsListComponent implements OnInit, OnChanges, OnDestroy {
   private parseEthereumDecimals(value: string | null | undefined): number | null {
     const normalized = value?.trim();
     if (!normalized || !/^\d+$/.test(normalized)) {
-      return 0;
+      return null;
     }
     const decimals = BigInt(normalized);
     return decimals <= 255n ? Number(decimals) : null;
@@ -241,6 +262,14 @@ export class TransactionsListComponent implements OnInit, OnChanges, OnDestroy {
 
   private groupEthereumInteger(value: string): string {
     return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+
+  private formatEthereumRawUnits(value: string): string {
+    if (value.length <= 9) {
+      return this.groupEthereumInteger(value);
+    }
+    const fraction = value.slice(1, 4).replace(/0+$/, '');
+    return `${value[0]}${fraction ? `.${fraction}` : ''}e${value.length - 1}`;
   }
 
   refreshPrice(): void {

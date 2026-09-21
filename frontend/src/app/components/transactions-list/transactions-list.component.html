@@ -413,11 +413,11 @@
                   </ng-template>
                   <ng-template #defaultOutput>
                     <ng-container *ngIf="tx.ethereum?.tokenTransfers?.[0] as transfer; else nativeAmount">
-                      <span class="ethereum-list-token-amount" [title]="formatEthereumTransferAmount(transfer, 36)">
-                        {{ formatEthereumTransferAmount(transfer) }} {{ transfer.token.symbol || 'tokens' }}
+                      <span class="ethereum-list-token-amount" [title]="ethereumTransferTitle(transfer)">
+                        {{ ethereumTransferLabel(transfer) }}
                       </span>
                       <span *ngIf="tx.ethereum.tokenTransfers.length > 1" class="ethereum-list-token-extra">
-                        +{{ tx.ethereum.tokenTransfers.length - 1 }}
+                        +{{ tx.ethereum.tokenTransfers.length - 1 }} {{ tx.ethereum.tokenTransfers.length === 2 ? 'transfer' : 'transfers' }}
                       </span>
                     </ng-container>
                     <ng-template #nativeAmount>

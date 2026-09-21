@@ -39,8 +39,6 @@ import { EnterpriseService } from '@app/services/enterprise.service';
 import { ZONE_SERVICE } from '@app/injection-tokens';
 import { MiningService, MiningStats } from '@app/services/mining.service';
 import { ETA, EtaService } from '@app/services/eta.service';
-import { EthereumToken, EthereumTokenTransfer } from '@interfaces/ethereum-api.interface';
-import { AssetFlow } from '@components/tx-bowtie-graph/tx-bowtie-graph.component';
 
 export interface Pool {
   id: number;
@@ -65,16 +63,6 @@ export interface TxAuditStatus {
 const DUPLICATE_TX_BLOCKS: Record<string, [number, number]> = {
   'e3bf3d07d4b0375638d5f1db5255fe07ba2c4cb067cd81b84ee974b6585fb468': [91722, 91880],
   'd5d27987d2a3dfc724e359870c6644b40e497bdc0589a033220fe15429d88599': [91812, 91842],
-};
-
-const ETHEREUM_NATIVE_PALETTE = ['#5269d6', '#8ea2ff', '#c7d2ff'];
-const FALLBACK_TOKEN_PALETTE = ['#167f94', '#38b6cd', '#a9e9f3'];
-const KNOWN_ETHEREUM_TOKENS: Record<string, Partial<EthereumToken>> = {
-  '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48': { name: 'USD Coin', symbol: 'USDC', decimals: '6' },
-  '0xdac17f958d2ee523a2206206994597c13d831ec7': { name: 'Tether USD', symbol: 'USDT', decimals: '6' },
-  '0x6b175474e89094c44da98b954eedeac495271d0f': { name: 'Dai Stablecoin', symbol: 'DAI', decimals: '18' },
-  '0x514910771af9ca656af840dff83e8264ecf986ca': { name: 'Chainlink', symbol: 'LINK', decimals: '18' },
-  '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599': { name: 'Wrapped BTC', symbol: 'WBTC', decimals: '8' },
 };
 
 @Component({
@@ -155,9 +143,6 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
   isLoadingFirstSeen = false;
   notAcceleratedOnLoad: boolean = null;
   duplicateTxBlocks: [number, number] | undefined;
-  ethereumAssetFlows: AssetFlow[] = [];
-  showAllEthereumTokenTransfers = false;
-
   featuresEnabled: boolean;
   segwitEnabled: boolean;
   rbfEnabled: boolean;
@@ -174,30 +159,6 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
   auditEnabled: boolean = this.stateService.env.AUDIT && this.stateService.env.BASE_MODULE === 'mempool' && this.stateService.env.MINING_DASHBOARD === true;
   isMempoolSpaceBuild = this.stateService.isMempoolSpaceBuild;
   partnerCode: string | undefined;
-
-  get ethereumSender(): string {
-    return this.tx?.ethereum?.from?.address || this.tx?.vin?.[0]?.prevout?.scriptpubkey_address || '';
-  }
-
-  get ethereumRecipient(): string {
-    return this.tx?.ethereum?.to?.address || this.tx?.ethereum?.createdContract?.address || this.tx?.vout?.[0]?.scriptpubkey_address || '';
-  }
-
-  get ethereumValueWei(): string | null {
-    return this.tx?.ethereum?.valueWei || null;
-  }
-
-  ethereumAddressLink(address: string | null | undefined): string | null {
-    return address ? `${this.relativeUrlPipe.transform('/address/')}${address}` : null;
-  }
-
-  ethereumTokenLink(address: string | null | undefined): string | null {
-    return address ? `${this.relativeUrlPipe.transform('/token/')}${address}` : null;
-  }
-
-  ethereumBlockLink(height: number | null | undefined): string | null {
-    return height != null ? `${this.relativeUrlPipe.transform('/block/')}${height}` : null;
-  }
 
   formatEthereumQuantity(value: string | null | undefined, decimals: string | null | undefined = '18', maxFractionDigits = 8): string {
     const normalizedValue = this.normalizeEthereumInteger(value);
@@ -230,158 +191,6 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ethereumMethod(): string {
     return this.tx?.ethereum?.decodedInput?.methodCall || this.tx?.ethereum?.method || this.tx?.vin?.[0]?.scriptsig_asm || 'Transfer';
-  }
-
-  get ethereumFlowMethod(): string | null {
-    const method = this.ethereumMethod();
-    return /^(transfer|coin transfer|contract call)$/i.test(method) ? null : method;
-  }
-
-  get ethereumStateActivity(): string {
-    const flags = this.tx?.flags ? BigInt(this.tx.flags) : 0n;
-    if (this.tx?.ethereum?.createdContract && !this.tx.ethereum.to) {
-      return 'Contract deployment';
-    }
-    if (flags & TransactionFlags.eth_contract_call) {
-      return 'Contract call';
-    }
-    if (flags & TransactionFlags.eth_token_transfer) {
-      return 'Token transfer';
-    }
-    return 'ETH transfer';
-  }
-
-  get ethereumStateTargetLabel(): string {
-    if (this.tx?.ethereum?.createdContract && !this.tx.ethereum.to) {
-      return 'Created contract';
-    }
-    return this.tx?.ethereum?.input !== '0x' ? 'Execution target' : 'Recipient';
-  }
-
-  get ethereumStateStatus(): string {
-    if (this.tx?.ethereum?.hasError) {
-      return 'Reverted';
-    }
-    return this.tx?.status?.confirmed ? 'Succeeded' : 'Pending';
-  }
-
-  get ethereumStateStatusClass(): string {
-    if (this.tx?.ethereum?.hasError) {
-      return 'bg-danger';
-    }
-    return this.tx?.status?.confirmed ? 'bg-success' : 'bg-warning text-dark';
-  }
-
-  get ethereumStateNotice(): string | null {
-    return this.tx?.ethereum
-      ? 'Balance and contract-storage deltas are unavailable from the connected public provider.'
-      : null;
-  }
-
-  get ethereumVisibleTokenTransfers(): EthereumTokenTransfer[] {
-    const transfers = this.tx?.ethereum?.tokenTransfers || [];
-    return this.showAllEthereumTokenTransfers ? transfers : transfers.slice(0, 20);
-  }
-
-  get ethereumHiddenTokenTransferCount(): number {
-    return Math.max(0, (this.tx?.ethereum?.tokenTransfers?.length || 0) - 20);
-  }
-
-  get ethereumFlowGraphWidth(): number {
-    return this.isMobile ? 320 : 960;
-  }
-
-  get ethereumFlowGraphHeight(): number {
-    const strandHeight = this.isMobile ? 22 : 18;
-    const maxHeight = this.isMobile ? 280 : 260;
-    return Math.min(maxHeight, Math.max(96, (this.ethereumAssetFlows.length * strandHeight) + 48));
-  }
-
-  get ethereumFlowMaxCombinedWeight(): number {
-    return Math.min(100, Math.max(28, this.ethereumAssetFlows.length * 10));
-  }
-
-  toggleEthereumTokenTransfers(): void {
-    this.showAllEthereumTokenTransfers = !this.showAllEthereumTokenTransfers;
-  }
-
-  ethereumTransferAmount(transfer: EthereumTokenTransfer): string {
-    if (!this.ethereumTransferHasPrecision(transfer)) {
-      return `${this.formatEthereumRawUnits(transfer.value)} raw units`;
-    }
-    return `${this.formatEthereumQuantity(transfer.value, transfer.token.decimals)} ${transfer.token.symbol || 'tokens'}`;
-  }
-
-  private ethereumTransferHasPrecision(transfer: EthereumTokenTransfer): boolean {
-    return this.parseEthereumDecimals(transfer.token.decimals) !== null;
-  }
-
-  private formatEthereumRawUnits(value: string | null | undefined): string {
-    const normalized = this.normalizeEthereumInteger(value);
-    if (normalized === null) {
-      return 'Unavailable';
-    }
-
-    const amount = BigInt(normalized);
-    const units = [
-      { divisor: 1_000_000_000_000_000n, suffix: 'Q' },
-      { divisor: 1_000_000_000_000n, suffix: 'T' },
-      { divisor: 1_000_000_000n, suffix: 'B' },
-      { divisor: 1_000_000n, suffix: 'M' },
-      { divisor: 1_000n, suffix: 'K' },
-    ];
-    const unit = units.find(({ divisor }) => amount >= divisor);
-    if (!unit) {
-      return normalized;
-    }
-
-    const whole = amount / unit.divisor;
-    const remainder = (amount % unit.divisor) * 1_000n / unit.divisor;
-    const fraction = remainder.toString().padStart(3, '0').replace(/0+$/, '');
-    return `${this.formatEthereumInteger(whole.toString())}${fraction ? `.${fraction}` : ''}${unit.suffix}`;
-  }
-
-  ethereumTokenAccent(token: EthereumToken | null | undefined): string {
-    return token?.palette?.[0] || FALLBACK_TOKEN_PALETTE[0];
-  }
-
-  private setEthereumAssetFlows(): void {
-    if (!this.tx?.ethereum) {
-      this.ethereumAssetFlows = [];
-      return;
-    }
-
-    this.showAllEthereumTokenTransfers = false;
-    this.tx.ethereum.tokenTransfers = (this.tx.ethereum.tokenTransfers || []).map((transfer) => {
-      const known = KNOWN_ETHEREUM_TOKENS[transfer.token.address?.toLowerCase()];
-      return known ? {
-        ...transfer,
-        token: {
-          ...transfer.token,
-          name: transfer.token.name || known.name,
-          symbol: transfer.token.symbol || known.symbol,
-          decimals: transfer.token.decimals || known.decimals,
-        },
-      } : transfer;
-    });
-
-    const flows: AssetFlow[] = [];
-    if (this.ethereumValueWei && this.ethereumValueWei !== '0') {
-      flows.push({ id: 'eth', palette: ETHEREUM_NATIVE_PALETTE });
-    }
-    const seenAssets = new Set<string>();
-    for (const transfer of this.tx.ethereum.tokenTransfers || []) {
-      const assetId = transfer.token.address?.toLowerCase() || `unknown:${transfer.logIndex || flows.length}`;
-      if (seenAssets.has(assetId)) {
-        continue;
-      }
-      seenAssets.add(assetId);
-      flows.push({
-        id: assetId,
-        palette: transfer.token.palette?.length ? transfer.token.palette : FALLBACK_TOKEN_PALETTE,
-      });
-    }
-    this.ethereumAssetFlows = flows.slice(0, 16);
   }
 
   private normalizeEthereumInteger(value: string | null | undefined): string | null {
@@ -903,7 +712,6 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
 
           this.tx = tx;
           this.setFeatures();
-          this.setEthereumAssetFlows();
           this.isCached = false;
           if (tx.fee === undefined) {
             this.tx.fee = 0;

@@ -25,6 +25,7 @@ const transactionStreamSignatures = new Map();
 const addressSubscriptions = new Map();
 const addressTransactionSnapshots = new Map();
 const rpcBlockFeeCache = new Map();
+const tokenMetadataCache = new Map();
 let activeProvider = providers[0];
 let activeRpcProvider = rpcProviders[0];
 let cachedSnapshot;
@@ -42,6 +43,8 @@ const ERC20_TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a116
 const RPC_TOKEN_TRANSFER_BLOCK_SPAN = 2;
 const RPC_TOKEN_TRANSFER_LIMIT = 100;
 const BLOCK_PAGE_SIZE = 10;
+const TOKEN_METADATA_CACHE_MS = 15 * 60_000;
+const TRANSACTION_TOKEN_METADATA_LIMIT = 12;
 
 // These mirror the frontend's BigInt filter flags. Keep them below 2^53 so
 // they retain their exact value when serialized through the JSON adapter.
@@ -580,7 +583,7 @@ async function rpcTransactionById(id) {
     transaction.blockNumber ? rpcJson('eth_blockNumber').catch(() => null) : Promise.resolve(null),
   ]);
   const fallback = mapRpcTransaction(transaction, receipt, block, hexNumber(tip));
-  return mapTransactionDetail(fallback, transaction.blockHash);
+  return hydrateTransactionTokenMetadata(mapTransactionDetail(fallback, transaction.blockHash));
 }
 
 function mapBlock(block) {
@@ -984,7 +987,7 @@ async function transactionById(id) {
     if (transaction.block_number) {
       try { blockHash = (await providerJson(`/api/v2/blocks/${transaction.block_number}`)).hash; } catch { /* Detail remains useful without a block hash. */ }
     }
-    return mapTransactionDetail(transaction, blockHash);
+    return hydrateTransactionTokenMetadata(mapTransactionDetail(transaction, blockHash));
   } catch (explorerError) {
     try {
       return await rpcTransactionById(id);
@@ -1061,6 +1064,76 @@ async function ethereumToken(address) {
   } catch {
     return rpcTokenMetadata(address);
   }
+}
+
+function tokenNeedsMetadata(token) {
+  return !token?.name || !token?.symbol || token?.decimals === null || token?.decimals === undefined;
+}
+
+function mergeEthereumTokenMetadata(token, metadata) {
+  if (!metadata) return token;
+  return {
+    ...token,
+    name: token.name || metadata.name,
+    symbol: token.symbol || metadata.symbol,
+    type: token.type && token.type !== 'Token' ? token.type : metadata.type || token.type,
+    decimals: token.decimals ?? metadata.decimals,
+    iconUrl: token.iconUrl || metadata.iconUrl,
+    totalSupply: token.totalSupply || metadata.totalSupply,
+    circulatingSupply: token.circulatingSupply || metadata.circulatingSupply,
+    holdersCount: token.holdersCount || metadata.holdersCount,
+    exchangeRate: token.exchangeRate || metadata.exchangeRate,
+    marketCap: token.marketCap || metadata.marketCap,
+    volume24h: token.volume24h || metadata.volume24h,
+    reputation: token.reputation || metadata.reputation,
+    palette: metadata.palette?.length ? metadata.palette : token.palette,
+  };
+}
+
+async function cachedEthereumTokenMetadata(address) {
+  const normalizedAddress = String(address || '').toLowerCase();
+  if (!/^0x[\da-f]{40}$/.test(normalizedAddress)) return null;
+
+  const cached = tokenMetadataCache.get(normalizedAddress);
+  if (cached?.expiresAt > Date.now()) return cached.value;
+
+  const value = ethereumToken(normalizedAddress).catch(() => null);
+  tokenMetadataCache.set(normalizedAddress, {
+    expiresAt: Date.now() + TOKEN_METADATA_CACHE_MS,
+    value,
+  });
+
+  const metadata = await value;
+  if (!metadata) tokenMetadataCache.delete(normalizedAddress);
+  return metadata;
+}
+
+async function hydrateTransactionTokenMetadata(transaction) {
+  const transfers = transaction?.ethereum?.tokenTransfers || [];
+  const addresses = new Set();
+  for (const transfer of transfers) {
+    const address = transfer?.token?.address;
+    if (tokenNeedsMetadata(transfer?.token) && /^0x[\da-f]{40}$/i.test(address)) {
+      addresses.add(address.toLowerCase());
+    }
+  }
+  const unresolvedAddresses = Array.from(addresses).slice(0, TRANSACTION_TOKEN_METADATA_LIMIT);
+
+  if (!unresolvedAddresses.length) return transaction;
+
+  const metadata = await Promise.all(unresolvedAddresses.map(async (address) => [
+    address,
+    await cachedEthereumTokenMetadata(address),
+  ]));
+  const metadataByAddress = new Map(metadata);
+
+  transaction.ethereum.tokenTransfers = transfers.map((transfer) => {
+    const address = transfer?.token?.address?.toLowerCase();
+    return address && metadataByAddress.has(address)
+      ? { ...transfer, token: mergeEthereumTokenMetadata(transfer.token, metadataByAddress.get(address)) }
+      : transfer;
+  });
+  return transaction;
 }
 
 async function ethereumTokenTransfers(address, searchParams) {
