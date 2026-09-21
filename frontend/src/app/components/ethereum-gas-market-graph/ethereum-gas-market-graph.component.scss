@@ -1,0 +1,102 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.gas-market {
+  container-type: inline-size;
+  color: var(--fg);
+  min-width: 0;
+}
+
+.gas-market__header {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.gas-market__title {
+  color: var(--title-fg);
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.gas-market__legend {
+  align-items: center;
+  color: var(--transparent-fg);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.75rem;
+  gap: 8px 16px;
+  justify-content: flex-end;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.gas-market__legend li {
+  align-items: center;
+  display: inline-flex;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.gas-market__swatch {
+  display: inline-block;
+  height: 0;
+  width: 18px;
+}
+
+.gas-market__swatch--fee {
+  border-top: 3px solid var(--primary);
+}
+
+.gas-market__swatch--utilization {
+  border-top: 2px dashed #2ec4b6;
+}
+
+.gas-market__chart {
+  min-height: 180px;
+  width: 100%;
+}
+
+.gas-market__empty {
+  align-items: center;
+  color: var(--transparent-fg);
+  display: flex;
+  flex-direction: column;
+  font-size: 0.875rem;
+  gap: 12px;
+  justify-content: center;
+  min-height: 180px;
+  text-align: center;
+}
+
+.gas-market__empty-mark {
+  border-bottom: 1px dashed var(--transparent-fg);
+  display: block;
+  opacity: 0.45;
+  width: min(160px, 45%);
+}
+
+@container (max-width: 560px) {
+  .gas-market__header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .gas-market__legend {
+    justify-content: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gas-market__chart {
+    scroll-behavior: auto;
+  }
+}

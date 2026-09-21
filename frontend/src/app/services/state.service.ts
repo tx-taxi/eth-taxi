@@ -2,7 +2,7 @@ import { Inject, Injectable, PLATFORM_ID, LOCALE_ID } from '@angular/core';
 import { ReplaySubject, BehaviorSubject, Subject, fromEvent, Observable } from 'rxjs';
 import { Transaction } from '@interfaces/electrs.interface';
 import { AccelerationDelta, HealthCheckHost, IBackendInfo, MempoolBlock, MempoolBlockUpdate, MempoolInfo, Recommendedfees, ReplacedTransaction, ReplacementInfo, StratumJob, isMempoolState } from '@interfaces/websocket.interface';
-import { Acceleration, AccelerationPosition, BlockExtended, CpfpInfo, DifficultyAdjustment, MempoolPosition, OptimizedMempoolStats, RbfTree, TransactionStripped } from '@interfaces/node-api.interface';
+import { Acceleration, AccelerationPosition, BlockExtended, CpfpInfo, DifficultyAdjustment, EthereumGasMarketStats, MempoolPosition, OptimizedMempoolStats, RbfTree, TransactionStripped } from '@interfaces/node-api.interface';
 import { Router, NavigationStart, NavigationEnd } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import { filter, map, scan, share, shareReplay } from 'rxjs/operators';
@@ -200,7 +200,7 @@ export class StateService {
   chainTip$ = new ReplaySubject<number>(-1);
   serverHealth$ = new Subject<HealthCheckHost[]>();
 
-  live2Chart$ = new Subject<OptimizedMempoolStats>();
+  live2Chart$ = new Subject<EthereumGasMarketStats>();
 
   viewAmountMode$: BehaviorSubject<'btc' | 'sats' | 'fiat'>;
   timezone$: BehaviorSubject<string>;

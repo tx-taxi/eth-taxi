@@ -1,0 +1,31 @@
+<section class="gas-market" [attr.aria-label]="'Ethereum gas market ' + historyLabel.toLowerCase()">
+  <div class="gas-market__header">
+    <div>
+      <h3 class="gas-market__title">Gas market <span aria-hidden="true">&middot;</span> {{ historyLabel }}</h3>
+      <span class="sr-only">Gas market, {{ historyLabel }}</span>
+    </div>
+
+    <ul class="gas-market__legend" aria-label="Chart legend">
+      <li><span class="gas-market__swatch gas-market__swatch--fee" aria-hidden="true"></span>Base fee (gwei)</li>
+      <li><span class="gas-market__swatch gas-market__swatch--utilization" aria-hidden="true"></span>Network utilization (%)</li>
+    </ul>
+  </div>
+
+  <div
+    *ngIf="recentSamples.length >= 2; else emptyHistory"
+    class="gas-market__chart"
+    role="img"
+    [attr.aria-label]="accessibleSummary"
+    echarts
+    [initOpts]="chartInitOptions"
+    [options]="chartOptions"
+    [style.height.px]="height"
+  ></div>
+
+  <ng-template #emptyHistory>
+    <div class="gas-market__empty" role="status" [style.height.px]="height">
+      <span class="gas-market__empty-mark" aria-hidden="true"></span>
+      <span>{{ emptyState }}</span>
+    </div>
+  </ng-template>
+</section>

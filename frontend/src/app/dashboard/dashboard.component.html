@@ -65,10 +65,16 @@
       <div class="card graph-card">
         <div class="card-body">
           <ng-container *ngTemplateOutlet="mempoolTable; context: { $implicit: mempoolInfoData }"></ng-container>
-            <h5 class="card-title mt-3">Pending fees</h5>
+            <h5 class="card-title mt-3">Sampled fees</h5>
             <p class="card-text" *ngIf="(isLoadingWebSocket$ | async) === false && mempoolInfoData.value; else loading">
               <app-amount [satoshis]="mempoolInfoData.value.memPoolInfo.total_fee" digitsInfo="1.2-4" [noFiat]="true"></app-amount>
             </p>
+            <div class="ethereum-gas-market-wrapper">
+              <app-ethereum-gas-market-graph
+                [samples]="mempoolStats$ | async"
+                [height]="gasMarketGraphHeight"
+              ></app-ethereum-gas-market-graph>
+            </div>
         </div>
       </div>
     </div>
@@ -264,20 +270,20 @@
 <ng-template #mempoolTable let-mempoolInfoData>
   <div class="mempool-info-data">
     <div class="item">
-      <h5 class="card-title">Low gas</h5>
+      <h5 class="card-title">Low gas price</h5>
       <ng-template #purgingText><h5 class="card-title" i18n="dashboard.purging|Purgin below fee">Purging</h5></ng-template>
       <p class="card-text" *ngIf="(isLoadingWebSocket$ | async) === false && mempoolInfoData.value; else loading">
         <app-fee-rate [fee]="mempoolInfoData.value.memPoolInfo.mempoolminfee"></app-fee-rate>
       </p>
     </div>
     <div class="item">
-      <h5 class="card-title">Pending transactions</h5>
+      <h5 class="card-title">Pending sample</h5>
       <p class="card-text" *ngIf="(isLoadingWebSocket$ | async) === false && mempoolInfoData.value; else loading">
         {{ mempoolInfoData.value.memPoolInfo.size | number }} <span i18n="dashboard.txs">TXs</span>
       </p>
     </div>
     <div class="item bar">
-      <h5 class="card-title">Pending gas</h5>
+      <h5 class="card-title">Sampled gas</h5>
       <div class="card-text" *ngIf="(isLoadingWebSocket$ | async) === false && mempoolInfoData.value; else loadingbig">
         <div class="progress">
           <div class="progress-bar {{ mempoolInfoData.value.mempoolSizeProgress }}" role="progressbar" [ngStyle]="{'width': (mempoolInfoData.value.memPoolInfo.usage / mempoolInfoData.value.memPoolInfo.maxmempool * 100) + '%' }">&nbsp;</div>

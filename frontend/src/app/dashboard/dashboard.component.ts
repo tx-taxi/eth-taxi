@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, HostListener, Inject, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
 import { combineLatest, EMPTY, fromEvent, interval, merge, Observable, of, Subject, Subscription, timer } from 'rxjs';
 import { catchError, delayWhen, distinctUntilChanged, filter, map, scan, share, shareReplay, startWith, switchMap, takeUntil, tap, throttleTime } from 'rxjs/operators';
-import { AuditStatus, BlockExtended, CurrentPegs, FederationAddress, FederationUtxo, OptimizedMempoolStats, RecentPeg } from '@interfaces/node-api.interface';
+import { AuditStatus, BlockExtended, CurrentPegs, EthereumGasMarketStats, FederationAddress, FederationUtxo, RecentPeg } from '@interfaces/node-api.interface';
 import { MempoolInfo, ReplacementInfo } from '@interfaces/websocket.interface';
 import { ApiService } from '@app/services/api.service';
 import { StateService } from '@app/services/state.service';
@@ -22,11 +22,6 @@ interface MempoolInfoData {
   progressColor: string;
 }
 
-interface MempoolStatsData {
-  mempool: OptimizedMempoolStats[];
-  weightPerSecond: any;
-}
-
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -43,9 +38,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   blocks$: Observable<BlockExtended[]>;
   replacements$: Observable<ReplacementInfo[]>;
   latestBlockHeight: number;
-  mempoolTransactionsWeightPerSecondData: any;
-  mempoolStats$: Observable<MempoolStatsData>;
-  transactionsWeightPerSecondOptions: any;
+  mempoolStats$: Observable<EthereumGasMarketStats[]>;
   isLoadingWebSocket$: Observable<boolean>;
   liquidPegsMonth$: Observable<any>;
   currentPeg$: Observable<CurrentPegs>;
@@ -63,7 +56,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   mempoolInfoSubscription: Subscription;
   currencySubscription: Subscription;
   currency: string;
-  incomingGraphHeight: number = 300;
+  gasMarketGraphHeight: number = 260;
   lbtcPegGraphHeight: number = 360;
   webGlEnabled = true;
   private lastPegBlockUpdate: number = 0;
@@ -217,35 +210,19 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
       .pipe(
         filter((state) => state === 2),
         switchMap(() => this.apiService.list2HStatistics$().pipe(
-          catchError((e) => {
-            return of(null);
-          })
+          catchError(() => of([])),
         )),
-        switchMap((mempoolStats) => {
-          return merge(
-            this.stateService.live2Chart$
-              .pipe(
-                scan((acc, stats) => {
-                  const now = Date.now() / 1000;
-                  const start = now - (2 * 60 * 60);
-                  acc.unshift(stats);
-                  acc = acc.filter(p => p.added >= start);
-                  return acc;
-                }, (mempoolStats || []))
-              ),
-            of(mempoolStats)
-          );
-        }),
-        map((mempoolStats) => {
-          if (mempoolStats) {
-            return {
-              mempool: mempoolStats,
-              weightPerSecond: this.handleNewMempoolData(mempoolStats.concat([])),
-            };
-          } else {
-            return null;
-          }
-        }),
+        switchMap((historical) => merge(
+          of(historical),
+          this.stateService.live2Chart$.pipe(
+            scan((samples, sample) => {
+              const byTimestamp = new Map(samples.map((item) => [item.added, item]));
+              byTimestamp.set(sample.added, sample);
+              const cutoff = Math.floor(Date.now() / 1000) - (2 * 60 * 60);
+              return Array.from(byTimestamp.values()).filter((item) => item.added >= cutoff);
+            }, [...historical]),
+          ),
+        )),
         shareReplay(1),
       );
 
@@ -392,16 +369,6 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-  handleNewMempoolData(mempoolStats: OptimizedMempoolStats[]) {
-    mempoolStats.reverse();
-    const labels = mempoolStats.map(stats => stats.added);
-
-    return {
-      labels: labels,
-      series: [mempoolStats.map((stats) => [stats.added * 1000, stats.vbytes_per_second])],
-    };
-  }
-
   trackByBlock(index: number, block: BlockExtended) {
     return block.height;
   }
@@ -418,15 +385,15 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   @HostListener('window:resize', ['$event'])
   onResize(): void {
     if (window.innerWidth >= 992) {
-      this.incomingGraphHeight = 300;
+      this.gasMarketGraphHeight = 260;
       this.goggleResolution = 82;
       this.lbtcPegGraphHeight = 360;
     } else if (window.innerWidth >= 768) {
-      this.incomingGraphHeight = 215;
+      this.gasMarketGraphHeight = 190;
       this.goggleResolution = 80;
       this.lbtcPegGraphHeight = 270;
     } else {
-      this.incomingGraphHeight = 180;
+      this.gasMarketGraphHeight = 180;
       this.goggleResolution = 86;
       this.lbtcPegGraphHeight = 270;
     }

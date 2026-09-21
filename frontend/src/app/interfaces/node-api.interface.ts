@@ -9,6 +9,18 @@ export interface OptimizedMempoolStats {
   vsizes: number[];
 }
 
+export interface EthereumGasMarketStats extends OptimizedMempoolStats {
+  base_fee_gwei: number;
+  network_utilization_percentage: number;
+  gas_price_slow_gwei: number;
+  gas_price_average_gwei: number;
+  gas_price_fast_gwei: number;
+  pending_sample_count: number;
+  pending_sample_gas: number;
+  pending_sample_max_fee_wei: number;
+  pending_sample_truncated: boolean;
+}
+
 interface Ancestor {
   txid: string;
   weight: number;

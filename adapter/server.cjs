@@ -15,10 +15,16 @@ const providers = (process.env.ETH_PROVIDER_URLS || 'https://eth.blockscout.com,
   .map((provider) => provider.trim().replace(/\/$/, ''))
   .filter(Boolean);
 const sockets = new Set();
+const mempoolBlockSubscriptions = new Map();
 let activeProvider = providers[0];
 let cachedSnapshot;
 let cachedAt = 0;
 let mempoolSamples = [];
+let lastBroadcastSignature = '';
+let lastBroadcastAt = 0;
+
+const POLL_INTERVAL_MS = Math.max(3_000, Number(process.env.ETH_POLL_INTERVAL_MS || 6_000));
+const HEARTBEAT_INTERVAL_MS = 30_000;
 
 // These mirror the frontend's BigInt filter flags. Keep them below 2^53 so
 // they retain their exact value when serialized through the JSON adapter.
@@ -194,14 +200,74 @@ function mapTransactionDetail(tx, blockHash) {
   };
 }
 
-function sampleMempool(pendingItems, gasUsed, gasFees) {
-  const sample = { added: Math.floor(Date.now() / 1000), count: pendingItems.length, vbytes_per_second: 0, total_fee: gasFees, mempool_byte_weight: gasUsed, vsizes: [] };
+function sampleMempool(pendingItems, gasUsed, gasFees, market) {
+  const sample = {
+    // Retain the compatibility fields used by shared mempool components.
+    added: Math.floor(Date.now() / 1000),
+    count: pendingItems.length,
+    vbytes_per_second: 0,
+    total_fee: gasFees,
+    mempool_byte_weight: gasUsed,
+    vsizes: [],
+    // Ethereum-native data powers the gas-market history graph. These values
+    // describe the public pending sample, not a complete global txpool.
+    base_fee_gwei: market.baseFeeGwei,
+    network_utilization_percentage: market.networkUtilization,
+    gas_price_slow_gwei: market.slow,
+    gas_price_average_gwei: market.average,
+    gas_price_fast_gwei: market.fast,
+    pending_sample_count: pendingItems.length,
+    pending_sample_gas: gasUsed,
+    pending_sample_max_fee_wei: gasFees,
+    pending_sample_truncated: market.pendingSampleTruncated,
+  };
   const previous = mempoolSamples.at(-1);
   if (!previous || sample.added - previous.added >= 10) {
     mempoolSamples.push(sample);
     mempoolSamples = mempoolSamples.filter((item) => item.added >= sample.added - 7_200);
   }
   return mempoolSamples.at(-1);
+}
+
+function snapshotSignature(data) {
+  const tip = data.blocks.at(-1)?.id || '';
+  const pending = data.projectedTransactions
+    .map((transaction) => `${transaction.txid}:${transaction.fee}:${transaction.vsize}:${transaction.flags}`)
+    .join(',');
+  return `${tip}|${data.mempoolInfo.size}|${data.mempoolInfo.usage}|${data.mempoolInfo.total_fee}|${pending}`;
+}
+
+function projectedBlockPayload(data, index) {
+  return {
+    'projected-block-transactions': {
+      index,
+      sequence: Date.now(),
+      // Ethereum has no deterministic Bitcoin-style multi-block package
+      // projection. The current pending sample is the next-slot estimate.
+      blockTransactions: index === 0 ? data.projectedTransactions.map(compressTransaction) : [],
+    },
+  };
+}
+
+function sendProjectedBlock(socket, data, index) {
+  if (socket.readyState !== socket.OPEN) return;
+  socket.send(JSON.stringify(projectedBlockPayload(data, index)));
+}
+
+function broadcastSnapshot(data) {
+  const encoded = JSON.stringify(data);
+  for (const socket of sockets) {
+    if (socket.readyState !== socket.OPEN) continue;
+    try {
+      socket.send(encoded);
+      for (const index of mempoolBlockSubscriptions.get(socket) || []) {
+        sendProjectedBlock(socket, data, index);
+      }
+    } catch {
+      // A socket can close between readyState and send; its close handler
+      // removes the subscription state.
+    }
+  }
 }
 
 async function blocksEndingAt(height) {
@@ -270,7 +336,14 @@ async function snapshot(force = false) {
   const fast = number(gasPrices.fast);
   const gasUsed = pendingItems.reduce((sum, item) => sum + number(item.gas_limit || item.gas_used), 0);
   const gasFees = pendingItems.reduce((sum, item) => sum + wei(item.fee?.value), 0);
-  const liveMempoolSample = sampleMempool(pendingItems, gasUsed, gasFees);
+  const liveMempoolSample = sampleMempool(pendingItems, gasUsed, gasFees, {
+    baseFeeGwei: gwei(blocks[0]?.base_fee_per_gas),
+    networkUtilization: number(stats.network_utilization_percentage),
+    slow,
+    average,
+    fast,
+    pendingSampleTruncated: Boolean(pending.next_page_params),
+  });
   const tip = mappedBlocks.at(-1);
   cachedSnapshot = {
     backend: 'blockscout',
@@ -454,7 +527,12 @@ const server = http.createServer(async (req, res) => {
 const wss = new WebSocketServer({ noServer: true });
 wss.on('connection', async (socket) => {
   sockets.add(socket);
-  socket.on('close', () => sockets.delete(socket));
+  const trackedMempoolBlocks = new Set();
+  mempoolBlockSubscriptions.set(socket, trackedMempoolBlocks);
+  socket.on('close', () => {
+    sockets.delete(socket);
+    mempoolBlockSubscriptions.delete(socket);
+  });
   socket.on('message', async (message) => {
     try {
       const request = JSON.parse(String(message));
@@ -483,13 +561,13 @@ wss.on('connection', async (socket) => {
       }
       if (Number.isInteger(request['track-mempool-block']) && request['track-mempool-block'] >= 0) {
         const data = await snapshot();
-        socket.send(JSON.stringify({
-          'projected-block-transactions': {
-            index: request['track-mempool-block'],
-            sequence: Date.now(),
-            blockTransactions: data.projectedTransactions.map(compressTransaction),
-          },
-        }));
+        const index = request['track-mempool-block'];
+        trackedMempoolBlocks.add(index);
+        sendProjectedBlock(socket, data, index);
+        return;
+      }
+      if (request['track-mempool-block'] === -1) {
+        trackedMempoolBlocks.clear();
       }
     } catch {
       // A malformed subscription must not disrupt the dashboard stream.
@@ -504,9 +582,15 @@ server.on('upgrade', (req, socket, head) => {
 setInterval(async () => {
   if (!sockets.size) return;
   try {
-    const encoded = JSON.stringify(await snapshot(true));
-    for (const socket of sockets) if (socket.readyState === socket.OPEN) socket.send(encoded);
+    const data = await snapshot(true);
+    const signature = snapshotSignature(data);
+    const now = Date.now();
+    if (signature !== lastBroadcastSignature || now - lastBroadcastAt >= HEARTBEAT_INTERVAL_MS) {
+      lastBroadcastSignature = signature;
+      lastBroadcastAt = now;
+      broadcastSnapshot(data);
+    }
   } catch { /* Retain the last good provider response. */ }
-}, 12_000).unref();
+}, POLL_INTERVAL_MS).unref();
 
 server.listen(port, host, () => console.log(`ETH adapter listening on http://${host}:${port}`));

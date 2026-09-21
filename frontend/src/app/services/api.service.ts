@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
-import { CpfpInfo, OptimizedMempoolStats, AddressInformation, LiquidPegs, ITranslators, PoolStat, BlockExtended, TransactionStripped, RewardStats, AuditScore, BlockSizesAndWeights,
+import { CpfpInfo, EthereumGasMarketStats, OptimizedMempoolStats, AddressInformation, LiquidPegs, ITranslators, PoolStat, BlockExtended, TransactionStripped, RewardStats, AuditScore, BlockSizesAndWeights,
   RbfTree, BlockAudit, CurrentPegs, AuditStatus, FederationAddress, FederationUtxo, RecentPeg, PegsVolume, AccelerationInfo, TestMempoolAcceptResult, WalletAddress, Treasury, SubmitPackageResult, ChainTip, StaleTip } from '@interfaces/node-api.interface';
 import { BehaviorSubject, Observable, catchError, filter, map, of, shareReplay, take, tap } from 'rxjs';
 import { StateService } from '@app/services/state.service';
@@ -76,8 +76,8 @@ export class ApiService {
     return this.requestCache.get(cacheKey).subject.asObservable().pipe(filter(val => val !== null), take(1));
   }
 
-  list2HStatistics$(): Observable<OptimizedMempoolStats[]> {
-    return this.httpClient.get<OptimizedMempoolStats[]>(this.apiBaseUrl + this.apiBasePath + '/api/v1/statistics/2h');
+  list2HStatistics$(): Observable<EthereumGasMarketStats[]> {
+    return this.httpClient.get<EthereumGasMarketStats[]>(this.apiBaseUrl + this.apiBasePath + '/api/v1/statistics/2h');
   }
 
   list24HStatistics$(): Observable<OptimizedMempoolStats[]> {
