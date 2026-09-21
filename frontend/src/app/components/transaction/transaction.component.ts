@@ -39,15 +39,8 @@ import { EnterpriseService } from '@app/services/enterprise.service';
 import { ZONE_SERVICE } from '@app/injection-tokens';
 import { MiningService, MiningStats } from '@app/services/mining.service';
 import { ETA, EtaService } from '@app/services/eta.service';
-import { EthereumIdentity, EthereumToken, EthereumTokenTransfer } from '@interfaces/ethereum-api.interface';
+import { EthereumToken, EthereumTokenTransfer } from '@interfaces/ethereum-api.interface';
 import { AssetFlow } from '@components/tx-bowtie-graph/tx-bowtie-graph.component';
-import {
-  AccountStateActor,
-  AccountStateAsset,
-  AccountStateBadge,
-  AccountStateChange,
-  AccountStateFlowStep,
-} from '@components/account-state-flow/account-state-flow.component';
 
 export interface Pool {
   id: number;
@@ -163,10 +156,7 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
   notAcceleratedOnLoad: boolean = null;
   duplicateTxBlocks: [number, number] | undefined;
   ethereumAssetFlows: AssetFlow[] = [];
-  ethereumStateSource: AccountStateActor | null = null;
-  ethereumStateTarget: AccountStateActor | null = null;
-  ethereumStateSteps: AccountStateFlowStep[] = [];
-  ethereumStateChanges: AccountStateChange[] = [];
+  showAllEthereumTokenTransfers = false;
 
   featuresEnabled: boolean;
   segwitEnabled: boolean;
@@ -247,6 +237,20 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
     return /^(transfer|coin transfer|contract call)$/i.test(method) ? null : method;
   }
 
+  get ethereumStateActivity(): string {
+    const flags = this.tx?.flags ? BigInt(this.tx.flags) : 0n;
+    if (this.tx?.ethereum?.createdContract && !this.tx.ethereum.to) {
+      return 'Contract deployment';
+    }
+    if (flags & TransactionFlags.eth_contract_call) {
+      return 'Contract call';
+    }
+    if (flags & TransactionFlags.eth_token_transfer) {
+      return 'Token transfer';
+    }
+    return 'ETH transfer';
+  }
+
   get ethereumStateTargetLabel(): string {
     if (this.tx?.ethereum?.createdContract && !this.tx.ethereum.to) {
       return 'Created contract';
@@ -254,10 +258,51 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.tx?.ethereum?.input !== '0x' ? 'Execution target' : 'Recipient';
   }
 
+  get ethereumStateStatus(): string {
+    if (this.tx?.ethereum?.hasError) {
+      return 'Reverted';
+    }
+    return this.tx?.status?.confirmed ? 'Succeeded' : 'Pending';
+  }
+
+  get ethereumStateStatusClass(): string {
+    if (this.tx?.ethereum?.hasError) {
+      return 'bg-danger';
+    }
+    return this.tx?.status?.confirmed ? 'bg-success' : 'bg-warning text-dark';
+  }
+
   get ethereumStateNotice(): string | null {
     return this.tx?.ethereum
       ? 'Balance and contract-storage deltas are unavailable from the connected public provider.'
       : null;
+  }
+
+  get ethereumVisibleTokenTransfers(): EthereumTokenTransfer[] {
+    const transfers = this.tx?.ethereum?.tokenTransfers || [];
+    return this.showAllEthereumTokenTransfers ? transfers : transfers.slice(0, 20);
+  }
+
+  get ethereumHiddenTokenTransferCount(): number {
+    return Math.max(0, (this.tx?.ethereum?.tokenTransfers?.length || 0) - 20);
+  }
+
+  get ethereumFlowGraphWidth(): number {
+    return this.isMobile ? 320 : 960;
+  }
+
+  get ethereumFlowGraphHeight(): number {
+    const strandHeight = this.isMobile ? 22 : 18;
+    const maxHeight = this.isMobile ? 280 : 260;
+    return Math.min(maxHeight, Math.max(96, (this.ethereumAssetFlows.length * strandHeight) + 48));
+  }
+
+  get ethereumFlowMaxCombinedWeight(): number {
+    return Math.min(100, Math.max(28, this.ethereumAssetFlows.length * 10));
+  }
+
+  toggleEthereumTokenTransfers(): void {
+    this.showAllEthereumTokenTransfers = !this.showAllEthereumTokenTransfers;
   }
 
   ethereumTransferAmount(transfer: EthereumTokenTransfer): string {
@@ -303,10 +348,10 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
   private setEthereumAssetFlows(): void {
     if (!this.tx?.ethereum) {
       this.ethereumAssetFlows = [];
-      this.setEthereumStateFlow();
       return;
     }
 
+    this.showAllEthereumTokenTransfers = false;
     this.tx.ethereum.tokenTransfers = (this.tx.ethereum.tokenTransfers || []).map((transfer) => {
       const known = KNOWN_ETHEREUM_TOKENS[transfer.token.address?.toLowerCase()];
       return known ? {
@@ -337,232 +382,6 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
       });
     }
     this.ethereumAssetFlows = flows.slice(0, 16);
-    this.setEthereumStateFlow();
-  }
-
-  private setEthereumStateFlow(): void {
-    if (!this.tx?.ethereum) {
-      this.ethereumStateSource = null;
-      this.ethereumStateTarget = null;
-      this.ethereumStateSteps = [];
-      this.ethereumStateChanges = [];
-      return;
-    }
-
-    const ethereum = this.tx.ethereum;
-    const source = this.ethereumStateActor(ethereum.from, this.ethereumSender, 'Unknown account');
-    const target = ethereum.to
-      ? this.ethereumStateActor(ethereum.to, this.ethereumRecipient, 'Unknown target')
-      : ethereum.createdContract
-        ? this.ethereumStateActor(ethereum.createdContract, this.ethereumRecipient, 'New contract')
-        : this.ethereumStateActor(null, '', 'New contract');
-    const nativeAsset = this.ethereumNativeAsset();
-    const steps: AccountStateFlowStep[] = [];
-    const changes: AccountStateChange[] = [];
-    const method = this.ethereumFlowMethod;
-    const activity = this.ethereumStateActivity();
-
-    if (activity === 'Contract deployment') {
-      steps.push({
-        id: 'deployment',
-        label: 'Contract deployment',
-        detail: method || 'Create contract',
-        kind: 'deployment',
-        accent: '#9171dc',
-      });
-    } else {
-      steps.push({
-        id: 'execution',
-        label: activity,
-        detail: method || (activity === 'Contract call' ? 'Contract execution' : 'Native value'),
-        kind: activity === 'ETH transfer' ? 'transfer' : 'call',
-        accent: activity === 'Token transfer' ? this.ethereumTokenAccent(ethereum.tokenTransfers?.[0]?.token) : ETHEREUM_NATIVE_PALETTE[0],
-      });
-    }
-
-    const tokenSteps = this.ethereumTokenSteps(ethereum.tokenTransfers || []);
-    steps.push(...tokenSteps);
-
-    const blockLink = this.ethereumBlockLink(this.tx.status?.block_height);
-    steps.push({
-      id: 'receipt',
-      label: ethereum.hasError ? 'Reverted' : this.tx.status?.confirmed ? 'Confirmed' : 'Pending',
-      detail: ethereum.hasError
-        ? 'Execution failed'
-        : this.tx.status?.confirmed
-          ? `Block ${this.formatEthereumInteger(ethereum.blockNumber)}`
-          : 'Awaiting a block',
-      href: this.tx.status?.confirmed ? blockLink : null,
-      kind: 'confirmation',
-      accent: ethereum.hasError ? 'var(--red)' : this.tx.status?.confirmed ? 'var(--success)' : 'var(--warning)',
-    });
-
-    if (this.ethereumValueWei && this.ethereumValueWei !== '0') {
-      changes.push({
-        id: 'native-value',
-        actor: source,
-        counterpart: target,
-        label: activity === 'Contract call' ? 'Call value' : 'Native transfer',
-        detail: activity === 'Contract call' ? 'Value supplied to contract execution' : 'Value transferred by this transaction',
-        value: `${this.formatEthereumQuantity(this.ethereumValueWei, '18')} ETH`,
-        asset: nativeAsset,
-        accent: ETHEREUM_NATIVE_PALETTE[0],
-        kind: 'value',
-      });
-    }
-
-    for (const transfer of ethereum.tokenTransfers || []) {
-      changes.push({
-        id: `token-${transfer.logIndex || transfer.token.address || changes.length}`,
-        actor: this.ethereumStateActor(transfer.from, transfer.from?.address || '', 'Unknown account'),
-        counterpart: transfer.to
-          ? this.ethereumStateActor(transfer.to, transfer.to.address || '', 'Unknown account')
-          : this.ethereumStateActor(null, '', 'Contract creation'),
-        label: `${transfer.token.symbol || 'Token'} transfer`,
-        detail: transfer.tokenId ? `Observed transfer event for token ${this.abbreviateEthereumValue(transfer.tokenId)}` : 'Observed transfer event',
-        value: this.ethereumTransferAmount(transfer),
-        asset: this.ethereumStateAsset(transfer.token),
-        accent: this.ethereumTokenAccent(transfer.token),
-        kind: 'transfer',
-      });
-    }
-
-    if (ethereum.feeWei) {
-      changes.push({
-        id: 'network-fee',
-        actor: source,
-        label: 'Network fee',
-        detail: this.ethereumFeeDetail(),
-        value: `${this.formatEthereumQuantity(ethereum.feeWei, '18')} ETH`,
-        asset: nativeAsset,
-        accent: '#bd7c20',
-        kind: 'fee',
-      });
-    }
-
-    if (ethereum.nonce) {
-      changes.push({
-        id: 'nonce',
-        actor: source,
-        label: 'Transaction nonce',
-        detail: 'Execution sequence',
-        value: `#${this.formatEthereumInteger(ethereum.nonce)}`,
-        accent: 'var(--info)',
-        kind: 'nonce',
-      });
-    }
-
-    changes.push({
-      id: 'execution-result',
-      actor: target,
-      label: 'Execution result',
-      detail: ethereum.revertReason || (this.tx.status?.confirmed ? 'Receipt included on chain' : 'Receipt not yet available'),
-      value: ethereum.hasError ? 'Reverted' : this.tx.status?.confirmed ? 'Succeeded' : 'Pending',
-      accent: ethereum.hasError ? 'var(--red)' : this.tx.status?.confirmed ? 'var(--success)' : 'var(--warning)',
-      kind: 'execution',
-    });
-
-    this.ethereumStateSource = source;
-    this.ethereumStateTarget = target;
-    this.ethereumStateSteps = steps.slice(0, 5);
-    this.ethereumStateChanges = changes;
-  }
-
-  private ethereumTokenSteps(transfers: EthereumTokenTransfer[]): AccountStateFlowStep[] {
-    const counts = new Map<string, { token: EthereumToken, count: number }>();
-    for (const transfer of transfers) {
-      const id = transfer.token.address?.toLowerCase() || transfer.token.symbol || `token-${counts.size}`;
-      const current = counts.get(id);
-      counts.set(id, current
-        ? { ...current, count: current.count + 1 }
-        : { token: transfer.token, count: 1 });
-    }
-
-    const grouped = Array.from(counts.values());
-    if (grouped.length > 2) {
-      return [{
-        id: 'token-events',
-        label: 'Token events',
-        detail: `${transfers.length} movements across ${grouped.length} assets`,
-        kind: 'event',
-        accent: this.ethereumTokenAccent(grouped[0].token),
-      }];
-    }
-    return grouped.map(({ token, count }, index) => ({
-      id: `token-event-${token.address || index}`,
-      label: `${token.symbol || 'Token'} event`,
-      detail: count === 1 ? 'Transfer event' : `${count} transfer events`,
-      kind: 'event' as const,
-      accent: this.ethereumTokenAccent(token),
-    }));
-  }
-
-  private ethereumStateActivity(): string {
-    const flags = this.tx?.flags ? BigInt(this.tx.flags) : 0n;
-    if (this.tx?.ethereum?.createdContract && !this.tx.ethereum.to) {
-      return 'Contract deployment';
-    }
-    if (flags & TransactionFlags.eth_contract_call) {
-      return 'Contract call';
-    }
-    if (flags & TransactionFlags.eth_token_transfer) {
-      return 'Token transfer';
-    }
-    return 'ETH transfer';
-  }
-
-  private ethereumStateActor(identity: EthereumIdentity | null | undefined, fallbackAddress: string, fallbackLabel: string): AccountStateActor {
-    const address = identity?.address?.trim() || fallbackAddress.trim();
-    const name = identity?.name?.trim() || identity?.ensName?.trim() || '';
-    const shortAddress = this.abbreviateEthereumValue(address);
-    const badges: AccountStateBadge[] = [];
-    if (identity?.isVerified) badges.push({ label: 'Verified', tone: 'verified' });
-    if (identity?.isContract) badges.push({ label: 'Contract', tone: 'contract' });
-    if (identity?.proxyType) badges.push({ label: 'Proxy', tone: 'neutral' });
-    if (identity?.isScam) badges.push({ label: 'Scam', tone: 'warning' });
-    return {
-      id: address || fallbackLabel.toLowerCase().replace(/\s+/g, '-'),
-      label: name || shortAddress || fallbackLabel,
-      address: address || null,
-      detail: name && shortAddress ? shortAddress : null,
-      href: this.ethereumAddressLink(address),
-      iconUrl: identity?.iconUrl || null,
-      badges,
-    };
-  }
-
-  private ethereumStateAsset(token: EthereumToken): AccountStateAsset {
-    return {
-      id: token.address || token.symbol || token.name || 'token',
-      label: token.name || token.symbol || this.abbreviateEthereumValue(token.address) || 'Token',
-      symbol: token.symbol || null,
-      href: this.ethereumTokenLink(token.address),
-      iconUrl: token.iconUrl || null,
-      accent: this.ethereumTokenAccent(token),
-    };
-  }
-
-  private ethereumNativeAsset(): AccountStateAsset {
-    return {
-      id: 'eth',
-      label: 'Ether',
-      symbol: 'ETH',
-      accent: ETHEREUM_NATIVE_PALETTE[0],
-    };
-  }
-
-  private ethereumFeeDetail(): string {
-    const gas = this.tx?.ethereum?.gasUsed;
-    const rate = this.tx?.ethereum?.gasPriceWei;
-    if (gas && rate) {
-      return `${this.formatEthereumInteger(gas)} gas at ${this.formatEthereumQuantity(rate, '9', 4)} gwei`;
-    }
-    return gas ? `${this.formatEthereumInteger(gas)} gas used` : 'Execution fee';
-  }
-
-  private abbreviateEthereumValue(value: string | null | undefined): string {
-    const normalized = value?.trim() || '';
-    return normalized.length > 16 ? `${normalized.slice(0, 8)}...${normalized.slice(-6)}` : normalized;
   }
 
   private normalizeEthereumInteger(value: string | null | undefined): string | null {

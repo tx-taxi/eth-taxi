@@ -122,24 +122,212 @@
       <br>
     </ng-container>
 
-    <section *ngIf="tx?.ethereum" class="ethereum-account-flow-section" aria-labelledby="state">
+    <section *ngIf="tx?.ethereum" class="ethereum-state-section" aria-labelledby="state">
       <div class="title">
         <h2 id="state" class="anchor">State</h2>
       </div>
 
-      <div class="box ethereum-account-flow">
-        <app-account-state-flow
-          [tx]="tx"
-          [network]="network"
-          [isMobile]="isMobile"
-          [source]="ethereumStateSource"
-          [target]="ethereumStateTarget"
-          [targetLabel]="ethereumStateTargetLabel"
-          [steps]="ethereumStateSteps"
-          [changes]="ethereumStateChanges"
-          [assetFlows]="ethereumAssetFlows"
-          [stateNotice]="ethereumStateNotice"
-        ></app-account-state-flow>
+      <div class="box ethereum-state">
+        <div class="row ethereum-state__summary">
+          <div class="col-sm ethereum-state__party">
+            <span class="ethereum-state__label">Initiator</span>
+            <ng-container *ngIf="tx?.ethereum?.from as sender; else rawEthereumStateSender">
+              <app-ethereum-identity
+                [entity]="sender"
+                [link]="ethereumAddressLink(sender.address)"
+              ></app-ethereum-identity>
+            </ng-container>
+            <ng-template #rawEthereumStateSender>
+              <ng-container *ngIf="ethereumSender; else unknownEthereumStateSender">
+                <app-truncate [text]="ethereumSender" [lastChars]="8" [link]="['/address/' | relativeUrl, ethereumSender]">
+                  <app-clipboard [text]="ethereumSender"></app-clipboard>
+                </app-truncate>
+              </ng-container>
+            </ng-template>
+            <ng-template #unknownEthereumStateSender><span class="text-muted">Unknown account</span></ng-template>
+          </div>
+
+          <div class="col-sm ethereum-state__execution">
+            <span class="ethereum-state__label">Execution</span>
+            <span class="ethereum-state__activity">{{ ethereumStateActivity }}</span>
+            <span *ngIf="ethereumFlowMethod as method" class="ethereum-state__method text-muted" [title]="method">{{ method }}</span>
+            <a *ngIf="ethereumBlockLink(tx?.status?.block_height) as blockLink; else pendingEthereumState" [href]="blockLink">
+              Block {{ tx?.status?.block_height | number }}
+            </a>
+            <ng-template #pendingEthereumState><span class="text-muted">Awaiting a block</span></ng-template>
+            <span class="badge" [ngClass]="ethereumStateStatusClass">{{ ethereumStateStatus }}</span>
+          </div>
+
+          <div class="col-sm ethereum-state__party ethereum-state__party--target">
+            <span class="ethereum-state__label">{{ ethereumStateTargetLabel }}</span>
+            <ng-container *ngIf="tx?.ethereum?.to as recipient; else createdEthereumStateContract">
+              <app-ethereum-identity
+                [entity]="recipient"
+                [link]="ethereumAddressLink(recipient.address)"
+              ></app-ethereum-identity>
+            </ng-container>
+            <ng-template #createdEthereumStateContract>
+              <ng-container *ngIf="tx?.ethereum?.createdContract as contract; else rawEthereumStateRecipient">
+                <app-ethereum-identity
+                  [entity]="contract"
+                  [link]="ethereumAddressLink(contract.address)"
+                ></app-ethereum-identity>
+              </ng-container>
+            </ng-template>
+            <ng-template #rawEthereumStateRecipient>
+              <ng-container *ngIf="ethereumRecipient; else newEthereumStateContract">
+                <app-truncate [text]="ethereumRecipient" [lastChars]="8" [link]="['/address/' | relativeUrl, ethereumRecipient]">
+                  <app-clipboard [text]="ethereumRecipient"></app-clipboard>
+                </app-truncate>
+              </ng-container>
+            </ng-template>
+            <ng-template #newEthereumStateContract><span class="text-muted">New contract</span></ng-template>
+          </div>
+        </div>
+
+        <div *ngIf="ethereumAssetFlows.length" class="ethereum-state__graph" aria-label="Observed asset flow">
+          <tx-bowtie-graph
+            [tx]="tx"
+            [cached]="true"
+            [width]="ethereumFlowGraphWidth"
+            [height]="ethereumFlowGraphHeight"
+            [lineLimit]="32"
+            [maxCombinedWeight]="ethereumFlowMaxCombinedWeight"
+            [maxStrands]="ethereumAssetFlows.length"
+            [network]="network"
+            [tooltip]="false"
+            [connectors]="false"
+            [inputIndex]="null"
+            [outputIndex]="null"
+            [assetFlows]="ethereumAssetFlows"
+          ></tx-bowtie-graph>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-borderless table-striped ethereum-state__table">
+            <thead>
+              <tr>
+                <th>Account</th>
+                <th>Observed change</th>
+                <th>Effect</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngIf="ethereumValueWei && ethereumValueWei !== '0'">
+                <td class="ethereum-state__account" data-label="Account">
+                  <ng-container *ngIf="tx?.ethereum?.from as sender; else rawEthereumStateValueSender">
+                    <app-ethereum-identity [entity]="sender" [compact]="true" [link]="ethereumAddressLink(sender.address)"></app-ethereum-identity>
+                  </ng-container>
+                  <ng-template #rawEthereumStateValueSender>
+                    <app-truncate [text]="ethereumSender" [lastChars]="8" [link]="['/address/' | relativeUrl, ethereumSender]"></app-truncate>
+                  </ng-template>
+                </td>
+                <td data-label="Observed change">
+                  <span>{{ ethereumStateActivity === 'Contract call' ? 'Call value' : 'Native balance' }}</span>
+                  <span class="ethereum-state__counterparty">
+                    <fa-icon [icon]="['fas', 'arrow-alt-circle-right']" [fixedWidth]="true"></fa-icon>
+                    <ng-container *ngIf="tx?.ethereum?.to as recipient; else rawEthereumStateValueRecipient">
+                      <app-ethereum-identity [entity]="recipient" [compact]="true" [link]="ethereumAddressLink(recipient.address)"></app-ethereum-identity>
+                    </ng-container>
+                    <ng-template #rawEthereumStateValueRecipient>
+                      <app-truncate [text]="ethereumRecipient" [lastChars]="8" [link]="['/address/' | relativeUrl, ethereumRecipient]"></app-truncate>
+                    </ng-template>
+                  </span>
+                </td>
+                <td class="ethereum-state__effect" data-label="Effect" [title]="formatEthereumQuantity(ethereumValueWei, '18', 36)">
+                  {{ formatEthereumQuantity(ethereumValueWei, '18') }} ETH
+                </td>
+              </tr>
+
+              <tr *ngFor="let transfer of ethereumVisibleTokenTransfers">
+                <td class="ethereum-state__account" data-label="Account">
+                  <ng-container *ngIf="transfer.from as sender; else rawEthereumStateTokenSender">
+                    <app-ethereum-identity [entity]="sender" [compact]="true" [link]="ethereumAddressLink(sender.address)"></app-ethereum-identity>
+                  </ng-container>
+                  <ng-template #rawEthereumStateTokenSender>
+                    <app-truncate [text]="transfer.from?.address || ethereumSender" [lastChars]="8" [link]="['/address/' | relativeUrl, transfer.from?.address || ethereumSender]"></app-truncate>
+                  </ng-template>
+                </td>
+                <td data-label="Observed change">
+                  <app-ethereum-identity
+                    [entity]="transfer.token"
+                    [compact]="true"
+                    [link]="ethereumTokenLink(transfer.token.address)"
+                  ></app-ethereum-identity>
+                  <span class="ethereum-state__counterparty">
+                    <fa-icon [icon]="['fas', 'arrow-alt-circle-right']" [fixedWidth]="true"></fa-icon>
+                    <ng-container *ngIf="transfer.to as recipient; else rawEthereumStateTokenRecipient">
+                      <app-ethereum-identity [entity]="recipient" [compact]="true" [link]="ethereumAddressLink(recipient.address)"></app-ethereum-identity>
+                    </ng-container>
+                    <ng-template #rawEthereumStateTokenRecipient>
+                      <app-truncate [text]="transfer.to?.address || ethereumRecipient" [lastChars]="8" [link]="['/address/' | relativeUrl, transfer.to?.address || ethereumRecipient]"></app-truncate>
+                    </ng-template>
+                  </span>
+                </td>
+                <td class="ethereum-state__effect" data-label="Effect" [title]="ethereumTransferAmount(transfer)">
+                  {{ ethereumTransferAmount(transfer) }}
+                </td>
+              </tr>
+
+              <tr *ngIf="tx?.ethereum?.feeWei">
+                <td class="ethereum-state__account" data-label="Account">
+                  <ng-container *ngIf="tx?.ethereum?.from as sender; else rawEthereumStateFeeSender">
+                    <app-ethereum-identity [entity]="sender" [compact]="true" [link]="ethereumAddressLink(sender.address)"></app-ethereum-identity>
+                  </ng-container>
+                  <ng-template #rawEthereumStateFeeSender>
+                    <app-truncate [text]="ethereumSender" [lastChars]="8" [link]="['/address/' | relativeUrl, ethereumSender]"></app-truncate>
+                  </ng-template>
+                </td>
+                <td data-label="Observed change">
+                  <span>Network fee</span>
+                  <small *ngIf="tx?.ethereum?.gasUsed" class="ethereum-state__detail text-muted">
+                    {{ formatEthereumInteger(tx.ethereum.gasUsed) }} gas used
+                  </small>
+                </td>
+                <td class="ethereum-state__effect" data-label="Effect" [title]="formatEthereumQuantity(tx.ethereum.feeWei, '18', 36)">
+                  {{ formatEthereumQuantity(tx.ethereum.feeWei, '18') }} ETH
+                </td>
+              </tr>
+
+              <tr *ngIf="tx?.ethereum?.nonce !== undefined && tx?.ethereum?.nonce !== null">
+                <td class="ethereum-state__account" data-label="Account">
+                  <ng-container *ngIf="tx?.ethereum?.from as sender; else rawEthereumStateNonceSender">
+                    <app-ethereum-identity [entity]="sender" [compact]="true" [link]="ethereumAddressLink(sender.address)"></app-ethereum-identity>
+                  </ng-container>
+                  <ng-template #rawEthereumStateNonceSender>
+                    <app-truncate [text]="ethereumSender" [lastChars]="8" [link]="['/address/' | relativeUrl, ethereumSender]"></app-truncate>
+                  </ng-template>
+                </td>
+                <td data-label="Observed change">Execution nonce</td>
+                <td class="ethereum-state__effect" data-label="Effect">#{{ formatEthereumInteger(tx.ethereum.nonce) }}</td>
+              </tr>
+
+              <tr>
+                <td class="ethereum-state__account" data-label="Account">
+                  <ng-container *ngIf="tx?.ethereum?.to as recipient; else rawEthereumStateResultTarget">
+                    <app-ethereum-identity [entity]="recipient" [compact]="true" [link]="ethereumAddressLink(recipient.address)"></app-ethereum-identity>
+                  </ng-container>
+                  <ng-template #rawEthereumStateResultTarget>
+                    <app-truncate [text]="ethereumRecipient" [lastChars]="8" [link]="['/address/' | relativeUrl, ethereumRecipient]"></app-truncate>
+                  </ng-template>
+                </td>
+                <td data-label="Observed change">
+                  <span>Execution result</span>
+                  <small *ngIf="tx?.ethereum?.revertReason" class="ethereum-state__detail text-muted">{{ tx.ethereum.revertReason }}</small>
+                </td>
+                <td class="ethereum-state__effect" data-label="Effect"><span class="badge" [ngClass]="ethereumStateStatusClass">{{ ethereumStateStatus }}</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div *ngIf="ethereumHiddenTokenTransferCount" class="ethereum-state__more">
+          <button type="button" class="btn btn-outline-info btn-sm" (click)="toggleEthereumTokenTransfers()">
+            {{ showAllEthereumTokenTransfers ? 'Show fewer token movements' : 'Show ' + ethereumHiddenTokenTransferCount + ' more token movements' }}
+          </button>
+        </div>
+
+        <p *ngIf="ethereumStateNotice" class="ethereum-state__notice text-muted">{{ ethereumStateNotice }}</p>
       </div>
     </section>
 

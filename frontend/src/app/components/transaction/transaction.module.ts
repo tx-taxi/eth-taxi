@@ -12,7 +12,6 @@ import { AccelerateFeeGraphComponent } from '@components/accelerate-checkout/acc
 import { TransactionRawComponent } from '@components/transaction/transaction-raw.component';
 import { CpfpInfoComponent } from '@components/transaction/cpfp-info.component';
 import { ClusterDiagramComponent } from '@components/cluster-diagram/cluster-diagram.component';
-import { AccountStateFlowModule } from '@components/account-state-flow/account-state-flow.module';
 
 const routes: Routes = [
   {
@@ -50,7 +49,6 @@ export class TransactionRoutingModule { }
     SharedModule,
     GraphsModule,
     TxBowtieModule,
-    AccountStateFlowModule,
     TransactionExtrasModule,
   ],
   declarations: [
@@ -72,7 +70,6 @@ export class TransactionRoutingModule { }
   ]
 })
 export class TransactionModule { }
-
 
 
 
