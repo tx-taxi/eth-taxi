@@ -43,7 +43,7 @@ export class TxFeeRatingComponent implements OnInit, OnChanges, OnDestroy {
     if (!this.tx.status.confirmed) {
       return;
     }
-    this.cacheService.loadBlock(this.tx.status.block_height);
+    this.cacheService.loadBlock(this.tx.status.block_height, true);
 
     const foundBlock = this.cacheService.getCachedBlock(this.tx.status.block_height) || null;
     if (foundBlock && foundBlock?.extras?.medianFee > 0) {

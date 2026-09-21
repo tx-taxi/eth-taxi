@@ -23,6 +23,9 @@ export class CacheService {
   blockLoading: { [height: number]: boolean } = {};
   copiesInBlockQueue: { [height: number]: number } = {};
   blockPriorities: number[] = [];
+  private blockPageLoadQueue: number[] = [];
+  private blockPageLoadsInFlight = 0;
+  private readonly maxConcurrentBlockPageLoads = 2;
 
   constructor(
     private stateService: StateService,
@@ -67,20 +70,58 @@ export class CacheService {
     }
   }
 
-  async loadBlock(height) {
-    if (!this.blockCache[height] && !this.blockLoading[height]) {
-      const chunkSize = 10;
-      const maxHeight = Math.ceil(height / chunkSize) * chunkSize;
-      for (let i = 0; i < chunkSize; i++) {
-        this.blockLoading[maxHeight - i] = true;
+  loadBlock(height: number, priority = false): void {
+    const chunkSize = 10;
+    const maxHeight = Math.ceil(height / chunkSize) * chunkSize;
+
+    if (this.blockCache[height]) {
+      this.bumpBlockPriority(height);
+      return;
+    }
+
+    if (this.blockLoading[height]) {
+      this.bumpBlockPriority(height);
+      if (priority) {
+        this.prioritizeBlockPageLoad(maxHeight);
       }
-      let result;
-      try {
-        result = await firstValueFrom(this.apiService.getBlocks$(maxHeight));
-      } catch (e) {
-        console.log('failed to load blocks: ', e.message);
-      }
-      if (result && result.length) {
+      return;
+    }
+
+    for (let i = 0; i < chunkSize; i++) {
+      this.blockLoading[maxHeight - i] = true;
+    }
+    if (priority) {
+      this.blockPageLoadQueue.unshift(maxHeight);
+    } else {
+      this.blockPageLoadQueue.push(maxHeight);
+    }
+    this.drainBlockPageLoadQueue();
+  }
+
+  private prioritizeBlockPageLoad(maxHeight: number): void {
+    const queuedIndex = this.blockPageLoadQueue.indexOf(maxHeight);
+    if (queuedIndex > 0) {
+      this.blockPageLoadQueue.splice(queuedIndex, 1);
+      this.blockPageLoadQueue.unshift(maxHeight);
+    }
+  }
+
+  private drainBlockPageLoadQueue(): void {
+    while (this.blockPageLoadsInFlight < this.maxConcurrentBlockPageLoads && this.blockPageLoadQueue.length) {
+      const maxHeight = this.blockPageLoadQueue.shift();
+      this.blockPageLoadsInFlight++;
+      void this.loadBlockPage(maxHeight).finally(() => {
+        this.blockPageLoadsInFlight--;
+        this.drainBlockPageLoadQueue();
+      });
+    }
+  }
+
+  private async loadBlockPage(maxHeight: number): Promise<void> {
+    const chunkSize = 10;
+    try {
+      const result = await firstValueFrom(this.apiService.getBlocks$(maxHeight));
+      if (result?.length) {
         result.forEach(block => {
           if (this.blockLoading[block.height]) {
             this.addBlockToCache(block);
@@ -88,12 +129,13 @@ export class CacheService {
           }
         });
       }
+    } catch (e) {
+      console.log('failed to load blocks: ', e.message);
+    } finally {
       for (let i = 0; i < chunkSize; i++) {
         delete this.blockLoading[maxHeight - i];
       }
       this.clearBlocks();
-    } else {
-      this.bumpBlockPriority(height);
     }
   }
 
@@ -126,6 +168,7 @@ export class CacheService {
     this.blockCache = {};
     this.apiService.blockAuditLoaded = {};
     this.blockLoading = {};
+    this.blockPageLoadQueue = [];
     this.copiesInBlockQueue = {};
     this.blockPriorities = [];
   }

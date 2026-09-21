@@ -1,9 +1,9 @@
 import { Component, ElementRef, HostListener, OnInit, OnDestroy, ViewChild, Input, ChangeDetectorRef, ChangeDetectionStrategy, AfterViewChecked } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { filter, Subscription } from 'rxjs';
 import { MarkBlockState, StateService } from '@app/services/state.service';
 import { specialBlocks } from '@app/app.constants';
 import { BlockExtended } from '@interfaces/node-api.interface';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { handleDemoRedirect } from '@app/shared/common.utils';
 
 @Component({
@@ -35,6 +35,11 @@ export class StartComponent implements OnInit, AfterViewChecked, OnDestroy {
   @ViewChild('blockchainWrapper', { static: true }) blockchainWrapper: ElementRef;
   @ViewChild('blockchainContainer') blockchainContainer: ElementRef;
   resetScrollSubscription: Subscription;
+  routerSubscription: Subscription;
+  deferInitialPageLoad = false;
+  historicalDetailView = false;
+  pinnedHistoricalBlockHeight?: number;
+  initialPageLoadTimer?: number;
 
   isMobile: boolean = false;
   isiOS: boolean = false;
@@ -75,6 +80,10 @@ export class StartComponent implements OnInit, AfterViewChecked, OnDestroy {
 
   ngOnInit() {
     handleDemoRedirect(this.route, this.router);
+    this.deferInitialPageLoad = this.isDeepDetailRoute();
+    // Keep the live rail dormant until a direct detail route identifies its
+    // block. A historical detail route should never compete with head data.
+    this.historicalDetailView = this.deferInitialPageLoad;
 
     this.firstPageWidth = 40 + (this.blockWidth * this.dynamicBlocksAmount);
     this.blockCounterSubscription = this.stateService.blocks$.subscribe((blocks) => {
@@ -82,19 +91,35 @@ export class StartComponent implements OnInit, AfterViewChecked, OnDestroy {
       this.dynamicBlocksAmount = Math.min(this.blockCount, this.stateService.env.KEEP_BLOCKS_AMOUNT, 8);
       this.firstPageWidth = 40 + (this.blockWidth * this.dynamicBlocksAmount);
       this.minScrollWidth = 40 + (8 * this.blockWidth) + (this.pageWidth * 2);
-      if (this.blockCount <= Math.min(8, this.stateService.env.KEEP_BLOCKS_AMOUNT)) {
+      if (!this.historicalDetailView && this.blockCount <= Math.min(8, this.stateService.env.KEEP_BLOCKS_AMOUNT)) {
         this.onResize();
       }
     });
     this.onResize();
-    this.updatePages();
+    if (this.deferInitialPageLoad) {
+      // A deep historical detail view will shortly mark its block. Do not
+      // spend the provider budget rendering the head of the chain first.
+      this.initialPageLoadTimer = window.setTimeout(() => {
+        if (!this.deferInitialPageLoad) {
+          return;
+        }
+        this.historicalDetailView = false;
+        this.pinnedHistoricalBlockHeight = undefined;
+        this.releaseInitialPageLoad();
+        this.updatePages();
+      }, 5000);
+    } else {
+      this.updatePages();
+    }
     this.timeLtrSubscription = this.stateService.timeLtr.subscribe((ltr) => {
       this.timeLtr = !!ltr;
     });
     this.chainTipSubscription = this.stateService.chainTip$.subscribe((height) => {
       this.chainTip = height;
       this.tipIsSet = true;
-      this.updatePages();
+      if (!this.deferInitialPageLoad && !this.historicalDetailView) {
+        this.updatePages();
+      }
       this.applyPendingMarkArrow();
     });
     this.markBlockSubscription = this.stateService.markBlock$.subscribe((mark) => {
@@ -118,12 +143,23 @@ export class StartComponent implements OnInit, AfterViewChecked, OnDestroy {
       }
       this.lastMark = mark;
       if (blockHeight != null) {
+        const wasDeferringInitialPageLoad = this.deferInitialPageLoad;
+        const isHistoricalDetail = this.isHistoricalDetailBlock(blockHeight);
+        if (isHistoricalDetail && this.pinnedHistoricalBlockHeight === blockHeight) {
+          newMark = false;
+        }
+        this.historicalDetailView = isHistoricalDetail;
+        this.pinnedHistoricalBlockHeight = isHistoricalDetail ? blockHeight : undefined;
+        this.releaseInitialPageLoad();
+        if (wasDeferringInitialPageLoad && blockHeight < 0) {
+          this.updatePages();
+        }
         if (this.tipIsSet) {
           let scrollToHeight = blockHeight;
           if (blockHeight < 0) {
             scrollToHeight = this.chainTip - blockHeight;
           }
-          if (newMark && !this.blockInViewport(scrollToHeight)) {
+          if (newMark && (!this.pages.length || !this.blockInViewport(scrollToHeight))) {
             this.scrollToBlock(scrollToHeight);
           }
         }
@@ -131,6 +167,23 @@ export class StartComponent implements OnInit, AfterViewChecked, OnDestroy {
           this.pendingMark = blockHeight;
         }
       }
+    });
+    this.routerSubscription = this.router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+    ).subscribe(() => {
+      if (this.isDeepDetailRoute()) {
+        return;
+      }
+      const wasHistoricalDetailView = this.historicalDetailView;
+      this.historicalDetailView = false;
+      this.pinnedHistoricalBlockHeight = undefined;
+      this.releaseInitialPageLoad();
+      if (wasHistoricalDetailView && this.tipIsSet) {
+        this.resetScroll();
+      } else if (!this.pages.length) {
+        this.updatePages();
+      }
+      this.cd.markForCheck();
     });
     this.stateService.blocks$
       .subscribe((blocks: BlockExtended[]) => {
@@ -195,7 +248,8 @@ export class StartComponent implements OnInit, AfterViewChecked, OnDestroy {
   applyScrollLeft(): void {
     if (this.blockchainContainer?.nativeElement?.scrollWidth) {
       let lastScrollLeft = null;
-      if (!this.timeLtr) {
+      const canPageHistoricalRail = !this.historicalDetailView || this.mouseDragStartX != null || Math.abs(this.velocity) >= 0.005;
+      if (!this.timeLtr && canPageHistoricalRail) {
         while (this.scrollLeft < 0 && this.shiftPagesForward() && lastScrollLeft !== this.scrollLeft) {
           lastScrollLeft = this.scrollLeft;
           this.scrollLeft += this.pageWidth;
@@ -244,7 +298,7 @@ export class StartComponent implements OnInit, AfterViewChecked, OnDestroy {
 
     if (firstVisibleBlock != null) {
       this.scrollToBlock(firstVisibleBlock, offset + (this.isMobile ? this.blockWidth : 0));
-    } else {
+    } else if (!this.deferInitialPageLoad) {
       this.updatePages();
     }
     this.cd.markForCheck();
@@ -346,6 +400,13 @@ export class StartComponent implements OnInit, AfterViewChecked, OnDestroy {
 
   onScroll(e) {
     if (this.blockchainContainer?.nativeElement?.scrollLeft == null) {
+      return;
+    }
+    // Filling a static page changes its measured width and emits a scroll
+    // event. Do not let that internal event move a pinned detail view away
+    // from the block selected by the route; explicit rail dragging still
+    // retains the normal historical paging behavior.
+    if (this.historicalDetailView && this.mouseDragStartX == null && Math.abs(this.velocity) < 0.005) {
       return;
     }
     this.scrollLeft = this.blockchainContainer?.nativeElement?.scrollLeft;
@@ -467,6 +528,9 @@ export class StartComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   blockInViewport(height: number): boolean {
+    if (!this.pages.length) {
+      return false;
+    }
     const firstHeight = this.pages[0].height;
     const translation = (this.isMobile ? this.chainWidth * 0.95 : this.chainWidth * 0.5);
     const firstX = this.pages[0].offset - this.getConvertedScrollOffset(this.scrollLeft) + translation;
@@ -508,5 +572,32 @@ export class StartComponent implements OnInit, AfterViewChecked, OnDestroy {
     this.markBlockSubscription.unsubscribe();
     this.blockCounterSubscription.unsubscribe();
     this.resetScrollSubscription.unsubscribe();
+    this.routerSubscription.unsubscribe();
+    if (this.initialPageLoadTimer !== undefined) {
+      window.clearTimeout(this.initialPageLoadTimer);
+    }
+  }
+
+  private isDeepDetailRoute(): boolean {
+    const path = this.router.url.split(/[?#]/, 1)[0];
+    return /(?:^|\/)(?:block|tx)\/[^/]+$/.test(path);
+  }
+
+  private isHistoricalDetailBlock(blockHeight: number): boolean {
+    return this.isDeepDetailRoute()
+      && blockHeight >= 0
+      && (!this.tipIsSet || blockHeight < this.chainTip - this.dynamicBlocksAmount);
+  }
+
+  private releaseInitialPageLoad(): void {
+    if (!this.deferInitialPageLoad) {
+      return;
+    }
+    this.deferInitialPageLoad = false;
+    if (this.initialPageLoadTimer !== undefined) {
+      window.clearTimeout(this.initialPageLoadTimer);
+      this.initialPageLoadTimer = undefined;
+    }
+    this.cd.markForCheck();
   }
 }

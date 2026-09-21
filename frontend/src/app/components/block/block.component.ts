@@ -308,7 +308,7 @@ export class BlockComponent implements OnInit, OnDestroy {
           this.stateService.markBlock$.next({ blockHeight: this.blockHeight });
           const cachedBlock = this.cacheService.getCachedBlock(block.height);
           if (!cachedBlock) {
-            this.cacheService.loadBlock(block.height);
+            this.cacheService.loadBlock(block.height, true);
           } else {
             this.loadedCacheBlock(cachedBlock);
           }

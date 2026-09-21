@@ -41,6 +41,7 @@ const EXPLORER_RATE_LIMIT_COOLDOWN_MS = 15 * 60_000;
 const ERC20_TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
 const RPC_TOKEN_TRANSFER_BLOCK_SPAN = 2;
 const RPC_TOKEN_TRANSFER_LIMIT = 100;
+const BLOCK_PAGE_SIZE = 10;
 
 // These mirror the frontend's BigInt filter flags. Keep them below 2^53 so
 // they retain their exact value when serialized through the JSON adapter.
@@ -939,7 +940,10 @@ async function broadcastSnapshot(data) {
 
 async function blocksEndingAt(height) {
   try {
-    const heights = Array.from({ length: 6 }, (_, index) => height - index).filter((value) => value > 0);
+    // CacheService requests block history in ten-height pages. Returning a
+    // shorter page leaves the remaining tiles permanently in their loading
+    // state because the cache has no subsequent request for those heights.
+    const heights = Array.from({ length: BLOCK_PAGE_SIZE }, (_, index) => height - index).filter((value) => value > 0);
     const blocks = await Promise.all(heights.map(async (blockHeight) => {
       try { return mapBlock(await providerJson(`/api/v2/blocks/${blockHeight}`)); } catch { return null; }
     }));
@@ -947,7 +951,7 @@ async function blocksEndingAt(height) {
     if (available.length) return available;
     throw new Error('No indexed blocks returned');
   } catch {
-    const heights = Array.from({ length: 6 }, (_, index) => height - index).filter((value) => value > 0);
+    const heights = Array.from({ length: BLOCK_PAGE_SIZE }, (_, index) => height - index).filter((value) => value > 0);
     const blocks = await Promise.all(heights.map(async (blockHeight) => {
       try {
         return mapRpcBlock(await rpcJson('eth_getBlockByNumber', [`0x${blockHeight.toString(16)}`, false], { requireResult: true }));

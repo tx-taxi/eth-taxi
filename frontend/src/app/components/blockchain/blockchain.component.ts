@@ -17,6 +17,8 @@ export class BlockchainComponent implements OnInit, OnDestroy, OnChanges {
   @Input() minScrollWidth: number = 0;
   @Input() scrollableMempool: boolean = false;
   @Input() containerWidth: number;
+  @Input() deferInitialPageLoad = false;
+  @Input() historicalDetailView = false;
 
   @Output() mempoolOffsetChange: EventEmitter<number> = new EventEmitter();
 
