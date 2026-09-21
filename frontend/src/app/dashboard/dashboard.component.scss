@@ -54,11 +54,9 @@
 
 .mempool-info-data {
   min-height: 56px;
-  display: block;
-  @media (min-width: 485px) {
-    display: flex;
-    flex-direction: row;
-  }
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 12px;
   &.lbtc-pegs-stats { 
     display: flex;
     flex-direction: row;
@@ -67,37 +65,9 @@
     margin-bottom: 10px;
   }
   .item {
-    width: 50%;
-    margin: 0px auto 20px;
-    display: inline-block;
-    @media (min-width: 485px) {
-      margin: 0px auto 10px;
-    }
-    @media (min-width: 768px) {
-      margin: 0px auto 0px;
-    }
-    &:last-child {
-      margin: 0px auto 0px;
-    }
-    &:nth-child(2) {
-      order: 2;
-      @media (min-width: 485px) {
-        order: 3;
-      }
-    }
-    &:nth-child(3) {
-      order: 3;
-      @media (min-width: 485px) {
-        order: 2;
-        display: block;
-      }
-      @media (min-width: 768px) {
-        display: none;
-      }
-      @media (min-width: 992px) {
-        display: block;
-      }
-    }
+    margin: 0;
+    min-width: 0;
+    width: 100%;
     .card-text {
       font-size: 18px;
       span {
@@ -116,12 +86,9 @@
     }
   }
   .bar {
-    width: 93%;
-    margin: 0px 5px 20px;
-    @media (min-width: 485px) {
-      max-width: 200px;
-      margin: 0px auto 0px;
-    }
+    margin: 0;
+    max-width: none;
+    width: 100%;
   }
   .skeleton-loader {
     width: 100%;
@@ -232,6 +199,39 @@
 
 .ethereum-gas-market-wrapper {
   margin-top: 1rem;
+}
+
+.pending-map-unavailable {
+  align-items: center;
+  color: var(--transparent-fg);
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  min-height: 300px;
+  padding: 24px;
+}
+
+@media (max-width: 767.98px) {
+  .dashboard-container {
+    padding-bottom: 56px;
+  }
+
+  .dashboard-container > .row > .col:nth-child(3) {
+    margin-top: 116px;
+  }
+
+  .graph-card {
+    min-height: 0;
+  }
+
+  .mempool-block-wrapper {
+    max-height: min(82vw, 344px);
+    max-width: min(82vw, 344px);
+  }
+
+  .ethereum-gas-market-wrapper {
+    margin-top: 12px;
+  }
 }
 .loadingGraphs{
   height: 250px;

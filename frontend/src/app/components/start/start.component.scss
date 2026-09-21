@@ -24,36 +24,50 @@
   position: relative;
 
   .reset-scroll {
+    align-items: center;
+    background: var(--bg);
+    border: 1px solid var(--secondary);
+    border-radius: 50%;
+    color: var(--fg);
+    display: flex;
+    height: 34px;
+    justify-content: center;
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 50px;
+    top: -20px;
+    font-size: 22px;
     z-index: 10;
     cursor: pointer;
-    opacity: 0.8;
-    transition: opacity 500ms;
-    background: radial-gradient(var(--bg) 0%, transparent 50%);
+    opacity: 0.92;
+    padding: 0;
+    transition: border-color 150ms ease, color 150ms ease, opacity 150ms ease;
+    width: 34px;
 
     &:hover {
+      border-color: var(--primary);
+      color: var(--primary);
       opacity: 1;
-      transition: opacity 300ms;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
     }
 
     &.hidden {
       opacity: 0;
       cursor: inherit;
       pointer-events: none;
-      transition: opacity 500ms;
+      transition: opacity 150ms ease;
     }
   }
 
   &.time-ltr .reset-scroll{
-    right: 10px;
-    transform: translateY(-50%) rotateZ(180deg);
+    right: 14px;
+    transform: rotateZ(180deg);
   }
 
   &.time-rtl .reset-scroll {
-    left: 10px;
+    left: 14px;
   }
 
   &:hover {

@@ -102,7 +102,15 @@
       <ng-container *ngIf="!connected || loadingTip || (block && block.loading)">
         <div class="flashing loading">
           <div class="text-center bitcoin-block mined-block" id="bitcoin-block-{{ block.height }}"
-            [ngStyle]="convertStyleForLoadingBlock(blockStyles[i])"></div>
+            [ngStyle]="convertStyleForLoadingBlock(blockStyles[i])"
+            [attr.aria-label]="block?.height >= 0 ? 'Loading block ' + block.height : 'Loading block data'">
+            <div *ngIf="!minimal && block?.height >= 0" class="block-height loading-height">{{ block.height }}</div>
+            <div *ngIf="!minimal" class="loading-block-body" aria-hidden="true">
+              <span class="loading-line loading-line-short"></span>
+              <span class="loading-line"></span>
+              <span class="loading-label">Loading</span>
+            </div>
+          </div>
         </div>
       </ng-container>
     </ng-template>
