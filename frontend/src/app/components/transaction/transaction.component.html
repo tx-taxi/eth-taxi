@@ -204,9 +204,31 @@
           </div>
         </div>
 
+        <div *ngIf="ethereumAssetFlows.length" class="ethereum-account-flow__diagram" aria-label="Asset transfer flow">
+          <tx-bowtie-graph
+            [tx]="tx"
+            [cached]="true"
+            [width]="ethereumFlowGraphWidth"
+            [height]="ethereumFlowGraphHeight"
+            [lineLimit]="32"
+            [maxCombinedWeight]="ethereumFlowMaxCombinedWeight"
+            [maxStrands]="ethereumAssetFlows.length"
+            [network]="network"
+            [tooltip]="false"
+            [connectors]="false"
+            [inputIndex]="null"
+            [outputIndex]="null"
+            [assetFlows]="ethereumAssetFlows"
+          ></tx-bowtie-graph>
+        </div>
+
         <div *ngIf="tx?.ethereum?.tokenTransfers?.length" class="ethereum-account-flow__assets" aria-label="Token movements">
           <div class="ethereum-account-flow__assets-heading">Token movements</div>
-          <article *ngFor="let transfer of tx.ethereum.tokenTransfers" class="ethereum-token-transfer">
+          <article
+            *ngFor="let transfer of tx.ethereum.tokenTransfers"
+            class="ethereum-token-transfer"
+            [style.--ethereum-token-accent]="ethereumTokenAccent(transfer.token)"
+          >
             <div class="ethereum-token-transfer__asset">
               <app-ethereum-identity
                 [entity]="transfer.token"

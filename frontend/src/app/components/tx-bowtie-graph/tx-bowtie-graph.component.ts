@@ -10,6 +10,11 @@ import { AssetsService } from '@app/services/assets.service';
 import { environment } from '@environments/environment';
 import { ElectrsApiService } from '@app/services/electrs-api.service';
 
+export interface AssetFlow {
+  id: string;
+  palette: string[];
+}
+
 interface SvgLine {
   path: string;
   style: string;
@@ -38,6 +43,8 @@ interface Xput {
   asset?: string;
 }
 
+let graphSequence = 0;
+
 @Component({
   selector: 'tx-bowtie-graph',
   templateUrl: './tx-bowtie-graph.component.html',
@@ -58,6 +65,7 @@ export class TxBowtieGraphComponent implements OnInit, OnChanges {
   @Input() connectors = false;
   @Input() inputIndex: number;
   @Input() outputIndex: number;
+  @Input() assetFlows: AssetFlow[] | null = null;
 
   dir: 'rtl' | 'ltr' = 'ltr';
 
@@ -78,8 +86,10 @@ export class TxBowtieGraphComponent implements OnInit, OnChanges {
   zeroValueWidth = 60;
   zeroValueThickness = 20;
   hasLine: boolean;
+  assetFlowMode = false;
   assetsMinimal: any;
   nativeAssetId = this.stateService.network === 'liquidtestnet' ? environment.nativeTestAssetId : environment.nativeAssetId;
+  readonly graphId = `tx-bowtie-${graphSequence++}`;
 
   outspendsSubscription: Subscription;
   refreshOutspends$: ReplaySubject<string> = new ReplaySubject();
@@ -115,6 +125,10 @@ export class TxBowtieGraphComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.initGraph();
+
+    if (this.assetFlowMode) {
+      return;
+    }
 
     if (this.network === 'liquid' || this.network === 'liquidtestnet') {
       this.assetsService.getAssetsMinimalJson$.subscribe((assets) => {
@@ -156,12 +170,18 @@ export class TxBowtieGraphComponent implements OnInit, OnChanges {
 
   ngOnChanges(): void {
     this.initGraph();
-    if (!this.cached) {
+    if (!this.cached && !this.assetFlowMode && this.tx?.txid) {
       this.refreshOutspends$.next(this.tx.txid);
     }
   }
 
   initGraph(): void {
+    this.assetFlowMode = Boolean(this.assetFlows?.length);
+    if (this.assetFlowMode) {
+      this.initAssetFlowGraph();
+      return;
+    }
+
     this.isLiquid = (this.network === 'liquid' || this.network === 'liquidtestnet');
     this.gradient = this.gradientColors[this.network];
     this.midWidth = Math.min(10, Math.ceil(this.width / 100));
@@ -237,6 +257,34 @@ export class TxBowtieGraphComponent implements OnInit, OnChanges {
 
     this.hasLine = this.inputs.reduce((line, put) => line || !put.zeroValue, false)
       && this.outputs.reduce((line, put) => line || !put.zeroValue, false);
+  }
+
+  private initAssetFlowGraph(): void {
+    const flows = this.assetFlows || [];
+    this.isLiquid = false;
+    this.gradient = this.gradientColors[this.network] || this.gradientColors[''];
+    this.midWidth = 0;
+    this.txWidth = this.width - 20;
+    this.combinedWeight = Math.min(this.maxCombinedWeight, Math.floor(this.txWidth / 6));
+    this.connectorWidth = 0;
+    this.zeroValueWidth = Math.max(20, Math.min((this.txWidth / 2) - 110, 60));
+
+    // Assets use unrelated decimal systems. Equal-width strands communicate
+    // distinct movements without implying that their raw amounts are comparable.
+    this.inputData = flows.map((flow, index) => ({ type: 'input', value: 1, index, asset: flow.id }));
+    this.outputData = flows.map((flow, index) => ({ type: 'output', value: 1, index, asset: flow.id }));
+    this.inputs = this.initLines('in', this.inputData, flows.length, flows.length);
+    this.outputs = this.initLines('out', this.outputData, flows.length, flows.length);
+    this.middle = { path: '', style: 'stroke-width: 0' };
+    this.hasLine = flows.length > 0;
+  }
+
+  assetGradientId(side: 'in' | 'out', index: number): string {
+    return `${this.graphId}-asset-${side}-${index}`;
+  }
+
+  assetPaletteColor(flow: AssetFlow, index: number): string {
+    return flow.palette?.[index] || flow.palette?.[0] || 'var(--primary)';
   }
 
   calcTotalValue(tx: Transaction): number {
@@ -377,17 +425,18 @@ export class TxBowtieGraphComponent implements OnInit, OnChanges {
     maxOffset -= minOffset;
 
     return lineParams.map((line, i) => {
+      const gradientId = this.assetFlowMode ? this.assetGradientId(side, i) : undefined;
       if (xputs[i].value === 0) {
         return {
           path: this.makeZeroValuePath(side, line.outerY),
-          style: this.makeStyle(this.zeroValueThickness, xputs[i].type),
+          style: this.makeStyle(this.zeroValueThickness, gradientId),
           class: xputs[i].type,
           zeroValue: true,
         };
       } else {
         return {
           path: this.makePath(side, line.outerY, line.innerY, line.thickness, line.offset, pad + maxOffset),
-          style: this.makeStyle(line.thickness, xputs[i].type),
+          style: this.makeStyle(line.thickness, gradientId),
           class: xputs[i].type,
           connectorPath: this.connectors ? this.makeConnectorPath(side, line.outerY, line.innerY, line.thickness): null,
           markerPath: this.makeMarkerPath(side, line.outerY, line.innerY, line.thickness),
@@ -459,12 +508,8 @@ export class TxBowtieGraphComponent implements OnInit, OnChanges {
     }
   }
 
-  makeStyle(minWeight, type): string {
-    if (type === 'fee') {
-      return `stroke-width: ${minWeight}`;
-    } else {
-      return `stroke-width: ${minWeight}`;
-    }
+  makeStyle(minWeight: number, gradientId?: string): string {
+    return `stroke-width: ${minWeight}${gradientId ? `; stroke: url(#${gradientId})` : ''}`;
   }
 
   getOutputValue(v: Vout): number | void {
@@ -527,6 +572,9 @@ export class TxBowtieGraphComponent implements OnInit, OnChanges {
   }
 
   onClick(event, side, index): void {
+    if (this.assetFlowMode) {
+      return;
+    }
     if (side.startsWith('input')) {
       const input = this.tx.vin[index];
       if (side === 'input-connector' && input && !input.is_coinbase && !input.is_pegin && input.txid && input.vout != null) {

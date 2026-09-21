@@ -39,7 +39,8 @@ import { EnterpriseService } from '@app/services/enterprise.service';
 import { ZONE_SERVICE } from '@app/injection-tokens';
 import { MiningService, MiningStats } from '@app/services/mining.service';
 import { ETA, EtaService } from '@app/services/eta.service';
-import { EthereumIdentity, EthereumTokenTransfer } from '@interfaces/ethereum-api.interface';
+import { EthereumIdentity, EthereumToken, EthereumTokenTransfer } from '@interfaces/ethereum-api.interface';
+import { AssetFlow } from '@components/tx-bowtie-graph/tx-bowtie-graph.component';
 
 export interface Pool {
   id: number;
@@ -65,6 +66,9 @@ const DUPLICATE_TX_BLOCKS: Record<string, [number, number]> = {
   'e3bf3d07d4b0375638d5f1db5255fe07ba2c4cb067cd81b84ee974b6585fb468': [91722, 91880],
   'd5d27987d2a3dfc724e359870c6644b40e497bdc0589a033220fe15429d88599': [91812, 91842],
 };
+
+const ETHEREUM_NATIVE_PALETTE = ['#5269d6', '#8ea2ff', '#c7d2ff'];
+const FALLBACK_TOKEN_PALETTE = ['#167f94', '#38b6cd', '#a9e9f3'];
 
 @Component({
   selector: 'app-transaction',
@@ -144,6 +148,7 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
   isLoadingFirstSeen = false;
   notAcceleratedOnLoad: boolean = null;
   duplicateTxBlocks: [number, number] | undefined;
+  ethereumAssetFlows: AssetFlow[] = [];
 
   featuresEnabled: boolean;
   segwitEnabled: boolean;
@@ -256,6 +261,43 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ethereumTransferExactAmount(transfer: EthereumTokenTransfer): string {
     return this.formatEthereumQuantity(transfer.value, transfer.token.decimals, 36);
+  }
+
+  ethereumTokenAccent(token: EthereumToken | null | undefined): string {
+    return token?.palette?.[0] || FALLBACK_TOKEN_PALETTE[0];
+  }
+
+  get ethereumFlowGraphWidth(): number {
+    return this.isMobile ? 320 : 960;
+  }
+
+  get ethereumFlowGraphHeight(): number {
+    const strandHeight = this.isMobile ? 22 : 18;
+    const maxHeight = this.isMobile ? 280 : 260;
+    return Math.min(maxHeight, Math.max(96, (this.ethereumAssetFlows.length * strandHeight) + 48));
+  }
+
+  get ethereumFlowMaxCombinedWeight(): number {
+    return Math.min(100, Math.max(28, this.ethereumAssetFlows.length * 10));
+  }
+
+  private setEthereumAssetFlows(): void {
+    if (!this.tx?.ethereum) {
+      this.ethereumAssetFlows = [];
+      return;
+    }
+
+    const flows: AssetFlow[] = [];
+    if (this.ethereumValueWei && this.ethereumValueWei !== '0') {
+      flows.push({ id: 'eth', palette: ETHEREUM_NATIVE_PALETTE });
+    }
+    for (const transfer of this.tx.ethereum.tokenTransfers || []) {
+      flows.push({
+        id: `${transfer.token.address}:${transfer.logIndex || flows.length}`,
+        palette: transfer.token.palette?.length ? transfer.token.palette : FALLBACK_TOKEN_PALETTE,
+      });
+    }
+    this.ethereumAssetFlows = flows.slice(0, 32);
   }
 
   private normalizeEthereumInteger(value: string | null | undefined): string | null {
@@ -777,6 +819,7 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
 
           this.tx = tx;
           this.setFeatures();
+          this.setEthereumAssetFlows();
           this.isCached = false;
           if (tx.fee === undefined) {
             this.tx.fee = 0;

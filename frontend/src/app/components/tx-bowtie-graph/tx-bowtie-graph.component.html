@@ -95,8 +95,20 @@
         <stop offset="50%" [attr.stop-color]="gradient[1]" />
         <stop offset="100%" stop-color="transparent" />
       </linearGradient>
+      <ng-container *ngIf="assetFlowMode">
+        <ng-container *ngFor="let flow of assetFlows; let i = index">
+          <linearGradient [attr.id]="assetGradientId('in', i)" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" [attr.stop-color]="assetPaletteColor(flow, 0)" />
+            <stop offset="100%" [attr.stop-color]="assetPaletteColor(flow, 1)" />
+          </linearGradient>
+          <linearGradient [attr.id]="assetGradientId('out', i)" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" [attr.stop-color]="assetPaletteColor(flow, 1)" />
+            <stop offset="100%" [attr.stop-color]="assetPaletteColor(flow, 2)" />
+          </linearGradient>
+        </ng-container>
+      </ng-container>
     </defs>
-    <path *ngIf="hasLine" [attr.d]="middle.path" class="line middle" [style]="middle.style"/>
+    <path *ngIf="hasLine && !assetFlowMode" [attr.d]="middle.path" class="line middle" [style]="middle.style"/>
     <ng-container *ngFor="let input of inputs; let i = index">
       <path *ngIf="connectors && !inputData[i].coinbase && !inputData[i].pegin"
         [attr.d]="input.connectorPath"
@@ -119,7 +131,7 @@
         class="line {{input.class}}"
         [class.highlight]="inputIndex != null && inputData[i].index === inputIndex"
         [style]="input.style"
-        attr.marker-start="url(#{{input.class}}-arrow)"
+        [attr.marker-start]="assetFlowMode ? null : 'url(#' + input.class + '-arrow)'"
         (pointerover)="onHover($event, 'input', i);"
         (pointerout)="onBlur($event, 'input', i);"
         (click)="onClick($event, 'input', inputData[i].index);"
@@ -157,7 +169,7 @@
         class="line {{output.class}}"
         [class.highlight]="outputIndex != null && outputData[i].index === outputIndex"
         [style]="output.style"
-        attr.marker-start="url(#{{output.class}}-arrow)"
+        [attr.marker-start]="assetFlowMode ? null : 'url(#' + output.class + '-arrow)'"
         (pointerover)="onHover($event, 'output', i);"
         (pointerout)="onBlur($event, 'output', i);"
         (click)="onClick($event, 'output', outputData[i].index);"

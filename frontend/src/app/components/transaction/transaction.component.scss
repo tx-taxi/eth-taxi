@@ -228,6 +228,18 @@
   border-top: 1px solid var(--border-subtle);
 }
 
+.ethereum-account-flow__diagram {
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  padding: 0.35rem 0;
+}
+
+.ethereum-account-flow__diagram tx-bowtie-graph {
+  display: block;
+  flex: 0 0 auto;
+}
+
 .ethereum-account-flow__assets-heading {
   padding: 0.6rem 1rem;
   color: var(--transparent-fg);
@@ -244,6 +256,7 @@
   gap: 1rem;
   min-width: 0;
   padding: 0.85rem 1rem;
+  border-left: 3px solid var(--ethereum-token-accent, transparent);
   border-bottom: 1px solid var(--border-subtle);
 }
 

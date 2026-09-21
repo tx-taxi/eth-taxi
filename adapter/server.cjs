@@ -39,6 +39,14 @@ const ETHEREUM_TRANSACTION_FLAGS = {
   tokenTransfer: 2 ** 50,
 };
 
+const TOKEN_PALETTES = {
+  DAI: ['#c99420', '#f5c85b', '#fff0c1'],
+  LINK: ['#285bcf', '#5d8cff', '#b9cbff'],
+  USDC: ['#2775ca', '#68a6e8', '#c8e5ff'],
+  USDT: ['#168c6a', '#46c6a0', '#b7f2df'],
+  WBTC: ['#d77c21', '#f6ab51', '#ffe0ae'],
+};
+
 const contentTypes = {
   '.css': 'text/css; charset=utf-8',
   '.gz': 'application/gzip',
@@ -97,6 +105,26 @@ function safeIconUrl(value) {
   }
 }
 
+function paletteFromToken(token, fallbackAddress = '') {
+  const symbol = String(token?.symbol || '').trim().toUpperCase();
+  if (TOKEN_PALETTES[symbol]) return TOKEN_PALETTES[symbol];
+
+  // Blockscout does not expose a token brand color. Seed a stable palette from
+  // public token metadata so the same asset always receives the same ribbons.
+  const seed = String(token?.address_hash || token?.address || fallbackAddress || token?.name || symbol || 'token');
+  let hash = 2166136261;
+  for (let index = 0; index < seed.length; index++) {
+    hash ^= seed.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  const hue = Math.abs(hash) % 360;
+  return [
+    `hsl(${hue} 66% 42%)`,
+    `hsl(${(hue + 28) % 360} 82% 62%)`,
+    `hsl(${(hue + 48) % 360} 88% 78%)`,
+  ];
+}
+
 function tagNames(entity) {
   const tags = [
     ...(Array.isArray(entity?.metadata?.tags) ? entity.metadata.tags : []),
@@ -124,6 +152,7 @@ function mapEthereumToken(token, fallbackAddress = '') {
     marketCap: nullableString(token.circulating_market_cap || token.market_cap),
     volume24h: nullableString(token.volume_24h),
     reputation: nullableString(token.reputation),
+    palette: paletteFromToken(token, fallbackAddress),
   };
 }
 
@@ -169,6 +198,7 @@ function mapEthereumTokenTransfer(transfer) {
       marketCap: null,
       volume24h: null,
       reputation: null,
+      palette: paletteFromToken(null, transfer?.token?.address_hash || ''),
     },
     tokenId: nullableString(transfer?.token_id),
     value: decimalString(transfer?.total?.value ?? transfer?.value),

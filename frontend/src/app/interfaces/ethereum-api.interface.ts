@@ -26,6 +26,7 @@ export interface EthereumToken {
   marketCap?: string | null;
   volume24h?: string | null;
   reputation?: string | null;
+  palette?: string[];
 }
 
 export interface EthereumTokenTransfer {
