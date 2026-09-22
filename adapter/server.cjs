@@ -24,6 +24,8 @@ const transactionSubscriptions = new Map();
 const transactionStreamSignatures = new Map();
 const addressSubscriptions = new Map();
 const addressTransactionSnapshots = new Map();
+const addressMetadataCache = new Map();
+const addressHistoryCache = new Map();
 const rpcBlockFeeCache = new Map();
 const tokenMetadataCache = new Map();
 let activeProvider = providers[0];
@@ -38,7 +40,11 @@ const providerCooldowns = new Map();
 
 const POLL_INTERVAL_MS = Math.max(3_000, Number(process.env.ETH_POLL_INTERVAL_MS || 6_000));
 const HEARTBEAT_INTERVAL_MS = 30_000;
-const EXPLORER_RATE_LIMIT_COOLDOWN_MS = 15 * 60_000;
+const EXPLORER_RATE_LIMIT_COOLDOWN_MS = 15_000;
+const EXPLORER_MAX_RATE_LIMIT_COOLDOWN_MS = 60_000;
+const ADDRESS_METADATA_CACHE_MS = 15_000;
+const ADDRESS_HISTORY_CACHE_MS = 5_000;
+const ADDRESS_CACHE_LIMIT = 256;
 const ERC20_TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
 const RPC_TOKEN_TRANSFER_BLOCK_SPAN = 2;
 const RPC_TOKEN_TRANSFER_LIMIT = 100;
@@ -540,7 +546,6 @@ async function rpcJson(method, params = [], options = {}) {
         throw new Error(`${provider} ${method} returned no result`);
       }
       activeRpcProvider = provider;
-      activeProvider = provider;
       return payload?.result;
     } catch (error) {
       lastError = error;
@@ -549,11 +554,25 @@ async function rpcJson(method, params = [], options = {}) {
   throw lastError || new Error(`No Ethereum RPC providers configured for ${method}`);
 }
 
-async function providerJson(requestPath) {
+function explorerRateLimitCooldown(response) {
+  const retryAfter = response.headers.get('retry-after');
+  const seconds = Number(retryAfter);
+  if (Number.isFinite(seconds) && seconds > 0) {
+    return Math.min(EXPLORER_MAX_RATE_LIMIT_COOLDOWN_MS, Math.max(EXPLORER_RATE_LIMIT_COOLDOWN_MS, seconds * 1_000));
+  }
+
+  const retryAt = retryAfter ? Date.parse(retryAfter) : NaN;
+  if (Number.isFinite(retryAt)) {
+    return Math.min(EXPLORER_MAX_RATE_LIMIT_COOLDOWN_MS, Math.max(EXPLORER_RATE_LIMIT_COOLDOWN_MS, retryAt - Date.now()));
+  }
+  return EXPLORER_RATE_LIMIT_COOLDOWN_MS;
+}
+
+async function providerJson(requestPath, { bypassCooldown = false } = {}) {
   let lastError;
   for (const provider of providers) {
     const cooldownUntil = providerCooldowns.get(provider) || 0;
-    if (cooldownUntil > Date.now()) {
+    if (!bypassCooldown && cooldownUntil > Date.now()) {
       lastError = new Error(`${provider} is rate limited until ${new Date(cooldownUntil).toISOString()}`);
       continue;
     }
@@ -563,16 +582,50 @@ async function providerJson(requestPath) {
         signal: AbortSignal.timeout(12_000),
       });
       if (!response.ok) {
-        if (response.status === 429) providerCooldowns.set(provider, Date.now() + EXPLORER_RATE_LIMIT_COOLDOWN_MS);
+        if (response.status === 429) providerCooldowns.set(provider, Date.now() + explorerRateLimitCooldown(response));
         throw new Error(`${provider}${requestPath} returned ${response.status}`);
       }
       activeProvider = provider;
+      providerCooldowns.delete(provider);
       return response.json();
     } catch (error) {
       lastError = error;
     }
   }
   throw lastError || new Error('No Ethereum providers configured');
+}
+
+function setAddressCacheEntry(cache, key, entry) {
+  cache.delete(key);
+  cache.set(key, entry);
+  while (cache.size > ADDRESS_CACHE_LIMIT) cache.delete(cache.keys().next().value);
+}
+
+function cachedAddressResponse(cache, address, ttl, load) {
+  const key = address.toLowerCase();
+  const cached = cache.get(key);
+  if (cached?.value !== undefined && cached.expiresAt > Date.now()) return Promise.resolve(cached.value);
+  if (cached?.request) return cached.request;
+
+  const request = Promise.resolve()
+    .then(load)
+    .then((value) => {
+      setAddressCacheEntry(cache, key, { value, expiresAt: Date.now() + ttl, request: null });
+      return value;
+    })
+    .catch((error) => {
+      // An indexer hiccup must not turn a previously indexed account into an
+      // empty account page. Its next request will refresh this stale value.
+      if (cached?.value !== undefined) {
+        setAddressCacheEntry(cache, key, { ...cached, request: null });
+        return cached.value;
+      }
+      cache.delete(key);
+      throw error;
+    });
+
+  setAddressCacheEntry(cache, key, { ...cached, request });
+  return request;
 }
 
 async function rpcTransactionById(id) {
@@ -982,10 +1035,10 @@ async function blockById(id) {
 
 async function transactionById(id) {
   try {
-    const transaction = await providerJson(`/api/v2/transactions/${encodeURIComponent(id)}`);
+    const transaction = await providerJson(`/api/v2/transactions/${encodeURIComponent(id)}`, { bypassCooldown: true });
     let blockHash;
     if (transaction.block_number) {
-      try { blockHash = (await providerJson(`/api/v2/blocks/${transaction.block_number}`)).hash; } catch { /* Detail remains useful without a block hash. */ }
+      try { blockHash = (await providerJson(`/api/v2/blocks/${transaction.block_number}`, { bypassCooldown: true })).hash; } catch { /* Detail remains useful without a block hash. */ }
     }
     return hydrateTransactionTokenMetadata(mapTransactionDetail(transaction, blockHash));
   } catch (explorerError) {
@@ -998,24 +1051,16 @@ async function transactionById(id) {
 }
 
 async function addressById(address) {
-  try {
-    const [details, transactions, counters, tokens] = await Promise.all([
-      providerJson(`/api/v2/addresses/${encodeURIComponent(address)}`),
-      providerJson(`/api/v2/addresses/${encodeURIComponent(address)}/transactions`),
-      providerJson(`/api/v2/addresses/${encodeURIComponent(address)}/counters`).catch(() => ({})),
-      providerJson(`/api/v2/addresses/${encodeURIComponent(address)}/tokens`).catch(() => ({ items: [] })),
-    ]);
-    const ethereum = mapEthereumAddressMetadata(details, counters, address, tokens.items || []);
-    return ethereumAddressResponse(details.hash || address, ethereum, number(counters.transactions_count, (transactions.items || []).length));
-  } catch {
-    return ethereumAddressResponse(address, await rpcAddressMetadata(address));
-  }
+  const ethereum = await ethereumAddressMetadata(address);
+  return ethereumAddressResponse(address, ethereum, number(ethereum.counters.transactions));
 }
 
 async function addressTransactions(address) {
   try {
-    const response = await providerJson(`/api/v2/addresses/${encodeURIComponent(address)}/transactions`);
-    return (response.items || []).map((transaction) => mapTransactionDetail(transaction, transaction.block_hash));
+    return await cachedAddressResponse(addressHistoryCache, address, ADDRESS_HISTORY_CACHE_MS, async () => {
+      const response = await providerJson(`/api/v2/addresses/${encodeURIComponent(address)}/transactions`, { bypassCooldown: true });
+      return (response.items || []).map((transaction) => mapTransactionDetail(transaction, transaction.block_hash));
+    });
   } catch {
     // Standard JSON-RPC exposes balances and contract code but not an address
     // history index. The frontend receives `historyUnavailable` from the
@@ -1046,12 +1091,14 @@ async function blockTransactions(blockId, start = 0) {
 
 async function ethereumAddressMetadata(address) {
   try {
-    const [details, counters, tokens] = await Promise.all([
-      providerJson(`/api/v2/addresses/${encodeURIComponent(address)}`),
-      providerJson(`/api/v2/addresses/${encodeURIComponent(address)}/counters`).catch(() => ({})),
-      providerJson(`/api/v2/addresses/${encodeURIComponent(address)}/tokens`).catch(() => ({ items: [] })),
-    ]);
-    return mapEthereumAddressMetadata(details, counters, address, tokens.items || []);
+    return await cachedAddressResponse(addressMetadataCache, address, ADDRESS_METADATA_CACHE_MS, async () => {
+      const [details, counters, tokens] = await Promise.all([
+        providerJson(`/api/v2/addresses/${encodeURIComponent(address)}`, { bypassCooldown: true }),
+        providerJson(`/api/v2/addresses/${encodeURIComponent(address)}/counters`, { bypassCooldown: true }).catch(() => ({})),
+        providerJson(`/api/v2/addresses/${encodeURIComponent(address)}/tokens`, { bypassCooldown: true }).catch(() => ({ items: [] })),
+      ]);
+      return mapEthereumAddressMetadata(details, counters, address, tokens.items || []);
+    });
   } catch {
     return rpcAddressMetadata(address);
   }
