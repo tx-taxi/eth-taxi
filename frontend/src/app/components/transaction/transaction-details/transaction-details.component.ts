@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import { ETA } from '@app/services/eta.service';
 import { MiningStats } from '@app/services/mining.service';
 import { Filter } from '@app/shared/filters.utils';
+import { formatEthereumQuantity } from '@app/shared/ethereum-quantity.utils';
 
 @Component({
   selector: 'app-transaction-details',
@@ -55,6 +56,10 @@ export class TransactionDetailsComponent implements OnInit {
 
   toggleCpfp(): void {
     this.toggleCpfp$.emit();
+  }
+
+  formatEthereumQuantity(value: string | null | undefined, decimals: string | null | undefined = '18', maxFractionDigits = 8): string {
+    return formatEthereumQuantity(value, decimals, maxFractionDigits);
   }
 
   get clusterPreviewStats(): { chunkSize: number; chunkFeerate: number; otherChunks: number } {

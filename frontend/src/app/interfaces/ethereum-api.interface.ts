@@ -71,6 +71,13 @@ export interface EthereumTransactionMetadata {
   createdContract?: EthereumIdentity | null;
   valueWei: string;
   feeWei?: string | null;
+  maximumFeeWei?: string | null;
+  executionFeeWei?: string | null;
+  blobFeeWei?: string | null;
+  maximumBlobFeeWei?: string | null;
+  blobGasUsed?: string | null;
+  blobGasPriceWei?: string | null;
+  maxFeePerBlobGasWei?: string | null;
   gasLimit: string;
   gasUsed?: string | null;
   gasPriceWei?: string | null;

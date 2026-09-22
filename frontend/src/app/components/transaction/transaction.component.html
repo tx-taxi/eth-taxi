@@ -162,15 +162,36 @@
               </tr>
               <tr>
                 <td>Gas used</td>
-                <td>&lrm;{{ tx?.ethereum?.gasUsed ? formatEthereumInteger(tx.ethereum.gasUsed) : (tx.weight / 4 | number) }} gas</td>
+                <td>
+                  <ng-container *ngIf="tx?.ethereum; else legacyGasUsed">
+                    {{ tx.ethereum.gasUsed ? formatEthereumInteger(tx.ethereum.gasUsed) + ' gas' : 'Not executed' }}
+                  </ng-container>
+                  <ng-template #legacyGasUsed>&lrm;{{ tx.weight / 4 | number }} gas</ng-template>
+                </td>
               </tr>
               <tr *ngIf="tx?.ethereum?.gasLimit">
                 <td>Gas limit</td>
                 <td>&lrm;{{ formatEthereumInteger(tx.ethereum.gasLimit) }} gas</td>
               </tr>
-              <tr *ngIf="tx?.ethereum?.feeWei">
-                <td>Transaction fee</td>
-                <td>&lrm;{{ formatEthereumQuantity(tx.ethereum.feeWei, '18') }} ETH</td>
+              <tr *ngIf="tx?.ethereum?.feeWei || tx?.ethereum?.maximumFeeWei">
+                <td>{{ tx.ethereum.maximumFeeWei ? 'Maximum fee' : 'Transaction fee' }}</td>
+                <td>&lrm;{{ formatEthereumQuantity(tx.ethereum.maximumFeeWei || tx.ethereum.feeWei, '18') }} ETH</td>
+              </tr>
+              <tr *ngIf="tx?.ethereum?.blobFeeWei">
+                <td>Execution fee</td>
+                <td>&lrm;{{ formatEthereumQuantity(tx.ethereum.executionFeeWei, '18') }} ETH</td>
+              </tr>
+              <tr *ngIf="tx?.ethereum?.blobFeeWei">
+                <td>Blob fee</td>
+                <td>&lrm;{{ formatEthereumQuantity(tx.ethereum.blobFeeWei, '18') }} ETH</td>
+              </tr>
+              <tr *ngIf="tx?.ethereum?.maximumBlobFeeWei">
+                <td>Maximum blob fee</td>
+                <td>&lrm;{{ formatEthereumQuantity(tx.ethereum.maximumBlobFeeWei, '18') }} ETH</td>
+              </tr>
+              <tr *ngIf="tx?.ethereum?.blobGasUsed">
+                <td>Blob gas used</td>
+                <td>&lrm;{{ formatEthereumInteger(tx.ethereum.blobGasUsed) }} blob gas</td>
               </tr>
             </tbody>
           </table>
@@ -191,8 +212,16 @@
                 <td class="ethereum-detail-method">{{ ethereumMethod() }}</td>
               </tr>
               <tr *ngIf="tx?.ethereum?.gasPriceWei">
-                <td>Gas price</td>
-                <td>&lrm;{{ formatEthereumQuantity(tx.ethereum.gasPriceWei, '9', 4) }} gwei</td>
+                <td>{{ tx.ethereum.maximumFeeWei ? 'Maximum fee per gas' : 'Gas price' }}</td>
+                <td>&lrm;{{ formatEthereumQuantity(tx.ethereum.maximumFeeWei ? (tx.ethereum.maxFeePerGasWei || tx.ethereum.gasPriceWei) : tx.ethereum.gasPriceWei, '9', 4) }} gwei</td>
+              </tr>
+              <tr *ngIf="tx?.ethereum?.blobGasPriceWei">
+                <td>Blob gas price</td>
+                <td>&lrm;{{ formatEthereumQuantity(tx.ethereum.blobGasPriceWei, '9', 4) }} gwei</td>
+              </tr>
+              <tr *ngIf="tx?.ethereum?.maxFeePerBlobGasWei">
+                <td>Maximum blob fee per gas</td>
+                <td>&lrm;{{ formatEthereumQuantity(tx.ethereum.maxFeePerBlobGasWei, '9', 4) }} gwei</td>
               </tr>
               <tr *ngIf="tx?.ethereum?.revertReason">
                 <td>Revert reason</td>

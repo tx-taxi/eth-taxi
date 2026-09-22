@@ -26,6 +26,7 @@ const addressSubscriptions = new Map();
 const addressTransactionSnapshots = new Map();
 const addressMetadataCache = new Map();
 const addressHistoryCache = new Map();
+const addressHistoryCursorCache = new Map();
 const rpcBlockFeeCache = new Map();
 const tokenMetadataCache = new Map();
 let activeProvider = providers[0];
@@ -46,6 +47,7 @@ const ADDRESS_METADATA_CACHE_MS = 15_000;
 const ADDRESS_HISTORY_CACHE_MS = 5_000;
 const ADDRESS_CACHE_LIMIT = 256;
 const ERC20_TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
+const BLOB_GAS_PER_BLOB = 131_072n;
 const RPC_TOKEN_TRANSFER_BLOCK_SPAN = 2;
 const RPC_TOKEN_TRANSFER_LIMIT = 100;
 const BLOCK_PAGE_SIZE = 10;
@@ -110,6 +112,62 @@ function decimalString(value, fallback = '0') {
   } catch {
     return fallback;
   }
+}
+
+function nullableDecimalString(value) {
+  return value === undefined || value === null ? null : decimalString(value);
+}
+
+function multiplyDecimalStrings(left, right) {
+  if (left === null || right === null) return null;
+  try {
+    return (BigInt(left) * BigInt(right)).toString();
+  } catch {
+    return null;
+  }
+}
+
+function sumDecimalStrings(...values) {
+  let total = 0n;
+  let hasValue = false;
+  for (const value of values) {
+    if (value === null || value === undefined) continue;
+    try {
+      total += BigInt(value);
+      hasValue = true;
+    } catch {
+      // Ignore malformed optional provider fields rather than corrupting the
+      // execution fee we do know.
+    }
+  }
+  return hasValue ? total.toString() : null;
+}
+
+function transactionFeeParts(tx) {
+  const pending = tx?.block_number === undefined || tx?.block_number === null;
+  const feeType = nullableString(tx?.fee?.type) || (pending ? 'maximum' : 'actual');
+  const executionFeeWei = nullableDecimalString(tx?.fee?.value);
+  const blobGasUsed = nullableDecimalString(tx?.blob_gas_used);
+  const blobGasPriceWei = nullableDecimalString(tx?.blob_gas_price);
+  const maxFeePerBlobGasWei = nullableDecimalString(tx?.max_fee_per_blob_gas);
+  const blobFeeWei = multiplyDecimalStrings(blobGasUsed, blobGasPriceWei);
+  const versionedHashes = tx?.blob_versioned_hashes || tx?.blobVersionedHashes;
+  const blobGasLimit = blobGasUsed || (Array.isArray(versionedHashes) && versionedHashes.length
+    ? (BigInt(versionedHashes.length) * BLOB_GAS_PER_BLOB).toString()
+    : null);
+  const maximumBlobFeeWei = feeType === 'maximum'
+    ? multiplyDecimalStrings(blobGasLimit, maxFeePerBlobGasWei)
+    : null;
+  return {
+    feeType,
+    executionFeeWei,
+    blobGasUsed,
+    blobGasPriceWei,
+    maxFeePerBlobGasWei,
+    blobFeeWei,
+    maximumBlobFeeWei,
+    totalFeeWei: sumDecimalStrings(executionFeeWei, feeType === 'actual' ? blobFeeWei : maximumBlobFeeWei),
+  };
 }
 
 function nullableString(value) {
@@ -250,7 +308,17 @@ function mapDecodedInput(input) {
   };
 }
 
+function mapRevertReason(reason) {
+  if (typeof reason === 'string') return nullableString(reason);
+  if (!reason || typeof reason !== 'object') return null;
+  for (const field of ['message', 'reason', 'error', 'method_call']) {
+    if (typeof reason[field] === 'string' && reason[field].trim()) return reason[field].trim();
+  }
+  return null;
+}
+
 function mapEthereumTransactionMetadata(tx, blockHash) {
+  const fee = transactionFeeParts(tx);
   return {
     hash: tx.hash || '',
     status: nullableString(tx.status) || 'unknown',
@@ -264,15 +332,22 @@ function mapEthereumTransactionMetadata(tx, blockHash) {
     to: tx.to ? mapEthereumIdentity(tx.to) : null,
     createdContract: tx.created_contract ? mapEthereumIdentity(tx.created_contract) : null,
     valueWei: decimalString(tx.value),
-    feeWei: tx.fee?.value === undefined ? null : decimalString(tx.fee.value),
+    feeWei: fee.feeType === 'actual' ? fee.totalFeeWei : null,
+    maximumFeeWei: fee.feeType === 'maximum' ? fee.totalFeeWei : null,
+    executionFeeWei: fee.executionFeeWei,
+    blobFeeWei: fee.blobFeeWei,
+    maximumBlobFeeWei: fee.maximumBlobFeeWei,
+    blobGasUsed: fee.blobGasUsed,
+    blobGasPriceWei: fee.blobGasPriceWei,
+    maxFeePerBlobGasWei: fee.maxFeePerBlobGasWei,
     gasLimit: decimalString(tx.gas_limit),
-    gasUsed: tx.gas_used === undefined ? null : decimalString(tx.gas_used),
-    gasPriceWei: tx.gas_price === undefined ? null : decimalString(tx.gas_price),
-    maxFeePerGasWei: tx.max_fee_per_gas === undefined ? null : decimalString(tx.max_fee_per_gas),
-    maxPriorityFeePerGasWei: tx.max_priority_fee_per_gas === undefined ? null : decimalString(tx.max_priority_fee_per_gas),
-    baseFeePerGasWei: tx.base_fee_per_gas === undefined ? null : decimalString(tx.base_fee_per_gas),
-    burntFeeWei: tx.transaction_burnt_fee === undefined ? null : decimalString(tx.transaction_burnt_fee),
-    priorityFeeWei: tx.priority_fee === undefined ? null : decimalString(tx.priority_fee),
+    gasUsed: nullableDecimalString(tx.gas_used),
+    gasPriceWei: nullableDecimalString(tx.gas_price),
+    maxFeePerGasWei: nullableDecimalString(tx.max_fee_per_gas),
+    maxPriorityFeePerGasWei: nullableDecimalString(tx.max_priority_fee_per_gas),
+    baseFeePerGasWei: nullableDecimalString(tx.base_fee_per_gas),
+    burntFeeWei: nullableDecimalString(tx.transaction_burnt_fee),
+    priorityFeeWei: nullableDecimalString(tx.priority_fee),
     nonce: decimalString(tx.nonce),
     type: nullableString(tx.type),
     method: nullableString(tx.method),
@@ -280,7 +355,7 @@ function mapEthereumTransactionMetadata(tx, blockHash) {
     decodedInput: mapDecodedInput(tx.decoded_input),
     tokenTransfers: (Array.isArray(tx.token_transfers) ? tx.token_transfers : []).map(mapEthereumTokenTransfer),
     tokenTransfersOverflow: Boolean(tx.token_transfers_overflow),
-    revertReason: nullableString(tx.revert_reason),
+    revertReason: mapRevertReason(tx.revert_reason),
     hasError: Boolean(tx.has_error || tx.has_error_in_internal_transactions || tx.status === 'error' || tx.result === 'error'),
   };
 }
@@ -477,13 +552,23 @@ function mapRpcTransaction(tx, receipt, block, tipHeight = 0, pending = false) {
   const rawInput = tx.input || tx.data || '0x';
   const value = hexBigInt(tx.value);
   const gasLimit = hexBigInt(tx.gas);
+  const confirmed = !pending && Boolean(tx.blockNumber);
   const gasUsed = receipt ? hexBigInt(receipt.gasUsed) : null;
-  const gasPrice = receipt?.effectiveGasPrice || tx.gasPrice || tx.maxFeePerGas || '0x0';
+  const gasPrice = receipt?.effectiveGasPrice || (!confirmed ? tx.maxFeePerGas || tx.gasPrice : tx.gasPrice || tx.maxFeePerGas) || '0x0';
   const effectiveGasPrice = hexBigInt(gasPrice);
+  const maximumGasPrice = hexBigInt(tx.maxFeePerGas || tx.gasPrice || '0x0');
   const baseFee = hexBigInt(block?.baseFeePerGas);
-  const fee = gasUsed === null ? null : gasUsed * effectiveGasPrice;
+  const blobGasUsed = receipt?.blobGasUsed === undefined || receipt?.blobGasUsed === null ? null : hexBigInt(receipt.blobGasUsed);
+  const blobGasPrice = receipt?.blobGasPrice === undefined || receipt?.blobGasPrice === null ? null : hexBigInt(receipt.blobGasPrice);
+  const maxFeePerBlobGas = tx.maxFeePerBlobGas === undefined || tx.maxFeePerBlobGas === null ? null : hexBigInt(tx.maxFeePerBlobGas);
+  const blobFee = blobGasUsed === null || blobGasPrice === null ? null : blobGasUsed * blobGasPrice;
+  const blobGasLimit = Array.isArray(tx.blobVersionedHashes) ? BigInt(tx.blobVersionedHashes.length) * BLOB_GAS_PER_BLOB : 0n;
+  const maximumBlobFee = maxFeePerBlobGas === null ? 0n : blobGasLimit * maxFeePerBlobGas;
+  const executionFee = gasUsed === null ? null : gasUsed * effectiveGasPrice;
+  const fee = executionFee === null ? null : executionFee + (blobFee || 0n);
+  const maximumFee = gasLimit * maximumGasPrice + maximumBlobFee;
   const burntFee = gasUsed === null ? null : gasUsed * baseFee;
-  const priorityFee = fee === null ? null : fee > (burntFee || 0n) ? fee - (burntFee || 0n) : 0n;
+  const priorityFee = executionFee === null ? null : executionFee > (burntFee || 0n) ? executionFee - (burntFee || 0n) : 0n;
   const tokenTransfers = rpcTokenTransfers(receipt, rpcTimestamp(block));
   const transactionTypes = [];
   if (value > 0n && rawInput === '0x') transactionTypes.push('coin_transfer');
@@ -491,11 +576,10 @@ function mapRpcTransaction(tx, receipt, block, tipHeight = 0, pending = false) {
   if (tokenTransfers.length) transactionTypes.push('token_transfer');
   if (!transactionTypes.length && tx.to) transactionTypes.push('coin_transfer');
 
-  const confirmed = !pending && Boolean(tx.blockNumber);
   const blockNumber = confirmed ? hexNumber(tx.blockNumber) : 0;
   return {
     hash: tx.hash,
-    status: receipt ? (hexBigInt(receipt.status) === 1n ? 'ok' : 'error') : (confirmed ? 'ok' : 'pending'),
+    status: receipt ? (hexBigInt(receipt.status) === 1n ? 'ok' : 'error') : (confirmed ? 'unknown' : 'pending'),
     result: receipt ? (hexBigInt(receipt.status) === 1n ? 'success' : 'error') : null,
     block_number: confirmed ? String(blockNumber) : null,
     block_hash: confirmed ? tx.blockHash : null,
@@ -506,7 +590,7 @@ function mapRpcTransaction(tx, receipt, block, tipHeight = 0, pending = false) {
     to: rpcIdentity(tx.to),
     created_contract: receipt?.contractAddress ? rpcIdentity(receipt.contractAddress) : null,
     value: value.toString(),
-    fee: fee === null ? { value: (gasLimit * effectiveGasPrice).toString() } : { value: fee.toString() },
+    fee: fee === null ? { type: 'maximum', value: maximumFee.toString() } : { type: 'actual', value: fee.toString() },
     gas_limit: gasLimit.toString(),
     gas_used: gasUsed === null ? undefined : gasUsed.toString(),
     gas_price: effectiveGasPrice.toString(),
@@ -515,6 +599,10 @@ function mapRpcTransaction(tx, receipt, block, tipHeight = 0, pending = false) {
     base_fee_per_gas: block?.baseFeePerGas ? baseFee.toString() : undefined,
     transaction_burnt_fee: burntFee === null ? undefined : burntFee.toString(),
     priority_fee: priorityFee === null ? undefined : priorityFee.toString(),
+    blob_gas_used: blobGasUsed === null ? undefined : blobGasUsed.toString(),
+    blob_gas_price: blobGasPrice === null ? undefined : blobGasPrice.toString(),
+    max_fee_per_blob_gas: maxFeePerBlobGas === null ? undefined : maxFeePerBlobGas.toString(),
+    blob_versioned_hashes: tx.blobVersionedHashes,
     nonce: hexDecimalString(tx.nonce),
     type: hexDecimalString(tx.type),
     method: rawInput.length >= 10 ? rawInput.slice(0, 10) : null,
@@ -628,6 +716,36 @@ function cachedAddressResponse(cache, address, ttl, load) {
   return request;
 }
 
+function blockscoutPagePath(pathname, pageParams) {
+  if (!pageParams || typeof pageParams !== 'object') return pathname;
+  const query = new URLSearchParams();
+  for (const [key, value] of Object.entries(pageParams)) {
+    if (value !== undefined && value !== null && value !== '') query.set(key, String(value));
+  }
+  return query.size ? `${pathname}?${query}` : pathname;
+}
+
+function addressHistoryCursorKey(address, txid) {
+  return `${address.toLowerCase()}:${txid.toLowerCase()}`;
+}
+
+function rememberAddressHistoryCursor(address, txid, cursor) {
+  if (!txid || !cursor || typeof cursor !== 'object') return;
+  setAddressCacheEntry(addressHistoryCursorCache, addressHistoryCursorKey(address, txid), { value: cursor, expiresAt: Date.now() + 10 * 60_000 });
+}
+
+function addressHistoryCursorFromTransaction(transaction) {
+  if (!transaction?.hash) return null;
+  return {
+    index: transaction.position,
+    value: transaction.value,
+    hash: transaction.hash,
+    block_number: transaction.block_number,
+    fee: transaction.fee?.value,
+    items_count: 50,
+  };
+}
+
 async function rpcTransactionById(id) {
   const transaction = await rpcJson('eth_getTransactionByHash', [id], { requireResult: true });
   const [receipt, block, tip] = await Promise.all([
@@ -641,7 +759,8 @@ async function rpcTransactionById(id) {
 
 function mapBlock(block) {
   const baseFee = wei(block.base_fee_per_gas);
-  const totalFees = wei(block.transaction_fees);
+  const blobFees = multiplyDecimalStrings(nullableDecimalString(block.blob_gas_used), nullableDecimalString(block.blob_gas_price));
+  const totalFees = wei(sumDecimalStrings(nullableDecimalString(block.transaction_fees), blobFees));
   const reward = wei(block.rewards?.reduce((sum, item) => sum + BigInt(item.reward || 0), 0n));
   return {
     id: block.hash,
@@ -707,14 +826,23 @@ async function rpcBlockFeeMetrics(block) {
   const cached = rpcBlockFeeCache.get(blockHash);
   if (cached) return cached;
 
-  const burntFee = hexBigInt(block.gasUsed) * hexBigInt(block.baseFeePerGas);
-  let metrics = { totalFees: burntFee, validatorReward: 0n };
+  const burntExecutionFee = hexBigInt(block.gasUsed) * hexBigInt(block.baseFeePerGas);
+  let metrics = { totalFees: burntExecutionFee, validatorReward: 0n };
   try {
     const receipts = await rpcJson('eth_getBlockReceipts', [blockHash], { requireResult: true });
-    const totalFees = receipts.reduce((sum, receipt) => sum + (hexBigInt(receipt?.gasUsed) * hexBigInt(receipt?.effectiveGasPrice)), 0n);
+    const totalFees = receipts.reduce((sum, receipt) => {
+      const executionFee = hexBigInt(receipt?.gasUsed) * hexBigInt(receipt?.effectiveGasPrice);
+      const blobFee = hexBigInt(receipt?.blobGasUsed) * hexBigInt(receipt?.blobGasPrice);
+      return sum + executionFee + blobFee;
+    }, 0n);
+    const burntFees = receipts.reduce((sum, receipt) => {
+      const executionFee = hexBigInt(receipt?.gasUsed) * hexBigInt(block.baseFeePerGas);
+      const blobFee = hexBigInt(receipt?.blobGasUsed) * hexBigInt(receipt?.blobGasPrice);
+      return sum + executionFee + blobFee;
+    }, 0n);
     metrics = {
       totalFees,
-      validatorReward: totalFees > burntFee ? totalFees - burntFee : 0n,
+      validatorReward: totalFees > burntFees ? totalFees - burntFees : 0n,
     };
   } catch {
     // A few public RPC providers do not expose block receipts. The burned base
@@ -729,6 +857,7 @@ async function rpcBlockFeeMetrics(block) {
 function mapTransaction(tx) {
   const gas = number(tx.gas_used || tx.gas_limit);
   const rate = wei(tx.gas_price || tx.max_fee_per_gas);
+  const fee = transactionFeeParts(tx);
   const types = new Set(tx.transaction_types || []);
   let flags = 0;
   if (types.has('coin_transfer')) flags += ETHEREUM_TRANSACTION_FLAGS.transfer;
@@ -736,7 +865,7 @@ function mapTransaction(tx) {
   if (types.has('token_transfer') || (tx.token_transfers?.length ?? 0) > 0) flags += ETHEREUM_TRANSACTION_FLAGS.tokenTransfer;
   return {
     txid: tx.hash,
-    fee: wei(tx.fee?.value),
+    fee: wei(fee.totalFeeWei),
     vsize: gas,
     value: wei(tx.value),
     rate,
@@ -1055,11 +1184,36 @@ async function addressById(address) {
   return ethereumAddressResponse(address, ethereum, number(ethereum.counters.transactions));
 }
 
-async function addressTransactions(address) {
+async function indexedAddressTransactions(address, afterTxid = '') {
+  let cursor = null;
+  if (afterTxid) {
+    const cached = addressHistoryCursorCache.get(addressHistoryCursorKey(address, afterTxid));
+    cursor = cached?.expiresAt > Date.now() ? cached.value : null;
+    if (!cursor && cached) addressHistoryCursorCache.delete(addressHistoryCursorKey(address, afterTxid));
+    if (!cursor) {
+      const transaction = await providerJson(`/api/v2/transactions/${encodeURIComponent(afterTxid)}`, { bypassCooldown: true });
+      cursor = addressHistoryCursorFromTransaction(transaction);
+    }
+    if (!cursor) return [];
+  }
+
+  const response = await providerJson(
+    blockscoutPagePath(`/api/v2/addresses/${encodeURIComponent(address)}/transactions`, cursor),
+    { bypassCooldown: true },
+  );
+  const items = response.items || [];
+  const last = items.at(-1);
+  if (last && response.next_page_params) {
+    rememberAddressHistoryCursor(address, last.hash, response.next_page_params);
+  }
+  return items.map((transaction) => mapTransactionDetail(transaction, transaction.block_hash));
+}
+
+async function addressTransactions(address, afterTxid = '') {
   try {
+    if (afterTxid) return await indexedAddressTransactions(address, afterTxid);
     return await cachedAddressResponse(addressHistoryCache, address, ADDRESS_HISTORY_CACHE_MS, async () => {
-      const response = await providerJson(`/api/v2/addresses/${encodeURIComponent(address)}/transactions`, { bypassCooldown: true });
-      return (response.items || []).map((transaction) => mapTransactionDetail(transaction, transaction.block_hash));
+      return indexedAddressTransactions(address);
     });
   } catch {
     // Standard JSON-RPC exposes balances and contract code but not an address
@@ -1071,10 +1225,29 @@ async function addressTransactions(address) {
 
 async function blockTransactions(blockId, start = 0) {
   try {
-    const response = await providerJson(`/api/v2/blocks/${encodeURIComponent(blockId)}/transactions`);
-    return (response.items || [])
-      .slice(start, start + 25)
-      .map((transaction) => mapTransactionDetail(transaction, blockId));
+    const offset = Math.max(0, Math.min(Number(start) || 0, 10_000));
+    const pageSize = 25;
+    let pageParams = null;
+    let consumed = 0;
+    const transactions = [];
+
+    while (transactions.length < pageSize) {
+      const response = await providerJson(
+        blockscoutPagePath(`/api/v2/blocks/${encodeURIComponent(blockId)}/transactions`, pageParams),
+      );
+      const items = response.items || [];
+      if (!items.length) break;
+
+      const pageStart = Math.max(0, offset - consumed);
+      if (pageStart < items.length) {
+        transactions.push(...items.slice(pageStart, pageStart + pageSize - transactions.length));
+      }
+      consumed += items.length;
+      if (!response.next_page_params || consumed > offset + pageSize) break;
+      pageParams = response.next_page_params;
+    }
+
+    return transactions.map((transaction) => mapTransactionDetail(transaction, transaction.block_hash || blockId));
   } catch {
     const isHash = /^0x[a-f\d]{64}$/i.test(blockId);
     const block = await rpcJson(
@@ -1083,9 +1256,14 @@ async function blockTransactions(blockId, start = 0) {
       { requireResult: true },
     );
     const tip = await rpcJson('eth_blockNumber').catch(() => null);
+    const receipts = await rpcJson('eth_getBlockReceipts', [block.hash], { requireResult: true }).catch(() => []);
+    const receiptsByHash = new Map((receipts || []).map((receipt) => [receipt.transactionHash?.toLowerCase(), receipt]));
     return (block.transactions || [])
       .slice(start, start + 25)
-      .map((transaction) => mapTransactionDetail(mapRpcTransaction(transaction, null, block, hexNumber(tip)), block.hash));
+      .map((transaction) => mapTransactionDetail(
+        mapRpcTransaction(transaction, receiptsByHash.get(transaction.hash?.toLowerCase()) || null, block, hexNumber(tip)),
+        block.hash,
+      ));
   }
 }
 
@@ -1155,7 +1333,49 @@ async function cachedEthereumTokenMetadata(address) {
   return metadata;
 }
 
+function tokenTransferKey(transfer) {
+  const logIndex = transfer?.logIndex;
+  if (logIndex !== undefined && logIndex !== null && logIndex !== '') return `log:${logIndex}`;
+  return [
+    transfer?.token?.address?.toLowerCase() || '',
+    transfer?.from?.address?.toLowerCase() || '',
+    transfer?.to?.address?.toLowerCase() || '',
+    transfer?.value || '',
+    transfer?.tokenId || '',
+  ].join(':');
+}
+
+async function hydrateOverflowedTokenTransfers(transaction) {
+  if (!transaction?.ethereum?.tokenTransfersOverflow || !transaction.txid) return transaction;
+
+  try {
+    const receipt = await rpcJson('eth_getTransactionReceipt', [transaction.txid], { requireResult: true });
+    const receiptTransfers = rpcTokenTransfers(receipt, transaction.ethereum.blockTimestamp)
+      .map(mapEthereumTokenTransfer);
+    if (!receiptTransfers.length) return transaction;
+
+    const indexedTransfers = transaction.ethereum.tokenTransfers || [];
+    const indexedByKey = new Map(indexedTransfers.map((transfer) => [tokenTransferKey(transfer), transfer]));
+    const receiptKeys = new Set();
+    const mergedTransfers = receiptTransfers.map((transfer) => {
+      const key = tokenTransferKey(transfer);
+      receiptKeys.add(key);
+      return indexedByKey.get(key) || transfer;
+    });
+
+    // Keep indexer-specific transfer records too (for example ERC-1155 events),
+    // while ensuring standard Transfer logs cannot disappear on an overflowed
+    // indexer response.
+    mergedTransfers.push(...indexedTransfers.filter((transfer) => !receiptKeys.has(tokenTransferKey(transfer))));
+    transaction.ethereum.tokenTransfers = mergedTransfers;
+  } catch {
+    // The indexer result remains useful if a public RPC omits receipts.
+  }
+  return transaction;
+}
+
 async function hydrateTransactionTokenMetadata(transaction) {
+  await hydrateOverflowedTokenTransfers(transaction);
   const transfers = transaction?.ethereum?.tokenTransfers || [];
   const addresses = new Set();
   for (const transfer of transfers) {
@@ -1217,7 +1437,7 @@ async function blockscoutSnapshot() {
   const average = number(gasPrices.average);
   const fast = number(gasPrices.fast);
   const gasUsed = pendingItems.reduce((sum, item) => sum + number(item.gas_limit || item.gas_used), 0);
-  const gasFees = pendingItems.reduce((sum, item) => sum + wei(item.fee?.value), 0);
+  const gasFees = pendingItems.reduce((sum, item) => sum + wei(transactionFeeParts(item).totalFeeWei), 0);
   const liveMempoolSample = sampleMempool(pendingItems, gasUsed, gasFees, {
     baseFeeGwei: gwei(blocks[0]?.base_fee_per_gas),
     networkUtilization: number(stats.network_utilization_percentage),
@@ -1288,7 +1508,7 @@ async function rpcSnapshot() {
   const average = marketPrice(1);
   const fast = marketPrice(2);
   const gasUsed = pendingItems.reduce((sum, item) => sum + number(item.gas_limit || item.gas_used), 0);
-  const gasFees = pendingItems.reduce((sum, item) => sum + wei(item.fee?.value), 0);
+  const gasFees = pendingItems.reduce((sum, item) => sum + wei(transactionFeeParts(item).totalFeeWei), 0);
   const liveMempoolSample = sampleMempool(pendingItems, gasUsed, gasFees, {
     baseFeeGwei: gwei(baseFee.toString()),
     networkUtilization: number(feeHistory?.gasUsedRatio?.at(-1)) * 100,
@@ -1452,7 +1672,7 @@ const server = http.createServer(async (req, res) => {
     const transactionMatch = requestPath.match(/^\/(?:api(?:\/v1)?)?\/tx\/(0x[a-fA-F0-9]+)$/);
     if (transactionMatch) return respond(res, 200, await transactionById(transactionMatch[1]));
     const addressTransactionsMatch = requestPath.match(/^\/api\/address\/(0x[a-fA-F0-9]{40})\/txs$/);
-    if (addressTransactionsMatch) return respond(res, 200, await addressTransactions(addressTransactionsMatch[1]));
+    if (addressTransactionsMatch) return respond(res, 200, await addressTransactions(addressTransactionsMatch[1], requestUrl.searchParams.get('after_txid') || ''));
     const addressMatch = requestPath.match(/^\/api\/address\/(0x[a-fA-F0-9]{40})$/);
     if (addressMatch) return respond(res, 200, await addressById(addressMatch[1]));
     const statusMatch = requestPath.match(/^\/api\/tx\/(0x[a-fA-F0-9]+)\/status$/);

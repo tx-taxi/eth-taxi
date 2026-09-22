@@ -210,12 +210,16 @@
 <ng-template #feeRow>
   @if (!isLoadingTx) {
     <tr>
-      <td class="td-width" i18n="transaction.fee|Transaction fee">Fee</td>
+      <td class="td-width">{{ tx?.ethereum?.maximumFeeWei ? 'Maximum fee' : 'Fee' }}</td>
+      @if (tx?.ethereum; as ethereum) {
+        <td class="text-wrap">&lrm;{{ formatEthereumQuantity(ethereum.maximumFeeWei || ethereum.feeWei, '18') }} ETH</td>
+      } @else {
       <td class="text-wrap"><app-amount [satoshis]="tx.fee" [blockConversion]="tx.price"></app-amount>
         @if (isAcceleration && (accelerationInfo?.bidBoost ?? tx.feeDelta > 0)) {
           <span class="oobFees" i18n-ngbTooltip="Acceleration Fees" ngbTooltip="Acceleration fees paid out-of-band"><app-amount [satoshis]="accelerationInfo?.bidBoost ?? tx.feeDelta" [blockConversion]="tx.price" [addPlus]="true"></app-amount></span>
         }
       </td>
+      }
     </tr>
   } @else {
     <ng-container *ngTemplateOutlet="skeletonDetailsRow"></ng-container>
@@ -225,10 +229,14 @@
 <ng-template #feeRateRow>
   @if (!isLoadingTx) {
     <tr>
-      <td i18n="transaction.fee-rate|Transaction fee rate">Fee rate</td>
+      <td>{{ tx?.ethereum?.maximumFeeWei ? 'Maximum fee per gas' : 'Fee rate' }}</td>
+      @if (tx?.ethereum; as ethereum) {
+        <td>&lrm;{{ formatEthereumQuantity(ethereum.maximumFeeWei ? (ethereum.maxFeePerGasWei || ethereum.gasPriceWei) : ethereum.gasPriceWei, '9', 4) }} gwei</td>
+      } @else {
       <td>
         <app-fee-rate [fee]="tx.feePerVsize"></app-fee-rate>
       </td>
+      }
     </tr>
   } @else {
     <ng-container *ngTemplateOutlet="skeletonDetailsRow"></ng-container>

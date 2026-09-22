@@ -15,7 +15,7 @@
       </ng-template>
     </span>
     <span class="field col-sm-4 text-center"><ng-container *ngIf="transactionTime > 0">&lrm;{{ transactionTime * 1000 | date:'yyyy-MM-dd HH:mm' }}</ng-container></span>
-    <span class="field col-sm-4 text-end"><span class="label" i18n="transaction.fee|Transaction fee">Fee</span> <app-amount [satoshis]="tx.fee" [noFiat]="true"></app-amount></span>
+    <span class="field col-sm-4 text-end"><span class="label">{{ tx.ethereum?.maximumFeeWei ? 'Maximum fee' : 'Fee' }}</span> <app-amount [satoshis]="tx.fee" [noFiat]="true"></app-amount></span>
   </div>
 
 

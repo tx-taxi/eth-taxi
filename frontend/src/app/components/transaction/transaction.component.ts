@@ -39,6 +39,7 @@ import { EnterpriseService } from '@app/services/enterprise.service';
 import { ZONE_SERVICE } from '@app/injection-tokens';
 import { MiningService, MiningStats } from '@app/services/mining.service';
 import { ETA, EtaService } from '@app/services/eta.service';
+import { formatEthereumInteger, formatEthereumQuantity } from '@app/shared/ethereum-quantity.utils';
 
 export interface Pool {
   id: number;
@@ -161,53 +162,15 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
   partnerCode: string | undefined;
 
   formatEthereumQuantity(value: string | null | undefined, decimals: string | null | undefined = '18', maxFractionDigits = 8): string {
-    const normalizedValue = this.normalizeEthereumInteger(value);
-    const decimalPlaces = this.parseEthereumDecimals(decimals);
-    if (normalizedValue === null || decimalPlaces === null) {
-      return 'Unavailable';
-    }
-
-    const amount = BigInt(normalizedValue);
-    if (decimalPlaces === 0) {
-      return this.formatEthereumInteger(amount.toString());
-    }
-
-    const divisor = 10n ** BigInt(decimalPlaces);
-    const whole = amount / divisor;
-    const remainder = amount % divisor;
-    let fraction = remainder.toString().padStart(decimalPlaces, '0').replace(/0+$/, '');
-    if (fraction.length > maxFractionDigits) {
-      fraction = fraction.slice(0, maxFractionDigits).replace(/0+$/, '');
-    }
-    return fraction
-      ? `${this.formatEthereumInteger(whole.toString())}.${fraction}`
-      : this.formatEthereumInteger(whole.toString());
+    return formatEthereumQuantity(value, decimals, maxFractionDigits);
   }
 
   formatEthereumInteger(value: string | null | undefined): string {
-    const normalized = this.normalizeEthereumInteger(value);
-    return normalized === null ? 'Unavailable' : normalized.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return formatEthereumInteger(value);
   }
 
   ethereumMethod(): string {
     return this.tx?.ethereum?.decodedInput?.methodCall || this.tx?.ethereum?.method || this.tx?.vin?.[0]?.scriptsig_asm || 'Transfer';
-  }
-
-  private normalizeEthereumInteger(value: string | null | undefined): string | null {
-    const normalized = value?.trim();
-    if (!normalized || !/^\d+$/.test(normalized)) {
-      return null;
-    }
-    return BigInt(normalized).toString();
-  }
-
-  private parseEthereumDecimals(value: string | null | undefined): number | null {
-    const normalized = value?.trim();
-    if (!normalized || !/^\d+$/.test(normalized)) {
-      return null;
-    }
-    const decimals = BigInt(normalized);
-    return decimals <= 255n ? Number(decimals) : null;
   }
 
   private txList: TransactionsListComponent;
