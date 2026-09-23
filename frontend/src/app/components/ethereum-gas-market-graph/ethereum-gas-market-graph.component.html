@@ -12,7 +12,7 @@
   </div>
 
   <div
-    *ngIf="recentSamples.length >= 2; else emptyHistory"
+    *ngIf="recentSamples.length; else emptyHistory"
     class="gas-market__chart"
     role="img"
     [attr.aria-label]="accessibleSummary"

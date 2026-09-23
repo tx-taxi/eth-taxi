@@ -35,7 +35,7 @@ export class EthereumGasMarketGraphComponent implements OnChanges {
 
   ngOnChanges(): void {
     this.recentSamples = this.normalizeSamples(this.samples);
-    this.chartOptions = this.recentSamples.length >= 2 ? this.buildChartOptions() : {};
+    this.chartOptions = this.recentSamples.length ? this.buildChartOptions() : {};
   }
 
   get emptyState(): string {
@@ -43,25 +43,31 @@ export class EthereumGasMarketGraphComponent implements OnChanges {
       return 'Loading gas market history';
     }
 
-    if (this.recentSamples.length === 1) {
-      return 'Collecting a second sample before drawing the trend';
-    }
-
     return 'No gas market samples are available for the last two hours';
   }
 
   get accessibleSummary(): string {
-    if (this.recentSamples.length < 2) {
+    if (!this.recentSamples.length) {
       return this.emptyState;
     }
 
     const latest = this.recentSamples[this.recentSamples.length - 1];
+    if (this.recentSamples.length === 1) {
+      return `Current gas market sample at ${this.formatTime(latest.timestamp)}. `
+        + `Base fee ${this.formatGwei(latest.base_fee_gwei)} gwei; `
+        + `network utilization ${this.formatPercentage(latest.network_utilization_percentage)}.`;
+    }
+
     return `Gas market history from ${this.formatTime(this.recentSamples[0].timestamp)} to ${this.formatTime(latest.timestamp)}. `
       + `Latest base fee ${this.formatGwei(latest.base_fee_gwei)} gwei; `
       + `network utilization ${this.formatPercentage(latest.network_utilization_percentage)}.`;
   }
 
   get historyLabel(): string {
+    if (this.recentSamples.length === 1) {
+      return 'Current sample';
+    }
+
     if (this.recentSamples.length < 2) {
       return 'Live history';
     }
@@ -104,6 +110,8 @@ export class EthereumGasMarketGraphComponent implements OnChanges {
 
   private buildChartOptions(): EChartsOption {
     const sampleByTimestamp = new Map(this.recentSamples.map(sample => [sample.timestamp, sample]));
+    const isCurrentSample = this.recentSamples.length === 1;
+    const currentTimestamp = this.recentSamples[0]?.timestamp || Date.now();
 
     return {
       animation: false,
@@ -154,8 +162,8 @@ export class EthereumGasMarketGraphComponent implements OnChanges {
       },
       xAxis: {
         type: 'time',
-        min: 'dataMin',
-        max: 'dataMax',
+        min: isCurrentSample ? currentTimestamp - 5 * 60 * 1000 : 'dataMin',
+        max: isCurrentSample ? currentTimestamp + 5 * 60 * 1000 : 'dataMax',
         boundaryGap: false,
         splitNumber: 3,
         axisLine: {
@@ -208,8 +216,9 @@ export class EthereumGasMarketGraphComponent implements OnChanges {
           type: 'line',
           yAxisIndex: 0,
           data: this.recentSamples.map(sample => [sample.timestamp, sample.base_fee_gwei]),
-          showSymbol: false,
+          showSymbol: isCurrentSample,
           symbol: 'circle',
+          symbolSize: isCurrentSample ? 9 : 4,
           smooth: false,
           lineStyle: {
             color: 'var(--primary)',
@@ -223,8 +232,9 @@ export class EthereumGasMarketGraphComponent implements OnChanges {
           type: 'line',
           yAxisIndex: 1,
           data: this.recentSamples.map(sample => [sample.timestamp, sample.network_utilization_percentage]),
-          showSymbol: false,
+          showSymbol: isCurrentSample,
           symbol: 'diamond',
+          symbolSize: isCurrentSample ? 9 : 4,
           smooth: false,
           lineStyle: {
             color: '#2ec4b6',

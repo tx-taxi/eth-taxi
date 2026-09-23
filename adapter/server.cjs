@@ -1653,6 +1653,7 @@ const server = http.createServer(async (req, res) => {
     const requestUrl = new URL(req.url, `http://${req.headers.host}`);
     const requestPath = requestUrl.pathname;
     if (requestPath === '/healthz') return respond(res, 200, { ok: true, provider: activeProvider });
+    if (requestPath.startsWith('/source/')) return respond(res, 404, { error: 'Not found' });
     if (isApiPath(requestPath) && !isSupportedApiPath(requestPath)) {
       return respond(res, 404, { error: 'Unsupported Ethereum explorer endpoint', path: requestPath });
     }
