@@ -175,7 +175,7 @@
               </tr>
               <tr *ngIf="tx?.ethereum?.feeWei || tx?.ethereum?.maximumFeeWei">
                 <td>{{ tx.ethereum.maximumFeeWei ? 'Maximum fee' : 'Transaction fee' }}</td>
-                <td>&lrm;{{ formatEthereumQuantity(tx.ethereum.maximumFeeWei || tx.ethereum.feeWei, '18') }} ETH <span class="fiat"><app-fiat [blockConversion]="tx.price" [value]="tx.fee"></app-fiat></span></td>
+                <td>&lrm;{{ formatEthereumQuantity(tx.ethereum.maximumFeeWei || tx.ethereum.feeWei, '18') }} ETH <span class="fiat"><app-fiat [blockConversion]="tx.price" [value]="ethereumWeiNumber(tx.ethereum.maximumFeeWei || tx.ethereum.feeWei)"></app-fiat></span></td>
               </tr>
               <tr *ngIf="tx?.ethereum?.blobFeeWei">
                 <td>Execution fee</td>

@@ -62,6 +62,11 @@ export class TransactionDetailsComponent implements OnInit {
     return formatEthereumQuantity(value, decimals, maxFractionDigits);
   }
 
+  ethereumWeiNumber(value: string | null | undefined): number {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
   get clusterPreviewStats(): { chunkSize: number; chunkFeerate: number; otherChunks: number } {
     const cluster = this.cpfpInfo?.cluster;
     const chunk = cluster?.chunks[cluster.chunkIndex];
