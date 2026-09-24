@@ -1666,6 +1666,57 @@ form label:not(.form-check-label):not(.btn) {
   margin-bottom: 0.5rem;
 }
 
+.dashboard-container .ethereum-network-card {
+  .card {
+    position: relative;
+  }
+
+  .widget-toggler {
+    font-size: 12px;
+    position: absolute;
+    top: -20px;
+    right: 3px;
+    text-align: right;
+
+    span {
+      color: var(--transparent-fg);
+      font-size: 8px;
+    }
+  }
+
+  .toggler-option {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    color: var(--transparent-fg);
+    cursor: pointer;
+    font: inherit;
+    padding: 0;
+    text-decoration: none;
+
+    &:focus-visible {
+      outline: 1px solid var(--primary);
+      outline-offset: 2px;
+    }
+  }
+
+  .active {
+    color: var(--primary);
+  }
+}
+
+.dashboard-container .ethereum-rewards-data {
+  .item .card-text {
+    white-space: nowrap;
+  }
+
+  .item .card-text .fiat {
+    color: var(--green);
+    font-size: 0.75rem;
+    margin-left: 4px;
+  }
+}
+
 // Angular date picker
 .ngb-dp-header, .ngb-dp-week {
   background-color: var(--bg) !important;
