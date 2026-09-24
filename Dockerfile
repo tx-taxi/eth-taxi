@@ -7,7 +7,7 @@ RUN apt-get update \
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci
 COPY frontend ./
-RUN npm run build
+RUN SKIP_SYNC=1 npm run build
 
 FROM node:24-bookworm-slim
 
