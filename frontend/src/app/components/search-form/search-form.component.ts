@@ -3,6 +3,7 @@ import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms
 import { EventType, NavigationStart, Router } from '@angular/router';
 import { AssetsService } from '@app/services/assets.service';
 import { Env, StateService } from '@app/services/state.service';
+import { TxTaxiExplorer, TxTaxiExplorerRegistryService } from '@app/services/tx-taxi-explorer-registry.service';
 import { Observable, of, Subject, zip, BehaviorSubject, combineLatest } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, catchError, map, startWith,  tap } from 'rxjs/operators';
 import { ElectrsApiService } from '@app/services/electrs-api.service';
@@ -20,6 +21,9 @@ import { Network, findOtherNetworks, getRegex, getTargetUrl, needBaseModuleChang
 })
 export class SearchFormComponent implements OnInit {
   @Input() hamburgerOpen = false;
+  readonly sourceChainId = 'ethereum';
+  readonly defaultChainIconUrl = 'https://tx.taxi/assets/brand/eth-dark-car.svg';
+  readonly defaultChainIconAlt = 'Ethereum explorer';
   env: Env;
   network = '';
   assets: object = {};
@@ -27,6 +31,8 @@ export class SearchFormComponent implements OnInit {
   isSearching = false;
   isTypeaheading$ = new BehaviorSubject<boolean>(false);
   typeAhead$: Observable<any>;
+  explorers$: Observable<TxTaxiExplorer[]>;
+  currentExplorer$: Observable<TxTaxiExplorer | undefined>;
   searchForm: UntypedFormGroup;
   dropdownHidden = false;
   searchError = '';
@@ -66,8 +72,13 @@ export class SearchFormComponent implements OnInit {
     private electrsApiService: ElectrsApiService,
     private apiService: ApiService,
     private relativeUrlPipe: RelativeUrlPipe,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
+    private explorerRegistry: TxTaxiExplorerRegistryService,
   ) {
+    this.explorers$ = this.explorerRegistry.explorers$;
+    this.currentExplorer$ = this.explorers$.pipe(
+      map((explorers) => explorers.find((explorer) => explorer.chainId === this.sourceChainId)),
+    );
   }
 
   ngOnInit(): void {
@@ -234,6 +245,10 @@ export class SearchFormComponent implements OnInit {
 
   handleKeyDown($event): void {
     this.searchResults.handleKeyDown($event);
+  }
+
+  trackExplorer(_index: number, explorer: TxTaxiExplorer): string {
+    return explorer.chainId;
   }
 
   itemSelected(): void {

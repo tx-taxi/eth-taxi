@@ -66,6 +66,7 @@ export interface Env {
   GIT_COMMIT_HASH: string;
   PACKAGE_JSON_VERSION: string;
   MEMPOOL_WEBSITE_URL: string;
+  TX_TAXI_ROUTER_URL: string;
   LIQUID_WEBSITE_URL: string;
   MINING_DASHBOARD: boolean;
   LIGHTNING: boolean;
@@ -115,6 +116,7 @@ const defaultEnv: Env = {
   'GIT_COMMIT_HASH': '',
   'PACKAGE_JSON_VERSION': '',
   'MEMPOOL_WEBSITE_URL': 'https://mempool.space',
+  'TX_TAXI_ROUTER_URL': 'https://tx.taxi',
   'LIQUID_WEBSITE_URL': 'https://liquid.network',
   'MINING_DASHBOARD': false,
   'LIGHTNING': false,
