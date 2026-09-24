@@ -10,12 +10,14 @@
         <div class="main-title">Latest block</div>
         <div class="card"><div class="card-body">
           <h2 class="card-title">Block <a [routerLink]="['/block' | relativeUrl, production.blocks[0].id]">{{ production.blocks[0].height | number }}</a></h2>
-          <div class="production-stat-grid">
-            <div><span class="stat-label">Fee recipient</span><span class="recipient" *ngIf="production.blocks[0].extras?.pool?.name as recipient" [title]="recipient"><app-truncate [text]="recipient" [lastChars]="6" [link]="['/address/' | relativeUrl, recipient]"></app-truncate></span></div>
-            <div><span class="stat-label">Transactions</span><strong>{{ production.blocks[0].tx_count | number }}</strong></div>
-            <div><span class="stat-label">Gas used</span><strong>{{ production.blocks[0].weight | number }}</strong></div>
-            <div><span class="stat-label">Produced</span><strong><app-timestamp [unixTime]="production.blocks[0].timestamp"></app-timestamp></strong></div>
-          </div>
+            <div class="production-stat-grid">
+              <div><span class="stat-label">Fee recipient</span><span class="recipient" *ngIf="production.blocks[0].extras?.pool?.name as recipient" [title]="recipient"><app-truncate [text]="recipient" [lastChars]="6" [link]="['/address/' | relativeUrl, recipient]"></app-truncate></span></div>
+              <div><span class="stat-label">Transactions</span><strong>{{ production.blocks[0].tx_count | number }}</strong></div>
+              <div><span class="stat-label">Gas used</span><strong>{{ production.blocks[0].weight | number }}</strong></div>
+              <div><span class="stat-label">Produced</span><strong><app-timestamp [unixTime]="production.blocks[0].timestamp"></app-timestamp></strong></div>
+              <div *ngIf="production.blocks[0].extras?.totalFees != null"><span class="stat-label">Total fees</span><span class="production-value"><app-amount [satoshis]="production.blocks[0].extras.totalFees" [noFiat]="true"></app-amount><span class="production-fiat"><app-fiat [value]="production.blocks[0].extras.totalFees"></app-fiat></span></span></div>
+              <div *ngIf="production.blocks[0].extras?.reward != null"><span class="stat-label">Validator reward</span><span class="production-value"><app-amount [satoshis]="production.blocks[0].extras.reward" [noFiat]="true"></app-amount><span class="production-fiat"><app-fiat [value]="production.blocks[0].extras.reward"></app-fiat></span></span></div>
+            </div>
         </div></div>
       </div>
 

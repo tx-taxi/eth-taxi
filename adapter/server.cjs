@@ -53,6 +53,13 @@ const RPC_TOKEN_TRANSFER_LIMIT = 100;
 const BLOCK_PAGE_SIZE = 10;
 const TOKEN_METADATA_CACHE_MS = 15 * 60_000;
 const TRANSACTION_TOKEN_METADATA_LIMIT = 12;
+const ETH_PRICE_API_URL = (process.env.ETH_PRICE_API_URL || 'https://api.coingecko.com/api/v3').replace(/\/$/, '');
+const ETH_COINBASE_API_URL = (process.env.ETH_COINBASE_API_URL || 'https://api.exchange.coinbase.com').replace(/\/$/, '');
+const ETH_PRICE_HISTORY_DAYS = Math.max(1, Number(process.env.ETH_PRICE_HISTORY_DAYS || 365));
+const ETH_PRICE_HISTORY_CACHE_MS = Math.max(60_000, Number(process.env.ETH_PRICE_HISTORY_CACHE_MS || 60 * 60_000));
+const ETH_PRICE_POINT_CACHE_MS = Math.max(60_000, Number(process.env.ETH_PRICE_POINT_CACHE_MS || 12 * 60 * 60_000));
+const ETH_FIAT_CURRENCIES = ['USD', 'EUR', 'GBP', 'CAD', 'CHF', 'AUD', 'JPY'];
+const ethereumPriceCache = new Map();
 
 // These mirror the frontend's BigInt filter flags. Keep them below 2^53 so
 // they retain their exact value when serialized through the JSON adapter.
@@ -88,6 +95,199 @@ const contentTypes = {
 function number(value, fallback = 0) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function emptyEthereumPrice(time = Math.floor(Date.now() / 1000)) {
+  return Object.fromEntries([
+    ['time', time],
+    ...ETH_FIAT_CURRENCIES.map((currency) => [currency, -1]),
+  ]);
+}
+
+function emptyEthereumExchangeRates() {
+  return {
+    USDEUR: 0,
+    USDGBP: 0,
+    USDCAD: 0,
+    USDCHF: 0,
+    USDAUD: 0,
+    USDJPY: 0,
+  };
+}
+
+function normalizeEthereumFiatCurrency(currency) {
+  const normalized = String(currency || 'USD').toUpperCase();
+  return ETH_FIAT_CURRENCIES.includes(normalized) ? normalized : 'USD';
+}
+
+function exchangeRatesFromEthereumPrice(price) {
+  if (!price || price.USD <= 0) return emptyEthereumExchangeRates();
+  return {
+    USDEUR: price.EUR > 0 ? price.EUR / price.USD : 0,
+    USDGBP: price.GBP > 0 ? price.GBP / price.USD : 0,
+    USDCAD: price.CAD > 0 ? price.CAD / price.USD : 0,
+    USDCHF: price.CHF > 0 ? price.CHF / price.USD : 0,
+    USDAUD: price.AUD > 0 ? price.AUD / price.USD : 0,
+    USDJPY: price.JPY > 0 ? price.JPY / price.USD : 0,
+  };
+}
+
+function cachedEthereumPrice(key, ttl, load) {
+  const cached = ethereumPriceCache.get(key);
+  if (cached?.value && cached.expiresAt > Date.now()) return Promise.resolve(cached.value);
+  if (cached?.request) return cached.request;
+
+  const request = Promise.resolve()
+    .then(load)
+    .then((value) => {
+      ethereumPriceCache.set(key, { value, expiresAt: Date.now() + ttl, request: null });
+      while (ethereumPriceCache.size > 512) ethereumPriceCache.delete(ethereumPriceCache.keys().next().value);
+      return value;
+    })
+    .catch((error) => {
+      ethereumPriceCache.delete(key);
+      throw error;
+    });
+
+  ethereumPriceCache.set(key, { value: cached?.value, expiresAt: cached?.expiresAt || 0, request });
+  return request;
+}
+
+async function ethereumPriceJson(url) {
+  const response = await fetch(url, {
+    headers: { accept: 'application/json', 'user-agent': 'eth-taxi/0.1' },
+    signal: AbortSignal.timeout(8_000),
+  });
+  if (!response.ok) throw new Error(`Ethereum price source returned ${response.status}`);
+  return response.json();
+}
+
+async function ethereumUsdCandles(granularity, from, to) {
+  const query = new URLSearchParams({
+    granularity: String(granularity),
+    start: new Date(from * 1000).toISOString(),
+    end: new Date(to * 1000).toISOString(),
+  });
+  const candles = await ethereumPriceJson(`${ETH_COINBASE_API_URL}/products/ETH-USD/candles?${query}`);
+  if (!Array.isArray(candles)) throw new Error('Ethereum USD price source returned no candles');
+  return candles;
+}
+
+async function ethereumUsdHistoricalPrice(timestamp) {
+  const hour = Math.floor(timestamp / 3600) * 3600;
+  const candles = await ethereumUsdCandles(3600, hour - 3600, hour + 7200);
+  let closest;
+  for (const candle of candles) {
+    const time = number(candle?.[0], -1);
+    const value = number(candle?.[4], -1);
+    if (time < 0 || value <= 0) continue;
+    if (!closest || Math.abs(time - timestamp) < Math.abs(closest.time - timestamp)) {
+      closest = { time, value };
+    }
+  }
+  if (!closest) throw new Error('Ethereum USD price source returned no usable candle');
+  const price = emptyEthereumPrice(closest.time);
+  price.USD = closest.value;
+  return price;
+}
+
+async function ethereumUsdPriceHistory() {
+  const now = Math.floor(Date.now() / 1000);
+  const from = Math.max(0, now - ETH_PRICE_HISTORY_DAYS * 24 * 60 * 60);
+  const ranges = [];
+  for (let end = now; end > from;) {
+    const start = Math.max(from, end - 299 * 24 * 60 * 60);
+    ranges.push([start, end]);
+    end = start - 1;
+  }
+  const candles = (await Promise.all(ranges.map(([start, end]) => ethereumUsdCandles(86400, start, end)))).flat();
+  const prices = new Map();
+  for (const candle of candles) {
+    const time = number(candle?.[0], -1);
+    const value = number(candle?.[4], -1);
+    if (time < 0 || value <= 0) continue;
+    const price = emptyEthereumPrice(time);
+    price.USD = value;
+    prices.set(time, price);
+  }
+  return [...prices.values()].sort((left, right) => right.time - left.time);
+}
+
+async function ethereumHistoricalPrice(timestamp, requestedCurrency) {
+  const currency = normalizeEthereumFiatCurrency(requestedCurrency);
+  const bucket = Math.floor(timestamp / 3600);
+  return cachedEthereumPrice(`point:${currency}:${bucket}`, ETH_PRICE_POINT_CACHE_MS, async () => {
+    if (currency === 'USD') {
+      try {
+        return await ethereumUsdHistoricalPrice(timestamp);
+      } catch {
+        // Use the broader market source below if the exchange endpoint is unavailable.
+      }
+    }
+    const from = Math.max(0, timestamp - 36 * 60 * 60);
+    const to = timestamp + 36 * 60 * 60;
+    const url = `${ETH_PRICE_API_URL}/coins/ethereum/market_chart/range?vs_currency=${currency.toLowerCase()}&from=${from}&to=${to}`;
+    const response = await ethereumPriceJson(url);
+    const points = Array.isArray(response?.prices) ? response.prices : [];
+    let closest;
+    for (const point of points) {
+      const pointTime = Math.floor(number(point?.[0]) / 1000);
+      const value = number(point?.[1], -1);
+      if (!Number.isFinite(pointTime) || value <= 0) continue;
+      if (!closest || Math.abs(pointTime - timestamp) < Math.abs(closest.time - timestamp)) {
+        closest = { time: pointTime, value };
+      }
+    }
+    if (!closest) throw new Error('Ethereum price source returned no usable historical price');
+    const price = emptyEthereumPrice(closest.time);
+    price[currency] = closest.value;
+    return price;
+  });
+}
+
+async function ethereumPriceHistory(requestedCurrency) {
+  const currency = normalizeEthereumFiatCurrency(requestedCurrency);
+  return cachedEthereumPrice(`history:${currency}`, ETH_PRICE_HISTORY_CACHE_MS, async () => {
+    if (currency === 'USD') {
+      try {
+        return await ethereumUsdPriceHistory();
+      } catch {
+        // Use the broader market source below if the exchange endpoint is unavailable.
+      }
+    }
+    const now = Math.floor(Date.now() / 1000);
+    const from = Math.max(0, now - ETH_PRICE_HISTORY_DAYS * 24 * 60 * 60);
+    const url = `${ETH_PRICE_API_URL}/coins/ethereum/market_chart/range?vs_currency=${currency.toLowerCase()}&from=${from}&to=${now}`;
+    const response = await ethereumPriceJson(url);
+    const points = Array.isArray(response?.prices) ? response.prices : [];
+    return points
+      .map((point) => {
+        const price = emptyEthereumPrice(Math.floor(number(point?.[0]) / 1000));
+        price[currency] = number(point?.[1], -1);
+        return price;
+      })
+      .filter((price) => Number.isFinite(price.time) && price[currency] > 0)
+      .sort((left, right) => right.time - left.time);
+  });
+}
+
+async function ethereumHistoricalPriceResponse(searchParams) {
+  const currency = normalizeEthereumFiatCurrency(searchParams.get('currency'));
+  const timestamp = number(searchParams.get('timestamp'), 0);
+  try {
+    const prices = timestamp > 0
+      ? [await ethereumHistoricalPrice(timestamp, currency)]
+      : await ethereumPriceHistory(currency);
+    const latest = prices[0];
+    return {
+      prices,
+      exchangeRates: exchangeRatesFromEthereumPrice(latest),
+    };
+  } catch {
+    // Returning no point makes the shared amount component use its live price
+    // instead of rendering a misleading zero during a price-source outage.
+    return { prices: [], exchangeRates: emptyEthereumExchangeRates() };
+  }
 }
 
 function wei(value) {
@@ -1704,10 +1904,7 @@ const server = http.createServer(async (req, res) => {
       return respond(res, 200, requestUrl.searchParams.get('txids')?.split(',').filter(Boolean).map(() => [{ spent: false }]) || []);
     }
     if (requestPath === '/api/v1/historical-price') {
-      return respond(res, 200, {
-        prices: [{ time: 0, USD: -1, EUR: -1, GBP: -1, CAD: -1, CHF: -1, AUD: -1, JPY: -1 }],
-        exchangeRates: { USDEUR: 0, USDGBP: 0, USDCAD: 0, USDCHF: 0, USDAUD: 0, USDJPY: 0 },
-      });
+      return respond(res, 200, await ethereumHistoricalPriceResponse(requestUrl.searchParams));
     }
     const data = await snapshot();
     if (requestPath === '/api/v1/init-data') return respond(res, 200, data);

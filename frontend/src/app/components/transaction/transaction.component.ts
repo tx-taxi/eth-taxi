@@ -169,6 +169,11 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
     return formatEthereumInteger(value);
   }
 
+  ethereumWeiNumber(value: string | null | undefined): number {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
   ethereumMethod(): string {
     return this.tx?.ethereum?.decodedInput?.methodCall || this.tx?.ethereum?.method || this.tx?.vin?.[0]?.scriptsig_asm || 'Transfer';
   }

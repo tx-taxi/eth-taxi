@@ -212,7 +212,7 @@
     <tr>
       <td class="td-width">{{ tx?.ethereum?.maximumFeeWei ? 'Maximum fee' : 'Fee' }}</td>
       @if (tx?.ethereum; as ethereum) {
-        <td class="text-wrap">&lrm;{{ formatEthereumQuantity(ethereum.maximumFeeWei || ethereum.feeWei, '18') }} ETH</td>
+        <td class="text-wrap">&lrm;{{ formatEthereumQuantity(ethereum.maximumFeeWei || ethereum.feeWei, '18') }} ETH <span class="fiat"><app-fiat [blockConversion]="tx.price" [value]="tx.fee"></app-fiat></span></td>
       } @else {
       <td class="text-wrap"><app-amount [satoshis]="tx.fee" [blockConversion]="tx.price"></app-amount>
         @if (isAcceleration && (accelerationInfo?.bidBoost ?? tx.feeDelta > 0)) {

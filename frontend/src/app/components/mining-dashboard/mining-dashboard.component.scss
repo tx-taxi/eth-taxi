@@ -23,7 +23,7 @@
     min-width: 0;
   }
 
-  strong, .recipient {
+  strong, .recipient, .production-value {
     display: block;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -36,6 +36,14 @@
     color: var(--title-fg);
     font-size: 0.8rem;
     margin-bottom: 0.3rem;
+  }
+
+  .production-fiat {
+    display: block;
+    color: var(--green);
+    font-size: 0.8rem;
+    line-height: 1.25;
+    margin-top: 0.2rem;
   }
 }
 
