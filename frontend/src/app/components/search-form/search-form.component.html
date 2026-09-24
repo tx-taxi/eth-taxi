@@ -1,5 +1,5 @@
 <form [class]="{hamburgerOpen: hamburgerOpen}" [formGroup]="searchForm" (submit)="searchForm.valid && search()" novalidate>
-  <div class="d-flex">
+  <div class="d-flex search-form-row" [style.--search-chain-accent]="(selectedExplorer$ | async)?.accentColor || defaultChainAccent">
     <div class="search-box-container me-2">
       <div class="search-input-row">
         <div ngbDropdown class="search-chain-selector" placement="bottom-start">
@@ -20,6 +20,7 @@
                 class="search-chain-option"
                 [class.is-current]="isSelectedExplorer(explorer)"
                 [attr.aria-pressed]="isSelectedExplorer(explorer)"
+                [style.--chain-option-accent]="explorer.accentColor"
                 (click)="selectExplorer(explorer)"
               >
                 <img [src]="explorer.iconUrl" alt="">
