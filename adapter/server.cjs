@@ -64,6 +64,7 @@ const OG_REQUEST_TIMEOUT_MS = 8_000;
 const OG_IMAGE_WIDTH = 1200;
 const OG_IMAGE_HEIGHT = 630;
 const OG_ORIGIN = 'https://eth.tx.taxi';
+const OG_CARD_VERSION = '2';
 const TRANSACTION_TOKEN_METADATA_LIMIT = 12;
 const ETH_PRICE_API_URL = (process.env.ETH_PRICE_API_URL || 'https://api.coingecko.com/api/v3').replace(/\/$/, '');
 const ETH_COINBASE_API_URL = (process.env.ETH_COINBASE_API_URL || 'https://api.exchange.coinbase.com').replace(/\/$/, '');
@@ -1861,7 +1862,7 @@ function ogEntityMetadata(kind, id, entity) {
   const pathname = `/${kind === 'tx' ? 'tx' : kind}/${encodeURIComponent(id)}`;
   const title = `${entity.heading} | eth.tx.taxi`;
   const url = `${OG_ORIGIN}${pathname}`;
-  const image = `${OG_ORIGIN}/og/${kind}/${encodeURIComponent(id)}.png`;
+  const image = `${OG_ORIGIN}/og/${kind}/${encodeURIComponent(id)}.png?v=${OG_CARD_VERSION}`;
   const tags = [
     ['name', 'description', entity.description],
     ['property', 'og:type', 'website'], ['property', 'og:site_name', 'eth.tx.taxi'],
@@ -1940,15 +1941,15 @@ function ogImageSvg(entity, metadata, unavailable = false) {
   }).join('');
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${OG_IMAGE_WIDTH}" height="${OG_IMAGE_HEIGHT}" viewBox="0 0 ${OG_IMAGE_WIDTH} ${OG_IMAGE_HEIGHT}">
     <rect width="1200" height="630" fill="#11141f"/><rect width="1200" height="8" fill="#627eea"/>
-    <text x="64" y="68" fill="#9eafff" font-family="Arial,sans-serif" font-size="22" font-weight="700">ETHEREUM / EXPLORER</text>
-    <text x="1136" y="68" text-anchor="end" fill="#f2f4ff" font-family="Arial,sans-serif" font-size="28" font-weight="700">eth.tx.taxi</text>
+    <text x="64" y="68" fill="#9eafff" font-family="DejaVu Sans, sans-serif" font-size="22" font-weight="700">ETHEREUM / EXPLORER</text>
+    <text x="950" y="68" fill="#f2f4ff" font-family="DejaVu Sans, sans-serif" font-size="26" font-weight="700">eth.tx.taxi</text>
     <path d="M64 94H1136" stroke="#343a51"/>
-    <text x="64" y="176" fill="#f2f4ff" font-family="Arial,sans-serif" font-size="52" font-weight="700">${ogEscape(ogShort(entity.heading, 32))}</text>
-    <text x="64" y="228" fill="#a8b9ff" font-family="Arial,monospace" font-size="24">${ogEscape(ogShort(entity.subtitle, 70))}</text>
-    ${unavailable ? '<text x="64" y="344" fill="#cbd2eb" font-family="Arial,sans-serif" font-size="28">Details temporarily unavailable</text>' : `<g font-family="Arial,sans-serif">${rowMarkup}</g>`}
+    <text x="64" y="176" fill="#f2f4ff" font-family="DejaVu Sans, sans-serif" font-size="52" font-weight="700">${ogEscape(ogShort(entity.heading, 32))}</text>
+    <text x="64" y="228" fill="#a8b9ff" font-family="DejaVu Sans Mono, monospace" font-size="24">${ogEscape(ogShort(entity.subtitle, 70))}</text>
+    ${unavailable ? '<text x="64" y="344" fill="#cbd2eb" font-family="DejaVu Sans, sans-serif" font-size="28">Details temporarily unavailable</text>' : `<g font-family="DejaVu Sans, sans-serif">${rowMarkup}</g>`}
     <path d="M64 574H1136" stroke="#343a51"/>
-    <text x="64" y="604" fill="#919bb9" font-family="Arial,sans-serif" font-size="17">Ethereum mainnet</text>
-    <text x="1136" y="604" text-anchor="end" fill="#919bb9" font-family="Arial,sans-serif" font-size="17">${ogEscape(metadata.url)}</text>
+    <text x="64" y="604" fill="#919bb9" font-family="DejaVu Sans, sans-serif" font-size="17">Ethereum mainnet</text>
+    <text x="1136" y="604" text-anchor="end" fill="#919bb9" font-family="DejaVu Sans, sans-serif" font-size="17">${ogEscape(metadata.url)}</text>
   </svg>`;
 }
 
