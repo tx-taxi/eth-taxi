@@ -29,7 +29,7 @@
         }
       }
       @if (!enterpriseInfo || enterpriseInfo.dualLogo) {
-        <app-svg-images *ngIf="!officialMempoolSpace" name="ethTaxi" viewBox="0 0 500 126" class="mempool-logo" [ngStyle]="{'opacity': connectionState.val === 2 ? 1 : 0.5 }"></app-svg-images>
+        <img *ngIf="!officialMempoolSpace" src="/resources/branding/eth-dark-navbar.svg" alt="eth.tx.taxi Ethereum explorer" class="tx-taxi-navbar-logo" [ngStyle]="{'opacity': connectionState.val === 2 ? 1 : 0.5 }">
         <app-svg-images *ngIf="officialMempoolSpace" name="officialMempoolSpace" viewBox="0 0 500 126"></app-svg-images>
       }
       <div class="connection-badge">
@@ -50,7 +50,7 @@
         }
       }
       @if (!enterpriseInfo || enterpriseInfo.dualLogo) {
-        <app-svg-images *ngIf="!officialMempoolSpace" name="ethTaxi" viewBox="0 0 500 126" class="mempool-logo" [ngStyle]="{'opacity': connectionState.val === 2 ? 1 : 0.5 }"></app-svg-images>
+        <img *ngIf="!officialMempoolSpace" src="/resources/branding/eth-dark-navbar.svg" alt="eth.tx.taxi Ethereum explorer" class="tx-taxi-navbar-logo" [ngStyle]="{'opacity': connectionState.val === 2 ? 1 : 0.5 }">
         <app-svg-images *ngIf="officialMempoolSpace" name="officialMempoolSpace" viewBox="0 0 500 126"></app-svg-images>
       }
       <div class="connection-badge">

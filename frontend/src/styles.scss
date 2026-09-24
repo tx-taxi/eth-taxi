@@ -1654,6 +1654,36 @@ a.badge:hover, a.badge:focus {
   padding: 0.5rem 1rem;
 }
 
+img.tx-taxi-navbar-logo {
+  align-self: center;
+  display: block;
+  width: 127px;
+  height: 35px;
+  object-fit: contain;
+}
+
+img.tx-taxi-full-logo {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+img.tx-taxi-document-logo {
+  display: inline-block;
+  width: 250px;
+  max-width: 80vw;
+  height: auto;
+  object-fit: contain;
+}
+
+@media (max-width: 767.98px) {
+  img.tx-taxi-navbar-logo {
+    width: 116px;
+    height: 32px;
+  }
+}
+
 .nav-tabs .nav-link.active {
   color: var(--fg);
 }

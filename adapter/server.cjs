@@ -2,6 +2,7 @@
 'use strict';
 
 const fs = require('node:fs/promises');
+const fsSync = require('node:fs');
 const http = require('node:http');
 const path = require('node:path');
 const { URL } = require('node:url');
@@ -34,6 +35,7 @@ const tokenMetadataCache = new Map();
 const ogImageCache = new Map();
 const ogImagePending = new Map();
 const ogFallbackCards = new Map();
+let ogBrandLogoDataUri;
 let ogActiveLoads = 0;
 let activeProvider = providers[0];
 let activeRpcProvider = rpcProviders[0];
@@ -64,7 +66,7 @@ const OG_REQUEST_TIMEOUT_MS = 8_000;
 const OG_IMAGE_WIDTH = 1200;
 const OG_IMAGE_HEIGHT = 630;
 const OG_ORIGIN = 'https://eth.tx.taxi';
-const OG_CARD_VERSION = '2';
+const OG_CARD_VERSION = '3';
 const TRANSACTION_TOKEN_METADATA_LIMIT = 12;
 const ETH_PRICE_API_URL = (process.env.ETH_PRICE_API_URL || 'https://api.coingecko.com/api/v3').replace(/\/$/, '');
 const ETH_COINBASE_API_URL = (process.env.ETH_COINBASE_API_URL || 'https://api.exchange.coinbase.com').replace(/\/$/, '');
@@ -1929,7 +1931,23 @@ function ogInjectDocument(html, metadata) {
   return output + html.slice(cursor, insertAt) + `\n  ${metadata.html}\n` + html.slice(insertAt);
 }
 
+function ogBrandLogo() {
+  if (ogBrandLogoDataUri !== undefined) return ogBrandLogoDataUri;
+  try {
+    const asset = fsSync.readFileSync(path.join(staticRoot, 'resources', 'branding', 'eth-dark-full.svg'));
+    ogBrandLogoDataUri = `data:image/svg+xml;base64,${asset.toString('base64')}`;
+  } catch {
+    ogBrandLogoDataUri = null;
+  }
+  return ogBrandLogoDataUri;
+}
+
 function ogImageSvg(entity, metadata, unavailable = false) {
+  const brandLogo = ogBrandLogo();
+  const brandLogoMarkup = brandLogo
+    ? `<image href="${brandLogo}" x="64" y="20" width="224" height="75" preserveAspectRatio="xMinYMid meet"/>`
+    : '';
+  const eyebrowX = brandLogo ? 314 : 64;
   const rows = (unavailable ? [] : entity.rows.filter(([, value]) => value !== null && value !== undefined && value !== '')).slice(0, 8);
   const rowMarkup = rows.map(([label, value], index) => {
     const column = index % 2;
@@ -1941,11 +1959,12 @@ function ogImageSvg(entity, metadata, unavailable = false) {
   }).join('');
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${OG_IMAGE_WIDTH}" height="${OG_IMAGE_HEIGHT}" viewBox="0 0 ${OG_IMAGE_WIDTH} ${OG_IMAGE_HEIGHT}">
     <rect width="1200" height="630" fill="#11141f"/><rect width="1200" height="8" fill="#627eea"/>
-    <text x="64" y="68" fill="#9eafff" font-family="DejaVu Sans, sans-serif" font-size="22" font-weight="700">ETHEREUM / EXPLORER</text>
+    ${brandLogoMarkup}
+    <text x="${eyebrowX}" y="68" fill="#9eafff" font-family="DejaVu Sans, sans-serif" font-size="22" font-weight="700">ETHEREUM / EXPLORER</text>
     <text x="950" y="68" fill="#f2f4ff" font-family="DejaVu Sans, sans-serif" font-size="26" font-weight="700">eth.tx.taxi</text>
-    <path d="M64 94H1136" stroke="#343a51"/>
-    <text x="64" y="176" fill="#f2f4ff" font-family="DejaVu Sans, sans-serif" font-size="52" font-weight="700">${ogEscape(ogShort(entity.heading, 32))}</text>
-    <text x="64" y="228" fill="#a8b9ff" font-family="DejaVu Sans Mono, monospace" font-size="24">${ogEscape(ogShort(entity.subtitle, 70))}</text>
+    <path d="M64 108H1136" stroke="#343a51"/>
+    <text x="64" y="190" fill="#f2f4ff" font-family="DejaVu Sans, sans-serif" font-size="52" font-weight="700">${ogEscape(ogShort(entity.heading, 32))}</text>
+    <text x="64" y="242" fill="#a8b9ff" font-family="DejaVu Sans Mono, monospace" font-size="24">${ogEscape(ogShort(entity.subtitle, 70))}</text>
     ${unavailable ? '<text x="64" y="344" fill="#cbd2eb" font-family="DejaVu Sans, sans-serif" font-size="28">Details temporarily unavailable</text>' : `<g font-family="DejaVu Sans, sans-serif">${rowMarkup}</g>`}
     <path d="M64 574H1136" stroke="#343a51"/>
     <text x="64" y="604" fill="#919bb9" font-family="DejaVu Sans, sans-serif" font-size="17">Ethereum mainnet</text>
