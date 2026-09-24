@@ -60,7 +60,7 @@ const ERC20_TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a116
 const BLOB_GAS_PER_BLOB = 131_072n;
 const RPC_TOKEN_TRANSFER_BLOCK_SPAN = 2;
 const RPC_TOKEN_TRANSFER_LIMIT = 100;
-const BLOCK_PAGE_SIZE = 10;
+const BLOCK_PAGE_SIZE = 15;
 const TOKEN_METADATA_CACHE_MS = 15 * 60_000;
 const OG_CACHE_LIMIT = 128;
 const OG_MAX_ACTIVE_LOADS = 8;
@@ -1350,28 +1350,23 @@ async function broadcastSnapshot(data) {
 }
 
 async function blocksEndingAt(height) {
-  try {
-    // CacheService requests block history in ten-height pages. Returning a
-    // shorter page leaves the remaining tiles permanently in their loading
-    // state because the cache has no subsequent request for those heights.
-    const heights = Array.from({ length: BLOCK_PAGE_SIZE }, (_, index) => height - index).filter((value) => value > 0);
-    const blocks = await Promise.all(heights.map(async (blockHeight) => {
-      try { return mapBlock(await providerJson(`/api/v2/blocks/${blockHeight}`)); } catch { return null; }
-    }));
-    const available = blocks.filter(Boolean);
-    if (available.length) return available;
-    throw new Error('No indexed blocks returned');
-  } catch {
-    const heights = Array.from({ length: BLOCK_PAGE_SIZE }, (_, index) => height - index).filter((value) => value > 0);
-    const blocks = await Promise.all(heights.map(async (blockHeight) => {
-      try {
+  const heights = Array.from({ length: BLOCK_PAGE_SIZE }, (_, index) => height - index).filter((value) => value >= 0);
+  return Promise.all(heights.map(async (blockHeight) => {
+    try {
+      return mapBlock(await providerJson(`/api/v2/blocks/${blockHeight}`));
+    } catch {
         return mapRpcBlock(await rpcJson('eth_getBlockByNumber', [`0x${blockHeight.toString(16)}`, false], { requireResult: true }));
-      } catch {
-        return null;
-      }
-    }));
-    return blocks.filter(Boolean);
-  }
+    }
+  }));
+}
+
+async function latestBlocks() {
+  try {
+    const response = await providerJson('/api/v2/blocks');
+    const blocks = response.items.slice(0, BLOCK_PAGE_SIZE).map(mapBlock);
+    if (blocks.length === BLOCK_PAGE_SIZE && blocks.every((block, index) => block.height === blocks[0].height - index)) return blocks;
+  } catch { /* Load the complete page from individual blocks below. */ }
+  return blocksEndingAt(hexNumber(await rpcJson('eth_blockNumber', [], { requireResult: true })));
 }
 
 async function blockById(id) {
@@ -1650,12 +1645,12 @@ async function ethereumTokenTransfers(address, searchParams) {
 
 async function blockscoutSnapshot() {
   const [blocks, transactions, pending, stats] = await Promise.all([
-    providerJson('/api/v2/main-page/blocks'),
+    providerJson('/api/v2/blocks'),
     providerJson('/api/v2/main-page/transactions'),
     providerJson('/api/v2/transactions?filter=pending'),
     providerJson('/api/v2/stats'),
   ]);
-  const mappedBlocks = blocks.map(mapBlock).reverse();
+  const mappedBlocks = blocks.items.slice(0, 6).map(mapBlock).reverse();
   const pendingItems = pending.items || [];
   const pendingTransactions = pendingItems.map(mapTransaction);
   const gasPrices = stats.gas_prices || {};
@@ -2202,9 +2197,9 @@ const server = http.createServer(async (req, res) => {
     if (requestPath === '/api/v1/historical-price') {
       return respond(res, 200, await ethereumHistoricalPriceResponse(requestUrl.searchParams));
     }
+    if (requestPath === '/api/v1/blocks') return respond(res, 200, await latestBlocks());
     const data = await snapshot();
     if (requestPath === '/api/v1/init-data') return respond(res, 200, data);
-    if (requestPath === '/api/v1/blocks') return respond(res, 200, data.blocks);
     if (requestPath === '/api/v1/txs') return respond(res, 200, data.transactions);
     if (requestPath === '/api/v1/transaction-times') {
       return respond(res, 200, requestUrl.searchParams.getAll('txId[]').map((id) => data.transactions.find((tx) => tx.txid === id)?.time || Math.floor(Date.now() / 1000)));

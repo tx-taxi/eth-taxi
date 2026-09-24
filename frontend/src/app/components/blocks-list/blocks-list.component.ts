@@ -158,14 +158,17 @@ export class BlocksList implements OnInit {
             return blocks[0];
           }
           if (blocks[1] && blocks[1].length) {
-            this.blocksCount = Math.max(this.blocksCount, blocks[1][0].height) + 1;
+            this.blocksCount = Math.max(this.blocksCount, blocks[1][0].height + 1);
             if (this.isMempoolModule) {
               // @ts-ignore: Need to add an extra field for the template
               blocks[1][0].extras.pool.logo = `/resources/mining-pools/` +
                 blocks[1][0].extras.pool.slug + '.svg';
             }
-            acc.unshift(blocks[1][0]);
-            acc = acc.slice(0, this.widget ? 6 : 15);
+            const byHeight = new Map(acc.map(block => [block.height, block]));
+            for (const block of blocks[1]) {
+              byHeight.set(block.height, block);
+            }
+            acc = [...byHeight.values()].sort((a, b) => b.height - a.height).slice(0, this.widget ? 6 : 15);
           }
           return acc;
         }, []),
