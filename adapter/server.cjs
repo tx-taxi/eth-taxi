@@ -25,6 +25,7 @@ const sockets = new Set();
 const mempoolBlockSubscriptions = new Map();
 const transactionSubscriptions = new Map();
 const transactionStreamSignatures = new Map();
+const transactionStreamRequests = new WeakSet();
 const addressSubscriptions = new Map();
 const addressTransactionSnapshots = new Map();
 const addressMetadataCache = new Map();
@@ -45,6 +46,7 @@ let mempoolSamples = [];
 let lastBroadcastSignature = '';
 let lastBroadcastAt = 0;
 let pollInFlight = false;
+let transactionPollInFlight = false;
 const providerCooldowns = new Map();
 
 const POLL_INTERVAL_MS = Math.max(3_000, Number(process.env.ETH_POLL_INTERVAL_MS || 6_000));
@@ -1232,10 +1234,20 @@ function transactionStreamSignature(transaction) {
 
 async function streamTrackedTransaction(socket, txid, force = false) {
   const signatures = transactionStreamSignatures.get(socket);
-  if (!signatures) return;
+  if (!signatures || transactionStreamRequests.has(socket)) return;
+  transactionStreamRequests.add(socket);
 
   try {
-    const transaction = await transactionById(txid);
+    // Live inclusion and execution data come from RPC; indexers can lag the tip.
+    const transaction = await rpcTransactionById(txid).catch(async () => {
+      const indexed = await transactionById(txid);
+      // A lagging fallback must not undo a receipt-confirmed inclusion.
+      if (!indexed.status?.confirmed && signatures.get(txid)?.startsWith(`${txid}|confirmed|`)) {
+        throw new Error('Indexer has not caught up with confirmed transaction');
+      }
+      return indexed;
+    });
+    if (!transactionSubscriptions.get(socket)?.has(txid)) return;
     const signature = transactionStreamSignature(transaction);
     if (force || signatures.get(txid) !== signature) {
       signatures.set(txid, signature);
@@ -1246,6 +1258,8 @@ async function streamTrackedTransaction(socket, txid, force = false) {
   } catch {
     // Public explorers can lag a just-broadcast transaction. Keep the
     // subscription alive and try again on the next source update.
+  } finally {
+    transactionStreamRequests.delete(socket);
   }
 }
 
@@ -1311,9 +1325,6 @@ async function streamAddressSubscription(socket, address) {
 async function streamSubscriptions() {
   const streams = [];
   for (const socket of sockets) {
-    for (const txid of transactionSubscriptions.get(socket) || []) {
-      streams.push(streamTrackedTransaction(socket, txid));
-    }
     for (const address of addressSubscriptions.get(socket) || []) {
       streams.push(streamAddressSubscription(socket, address));
     }
@@ -2244,10 +2255,13 @@ wss.on('connection', async (socket) => {
         return;
       }
       if (typeof request['track-tx'] === 'string' && request['track-tx'] !== 'stop') {
-        const data = await snapshot();
         const txid = request['track-tx'];
-        const transaction = data.projectedTransactions.find((item) => item.txid === txid);
+        if (!/^0x[a-fA-F0-9]{64}$/.test(txid)) return;
+        trackedTransactions.clear();
+        transactionStreamSignatures.get(socket)?.clear();
         trackedTransactions.add(txid);
+        const data = await snapshot();
+        const transaction = data.projectedTransactions.find((item) => item.txid === txid);
         // Ethereum's pending pool has no Bitcoin-style package position. A
         // pending transaction is instead estimated for the next validator slot.
         socket.send(JSON.stringify({
@@ -2296,6 +2310,14 @@ server.on('upgrade', (req, socket, head) => {
   if (new URL(req.url, `http://${req.headers.host}`).pathname !== '/api/v1/ws') return socket.destroy();
   wss.handleUpgrade(req, socket, head, (client) => wss.emit('connection', client, req));
 });
+setInterval(async () => {
+  if (!sockets.size || transactionPollInFlight) return;
+  transactionPollInFlight = true;
+  try {
+    await Promise.allSettled([...sockets].flatMap((socket) =>
+      [...(transactionSubscriptions.get(socket) || [])].map((txid) => streamTrackedTransaction(socket, txid))));
+  } finally { transactionPollInFlight = false; }
+}, POLL_INTERVAL_MS).unref();
 setInterval(async () => {
   if (!sockets.size || pollInFlight) return;
   pollInFlight = true;

@@ -270,6 +270,7 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.blocksSubscription = this.stateService.blocks$.subscribe((blocks) => {
       this.latestBlock = blocks[0];
+      this.cd.markForCheck();
     });
 
     this.transactionTimesSubscription = this.transactionTimes$.pipe(
@@ -654,7 +655,7 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
           }
           return merge(
             transactionObservable$,
-            this.stateService.mempoolTransactions$
+            this.stateService.mempoolTransactions$.pipe(filter(tx => tx?.txid === this.txId))
           );
         }),
         switchMap((tx) => {

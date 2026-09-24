@@ -164,6 +164,8 @@ export class BlockchainBlocksComponent implements OnInit, OnChanges, OnDestroy {
           if (this.pendingMarkBlock) {
             this.moveArrowToPosition(this.pendingMarkBlock.animate, this.pendingMarkBlock.newBlockFromLeft);
             this.pendingMarkBlock = null;
+          } else if (this.markHeight !== undefined) {
+            this.moveArrowToPosition(animate);
           }
           this.cd.markForCheck();
         });
