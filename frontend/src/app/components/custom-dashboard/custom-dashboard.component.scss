@@ -413,8 +413,21 @@
 }
 
 .quick-filter {
+  display: flex;
+  justify-content: center;
   margin-top: 5px;
   margin-bottom: 6px;
+}
+
+.pending-transactions-title {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+
+.pending-transactions-title .card-title {
+  margin: 0;
 }
 
 .card-liquid {
