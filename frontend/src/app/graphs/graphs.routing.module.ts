@@ -47,7 +47,7 @@ const routes: Routes = [
       },
       {
         path: 'production',
-        data: { networks: ['bitcoin'] },
+        data: { networks: ['ethereum'] },
         component: StartComponent,
         children: [
           {

@@ -13,6 +13,7 @@ export class ThemeService {
   themeState$: BehaviorSubject<{ theme: string; loading: boolean; }>;
   mempoolFeeColors: string[] = defaultMempoolFeeColors;
   initialLoad: boolean = true;
+  private themeLoadVersion = 0;
 
   constructor(
     private storageService: StorageService,
@@ -40,16 +41,15 @@ export class ThemeService {
   }
 
   private apply(theme: string): void {
-    if (this.theme === theme) {
+    const themeAlreadyApplied = theme === 'default' ? !this.style?.isConnected : this.style?.isConnected;
+    if (this.theme === theme && themeAlreadyApplied) {
       return;
     }
 
+    const loadVersion = ++this.themeLoadVersion;
     this.theme = theme;
     if (theme === 'default') {
-      if (this.style) {
-        this.style.remove();
-        this.style = null;
-      }
+      this.removeThemeStylesheet();
       if (!this.stateService.env.customize?.theme) {
         this.storageService.setValue('theme-preference', theme);
       }
@@ -69,17 +69,25 @@ export class ThemeService {
         }
         document.head.appendChild(this.style); // load the css now
       }
+      const style = this.style;
 
-      this.style.onload = () => {
+      style.onload = () => {
+        if (!this.isCurrentThemeLoad(theme, loadVersion, style)) {
+          return;
+        }
         if (this.initialLoad) {
-          this.style.media = 'all';
+          style.media = 'all';
           this.initialLoad = false;
         }
         this.mempoolFeeColors = this.getMempoolFeeColors(theme);
         this.themeState$.next({ theme, loading: false });
       };
-      this.style.onerror = () => this.apply('default');
-      this.style.href = this.getThemeFile(theme);
+      style.onerror = () => {
+        if (this.isCurrentThemeLoad(theme, loadVersion, style)) {
+          this.apply('default');
+        }
+      };
+      style.href = this.getThemeFile(theme);
 
       if (!this.stateService.env.customize?.theme) {
         this.storageService.setValue('theme-preference', theme);
@@ -88,6 +96,23 @@ export class ThemeService {
       console.log('failed to apply theme stylesheet: ', err);
       this.apply('default');
     }
+  }
+
+  private removeThemeStylesheet(): void {
+    if (!this.style) {
+      return;
+    }
+
+    // A cancelled request can emit after a user makes a new selection.
+    // Disconnect handlers before removing the element, then guard callbacks too.
+    this.style.onload = null;
+    this.style.onerror = null;
+    this.style.remove();
+    this.style = null;
+  }
+
+  private isCurrentThemeLoad(theme: string, loadVersion: number, style: HTMLLinkElement): boolean {
+    return this.theme === theme && this.themeLoadVersion === loadVersion && this.style === style;
   }
 
   private getThemeFile(theme: string): string {
