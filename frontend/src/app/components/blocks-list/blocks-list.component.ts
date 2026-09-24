@@ -114,6 +114,7 @@ export class BlocksList implements OnInit {
           this.lastBlockHeightFetched = fromBlockHeight;
           return this.apiService.getBlocks$(this.page === 1 ? undefined : fromBlockHeight)
             .pipe(
+              map(blocks => [...blocks].sort((a, b) => b.height - a.height)),
               tap(blocks => {
                 if (this.blocksCount === undefined) {
                   this.blocksCount = blocks[0].height + 1;

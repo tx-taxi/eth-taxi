@@ -1,80 +1,52 @@
-<app-indexing-progress></app-indexing-progress>
-
 <div class="container-xl dashboard-container">
+  <h1>Block production</h1>
+
+  <ng-container *ngIf="production$ | async as production; else loadingProduction">
+    <div *ngIf="production.error" class="alert alert-warning" role="status">Block production data is temporarily unavailable.</div>
+    <div *ngIf="!production.error && !production.blocks.length" class="alert alert-secondary" role="status">No recent blocks are available.</div>
+
+    <div class="row row-cols-1 row-cols-md-2" *ngIf="production.blocks.length">
+      <div class="col">
+        <div class="main-title">Latest block</div>
+        <div class="card"><div class="card-body">
+          <h2 class="card-title">Block <a [routerLink]="['/block', production.blocks[0].id]">{{ production.blocks[0].height | number }}</a></h2>
+          <div class="production-stat-grid">
+            <div><span class="stat-label">Fee recipient</span><span class="recipient" *ngIf="production.blocks[0].extras?.pool?.name as recipient" [title]="recipient"><app-truncate [text]="recipient" [lastChars]="6"></app-truncate></span></div>
+            <div><span class="stat-label">Transactions</span><strong>{{ production.blocks[0].tx_count | number }}</strong></div>
+            <div><span class="stat-label">Gas used</span><strong>{{ production.blocks[0].weight | number }}</strong></div>
+            <div><span class="stat-label">Produced</span><strong><app-timestamp [unixTime]="production.blocks[0].timestamp"></app-timestamp></strong></div>
+          </div>
+        </div></div>
+      </div>
+
+      <div class="col">
+        <div class="main-title">Recent production <span>({{ production.blocks.length }} blocks)</span></div>
+        <div class="card"><div class="card-body">
+          <h2 class="card-title">Execution activity</h2>
+          <div class="production-stat-grid">
+            <div><span class="stat-label">Transactions</span><strong>{{ production.transactionCount | number }}</strong></div>
+            <div><span class="stat-label">Average gas used</span><strong>{{ production.averageGasUsed | number }}</strong></div>
+            <div><span class="stat-label">Observed block interval</span><strong>{{ production.averageInterval === null ? 'Unavailable' : (production.averageInterval + ' seconds') }}</strong></div>
+            <div><span class="stat-label">Consensus</span><strong>Proof of Stake</strong></div>
+          </div>
+        </div></div>
+      </div>
+    </div>
+  </ng-container>
+  <ng-template #loadingProduction><div class="alert alert-secondary" role="status">Loading block production...</div></ng-template>
 
   <div class="row row-cols-1 row-cols-md-2">
-
     <div class="col">
-      <div class="main-title">
-        <span [attr.data-cy]="'reward-stats'" i18n="mining.reward-stats">Reward stats</span>&nbsp;
-        <span style="font-size: xx-small" i18n="mining.144-blocks">(144 blocks)</span>
-      </div>
-      <div class="card-wrapper">
-        <div class="card">
-          <div class="card-body more-padding">
-            <app-reward-stats></app-reward-stats>
-          </div>
-        </div>
-      </div>
+      <div class="card"><div class="card-body">
+        <app-ethereum-gas-market-graph [samples]="gasMarket$ | async" [height]="260"></app-ethereum-gas-market-graph>
+        <p *ngIf="gasMarketError" class="text-warning mt-2" role="status">Gas market history is temporarily unavailable.</p>
+      </div></div>
     </div>
-
-    <!-- difficulty adjustment -->
     <div class="col">
-      <div class="main-title" i18n="dashboard.difficulty-adjustment">Difficulty Adjustment</div>
-      <app-difficulty-mining [attr.data-cy]="'difficulty-adjustment'" [showTitle]="false" [showProgress]="false" [showHalving]="true"></app-difficulty-mining>
+      <div class="card"><div class="card-body">
+        <a class="title-link" [routerLink]="['/blocks']"><h2 class="card-title d-inline">Recent blocks</h2></a>
+        <app-blocks-list [widget]="true"></app-blocks-list>
+      </div></div>
     </div>
-
-    <!-- pool distribution -->
-    <div class="col" style="margin-bottom: 1.47rem">
-      <div class="card">
-        <div class="card-body ps-2 pe-2">
-          <div class="mempool-graph">
-            <app-pool-ranking [height]="poolGraphHeight" [attr.data-cy]="'pool-distribution'" [widget]=true></app-pool-ranking>
-          </div>
-          <div class="mt-1"><a [attr.data-cy]="'pool-distribution-view-more'" [routerLink]="['/graphs/mining/pools' | relativeUrl]" i18n="dashboard.view-more">View more &raquo;</a></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- hashrate -->
-    <div class="col" style="margin-bottom: 1.47rem">
-      <div class="card">
-        <div class="card-body ps-lg-3 pe-lg-3 ps-2 pe-2">
-          <div class="fixed-mempool-graph">
-            <app-hashrate-chart [height]="hashrateGraphHeight" [attr.data-cy]="'hashrate-graph'" [widget]="true"></app-hashrate-chart>
-          </div>
-          <div class="mt-1"><a [routerLink]="['/graphs/mining/hashrate-difficulty' | relativeUrl]" fragment="1y" i18n="dashboard.view-more">View more &raquo;</a></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Recent blocks -->
-    <div class="col">
-      <div class="card">
-        <div class="card-body">
-          <a class="title-link" href="" [routerLink]="['/blocks' | relativeUrl]">
-            <h5 class="card-title d-inline" i18n="dashboard.recent-blocks">Recent Blocks</h5>
-            <span>&nbsp;</span>
-            <fa-icon [icon]="['fas', 'external-link-alt']" [fixedWidth]="true" style="vertical-align: text-top; font-size: 13px; color: var(--title-fg)"></fa-icon>
-          </a>
-          <app-blocks-list [attr.data-cy]="'latest-blocks'" [widget]=true></app-blocks-list>
-        </div>
-      </div>
-    </div>
-
-    <!-- Difficult adjustments -->
-    <div class="col">
-      <div class="card">
-        <div class="card-body">
-          <a class="title-link" href="" [routerLink]="['/graphs/mining/hashrate-difficulty' | relativeUrl]">
-            <h5 class="card-title d-inline" i18n="dashboard.adjustments">Adjustments</h5>
-            <span>&nbsp;</span>
-            <fa-icon [icon]="['fas', 'external-link-alt']" [fixedWidth]="true" style="vertical-align: text-top; font-size: 13px; color: var(--title-fg)"></fa-icon>
-          </a>
-          <app-difficulty-adjustments-table [attr.data-cy]="'difficulty-adjustments-table'"></app-difficulty-adjustments-table>
-        </div>
-      </div>
-    </div>
-
   </div>
 </div>

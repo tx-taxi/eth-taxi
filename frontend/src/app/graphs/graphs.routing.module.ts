@@ -46,7 +46,7 @@ const routes: Routes = [
         component: PoolComponent,
       },
       {
-        path: 'mining',
+        path: 'production',
         data: { networks: ['bitcoin'] },
         component: StartComponent,
         children: [
@@ -55,6 +55,11 @@ const routes: Routes = [
             component: MiningDashboardComponent,
           },
         ]
+      },
+      {
+        path: 'mining',
+        redirectTo: 'production',
+        pathMatch: 'full',
       },
       {
         path: 'acceleration',

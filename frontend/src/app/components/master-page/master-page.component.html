@@ -88,6 +88,11 @@
           <div class="svg-wrapper"><app-svg-images name="nav-cubes" width="21.59" height="100%"></app-svg-images></div>
         </a>
       </li>
+      <li class="nav-item" routerLinkActive="active" id="btn-production">
+        <a class="nav-link" [routerLink]="['/production' | relativeUrl]" (click)="collapse()" title="Block production" aria-label="Block production">
+          <div class="svg-wrapper"><app-svg-images name="nav-enterprise" width="21.59" height="100%"></app-svg-images></div>
+        </a>
+      </li>
       <li class="nav-item" routerLinkActive="active" id="btn-transactions">
         <a class="nav-link" [routerLink]="['/txs' | relativeUrl]" (click)="collapse()">
           <div class="svg-wrapper"><app-svg-images name="nav-database" width="21.59" height="100%"></app-svg-images></div>

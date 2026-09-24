@@ -6,6 +6,45 @@
   }
 }
 
+.dashboard-container h1 {
+  text-align: left;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.production-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+  text-align: left;
+  margin-top: 1.5rem;
+
+  > div {
+    min-width: 0;
+  }
+
+  strong, .recipient {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 1rem;
+  }
+
+  .stat-label {
+    display: block;
+    color: var(--title-fg);
+    font-size: 0.8rem;
+    margin-bottom: 0.3rem;
+  }
+}
+
+@media (max-width: 450px) {
+  .production-stat-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .card {
   background-color: var(--bg);
 }
