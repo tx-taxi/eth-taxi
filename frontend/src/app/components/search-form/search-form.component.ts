@@ -22,7 +22,7 @@ import { Network, findOtherNetworks, getRegex, getTargetUrl, needBaseModuleChang
 export class SearchFormComponent implements OnInit {
   @Input() hamburgerOpen = false;
   readonly sourceChainId = 'ethereum';
-  readonly defaultChainIconUrl = 'https://tx.taxi/assets/brand/eth-dark-car.svg';
+  readonly defaultChainIconUrl = 'https://tx.taxi/assets/chains/ethereum.png';
   readonly defaultChainIconAlt = 'Ethereum explorer';
   env: Env;
   network = '';
