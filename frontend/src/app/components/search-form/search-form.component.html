@@ -64,7 +64,7 @@
             </ng-template>
           </div>
         </div>
-        <input #searchInput (focus)="showSourceSuggestions(); focus$.next($any($event).target.value)" (click)="showSourceSuggestions(); click$.next($any($event).target.value)" formControlName="searchText" type="text" class="form-control" [placeholder]="(activeTarget$ | async)?.searchPlaceholder || defaultSearchPlaceholder" [attr.aria-label]="(activeTarget$ | async)?.searchPlaceholder || defaultSearchPlaceholder" [attr.aria-invalid]="searchError ? 'true' : null" [attr.aria-describedby]="searchError ? 'ethereum-search-error' : null">
+        <input #searchInput (focus)="showSourceSuggestions(); focus$.next($any($event).target.value)" (click)="showSourceSuggestions(); click$.next($any($event).target.value)" formControlName="searchText" type="text" class="form-control" placeholder="Wave a taxi, paste anything here." aria-label="Search across chains" [attr.aria-invalid]="searchError ? 'true' : null" [attr.aria-describedby]="searchError ? 'ethereum-search-error' : null">
       </div>
       <app-search-results #searchResults [hidden]="dropdownHidden || !isSourceChainSelected()" [results]="typeAhead$ | async" (selectedResult)="selectedResult($event)"></app-search-results>
       <div *ngIf="searchError" id="ethereum-search-error" class="search-error" role="alert">{{ searchError }}</div>

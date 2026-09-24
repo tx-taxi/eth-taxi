@@ -19,7 +19,6 @@ interface SearchTarget {
   accentColor: string;
   iconUrl: string;
   iconAlt: string;
-  searchPlaceholder: string;
   confirmed?: boolean;
   directUrl?: string;
 }
@@ -37,7 +36,6 @@ export class SearchFormComponent implements OnInit {
   readonly defaultChainIconUrl = 'https://tx.taxi/assets/chains/ethereum.png';
   readonly defaultChainIconAlt = 'Ethereum explorer';
   readonly defaultChainAccent = '#627eea';
-  readonly defaultSearchPlaceholder = 'Search an Ethereum block, transaction, or address';
   env: Env;
   network = '';
   assets: object = {};
@@ -54,7 +52,6 @@ export class SearchFormComponent implements OnInit {
     accentColor: this.defaultChainAccent,
     iconUrl: this.defaultChainIconUrl,
     iconAlt: this.defaultChainIconAlt,
-    searchPlaceholder: this.defaultSearchPlaceholder,
   });
   searchOptions$ = new BehaviorSubject<TxTaxiSearchOptions | undefined>(undefined);
   searchForm: UntypedFormGroup;
@@ -589,7 +586,6 @@ export class SearchFormComponent implements OnInit {
       accentColor: this.defaultChainAccent,
       iconUrl: this.defaultChainIconUrl,
       iconAlt: this.defaultChainIconAlt,
-      searchPlaceholder: this.defaultSearchPlaceholder,
     };
   }
 
@@ -601,7 +597,6 @@ export class SearchFormComponent implements OnInit {
       accentColor: explorer.accentColor,
       iconUrl: explorer.iconUrl,
       iconAlt: explorer.iconAlt,
-      searchPlaceholder: explorer.searchPlaceholder,
     };
   }
 
@@ -613,7 +608,6 @@ export class SearchFormComponent implements OnInit {
       accentColor: candidate.accentColor,
       iconUrl: candidate.iconUrl,
       iconAlt: candidate.iconAlt,
-      searchPlaceholder: `Search ${candidate.name}`,
       confirmed: candidate.confirmed,
       directUrl: candidate.directUrl,
     };
@@ -625,7 +619,6 @@ export class SearchFormComponent implements OnInit {
     accentColor: '#ffd21f',
     iconUrl: 'https://tx.taxi/assets/brand/taxi-logo.svg',
     iconAlt: 'tx.taxi',
-    searchPlaceholder: 'Search any supported chain',
   };
 
   private showSearchError(message: string): void {
