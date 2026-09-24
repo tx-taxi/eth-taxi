@@ -5,6 +5,8 @@ const fs = require('node:fs/promises');
 const http = require('node:http');
 const path = require('node:path');
 const { URL } = require('node:url');
+const parse5 = require('parse5');
+const sharp = require('sharp');
 const { WebSocketServer } = require('ws');
 
 const host = process.env.ETH_ADAPTER_HOST || '0.0.0.0';
@@ -29,6 +31,10 @@ const addressHistoryCache = new Map();
 const addressHistoryCursorCache = new Map();
 const rpcBlockFeeCache = new Map();
 const tokenMetadataCache = new Map();
+const ogImageCache = new Map();
+const ogImagePending = new Map();
+const ogFallbackCards = new Map();
+let ogActiveLoads = 0;
 let activeProvider = providers[0];
 let activeRpcProvider = rpcProviders[0];
 let cachedSnapshot;
@@ -52,6 +58,12 @@ const RPC_TOKEN_TRANSFER_BLOCK_SPAN = 2;
 const RPC_TOKEN_TRANSFER_LIMIT = 100;
 const BLOCK_PAGE_SIZE = 10;
 const TOKEN_METADATA_CACHE_MS = 15 * 60_000;
+const OG_CACHE_LIMIT = 128;
+const OG_MAX_ACTIVE_LOADS = 8;
+const OG_REQUEST_TIMEOUT_MS = 8_000;
+const OG_IMAGE_WIDTH = 1200;
+const OG_IMAGE_HEIGHT = 630;
+const OG_ORIGIN = 'https://eth.tx.taxi';
 const TRANSACTION_TOKEN_METADATA_LIMIT = 12;
 const ETH_PRICE_API_URL = (process.env.ETH_PRICE_API_URL || 'https://api.coingecko.com/api/v3').replace(/\/$/, '');
 const ETH_COINBASE_API_URL = (process.env.ETH_COINBASE_API_URL || 'https://api.exchange.coinbase.com').replace(/\/$/, '');
@@ -1772,6 +1784,249 @@ function respondJavaScript(res, source) {
   res.end(source);
 }
 
+function ogEscape(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (character) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;',
+  })[character]);
+}
+
+function ogShort(value, limit = 38) {
+  const text = String(value ?? '');
+  return text.length > limit ? `${text.slice(0, Math.ceil((limit - 1) / 2))}…${text.slice(-Math.floor((limit - 1) / 2))}` : text;
+}
+
+function ogAtomic(value, decimals, unit, precision = 6) {
+  if (value === null || value === undefined || !/^\d+$/.test(String(value))) return null;
+  const atomic = BigInt(value);
+  const divisor = 10n ** BigInt(decimals);
+  const whole = atomic / divisor;
+  const fraction = (atomic % divisor).toString().padStart(decimals, '0').slice(0, precision).replace(/0+$/, '');
+  return `${whole.toLocaleString('en-US')}${fraction ? `.${fraction}` : ''} ${unit}`;
+}
+
+function ogCount(value) {
+  const count = Number(value);
+  return Number.isSafeInteger(count) && count >= 0 ? count.toLocaleString('en-US') : null;
+}
+
+function ogEntity(kind, id, data) {
+  if (kind === 'tx') {
+    const tx = data.ethereum;
+    const state = tx.hasError ? 'Failed' : data.status?.confirmed ? 'Confirmed' : 'Pending';
+    return {
+      heading: 'Transaction', subtitle: id, description: `Ethereum transaction ${id}. ${state}.`,
+      rows: [
+        ['Status', state], ['Value', ogAtomic(tx.valueWei, 18, 'ETH')],
+        ['From', tx.from?.address], ['To', tx.to?.address || tx.createdContract?.address],
+        ['Block', tx.blockNumber ? ogCount(tx.blockNumber) : null],
+        ['Gas used', tx.gasUsed ? ogCount(tx.gasUsed) : null],
+        ['Fee', ogAtomic(tx.feeWei, 18, 'ETH')],
+        ['Method', tx.method && tx.method !== '0x' ? tx.method : null],
+      ],
+    };
+  }
+  if (kind === 'block') return {
+    heading: `Block ${ogCount(data.height) || id}`, subtitle: data.id || id,
+    description: `Ethereum block ${ogCount(data.height) || id}.`,
+    rows: [
+      ['Transactions', ogCount(data.tx_count)], ['Gas used', ogCount(data.weight)],
+      ['Timestamp', data.timestamp ? new Date(data.timestamp * 1000).toISOString().replace('T', ' ').slice(0, 19) + ' UTC' : null],
+      ['Block producer', data.extras?.pool?.name],
+      ['Parent', data.previousblockhash],
+    ],
+  };
+  if (kind === 'address') return {
+    heading: data.identity?.name || 'Address', subtitle: id,
+    description: `Ethereum ${data.identity?.isContract ? 'contract' : 'address'} ${id}.`,
+    rows: [
+      ['Type', data.identity?.isContract ? 'Contract' : 'Account'],
+      ['Balance', ogAtomic(data.balanceWei, 18, 'ETH')],
+      ['ENS', data.identity?.ensName],
+      ['Token balances', data.tokenBalances?.length ? `${data.tokenBalances.length} shown` : null],
+    ],
+  };
+  return {
+    heading: data.name || data.symbol || 'Token', subtitle: id,
+    description: `Ethereum token ${data.name || data.symbol || id}.`,
+    rows: [
+      ['Symbol', data.symbol], ['Standard', data.type],
+      ['Decimals', data.decimals !== null && data.decimals !== undefined ? ogCount(data.decimals) : null],
+      ['Holders', data.holdersCount ? ogCount(data.holdersCount) : null],
+      ['Contract', data.address || id],
+    ],
+  };
+}
+
+function ogEntityMetadata(kind, id, entity) {
+  const pathname = `/${kind === 'tx' ? 'tx' : kind}/${encodeURIComponent(id)}`;
+  const title = `${entity.heading} | eth.tx.taxi`;
+  const url = `${OG_ORIGIN}${pathname}`;
+  const image = `${OG_ORIGIN}/og/${kind}/${encodeURIComponent(id)}.png`;
+  const tags = [
+    ['name', 'description', entity.description],
+    ['property', 'og:type', 'website'], ['property', 'og:site_name', 'eth.tx.taxi'],
+    ['property', 'og:locale', 'en_US'],
+    ['property', 'og:title', title], ['property', 'og:description', entity.description],
+    ['property', 'og:url', url], ['property', 'og:image', image],
+    ['property', 'og:image:type', 'image/png'], ['property', 'og:image:width', String(OG_IMAGE_WIDTH)],
+    ['property', 'og:image:height', String(OG_IMAGE_HEIGHT)], ['property', 'og:image:alt', `eth.tx.taxi ${entity.heading}`],
+    ['name', 'twitter:card', 'summary_large_image'], ['name', 'twitter:title', title],
+    ['name', 'twitter:description', entity.description], ['name', 'twitter:image', image],
+    ['name', 'twitter:image:alt', `eth.tx.taxi ${entity.heading}`], ['name', 'twitter:domain', 'eth.tx.taxi'],
+  ];
+  return {
+    title, description: entity.description, url, image,
+    html: `<title>${ogEscape(title)}</title><link rel="canonical" href="${ogEscape(url)}">` +
+      tags.map(([attribute, name, content]) => `<meta ${attribute}="${name}" content="${ogEscape(content)}">`).join(''),
+  };
+}
+
+function ogEntityIdIsValid(kind, id) {
+  if (kind === 'block') return /^(?:0x[\da-f]{64}|[1-9]\d{0,9})$/i.test(id);
+  if (kind === 'tx') return /^0x[\da-f]{64}$/i.test(id);
+  return /^0x[\da-f]{40}$/i.test(id);
+}
+
+function ogEntityRoute(pathname) {
+  const match = pathname.match(/^\/(tx|block|address|token)\/([^/]+)$/);
+  if (!match) return null;
+  const [, kind, id] = match;
+  return ogEntityIdIsValid(kind, id) ? { kind, id } : null;
+}
+
+function ogRouteEntity(kind, id) {
+  const label = { tx: 'Transaction', block: 'Block', address: 'Address', token: 'Token' }[kind];
+  const heading = kind === 'block' && /^\d+$/.test(id) ? `Block ${id}` : `${label} ${ogShort(id, 20)}`;
+  const description = {
+    tx: `Ethereum transaction ${id}.`,
+    block: `Ethereum block ${id}.`,
+    address: `Ethereum address ${id}.`,
+    token: `Ethereum token contract ${id}.`,
+  }[kind];
+  return { heading, subtitle: id, description, rows: [] };
+}
+
+function ogInjectDocument(html, metadata) {
+  const document = parse5.parse(html, { sourceCodeLocationInfo: true });
+  const root = document.childNodes.find((node) => node.tagName === 'html');
+  const head = root?.childNodes.find((node) => node.tagName === 'head');
+  if (!head?.sourceCodeLocation?.endTag) throw new Error('SPA index has no head element');
+  const attribute = (node, name) => node.attrs?.find((item) => item.name === name)?.value?.toLowerCase();
+  const locations = head.childNodes.filter((node) => {
+    if (node.tagName === 'title') return true;
+    if (node.tagName === 'link') return attribute(node, 'rel')?.split(/\s+/).includes('canonical');
+    if (node.tagName !== 'meta') return false;
+    return attribute(node, 'name') === 'description' || attribute(node, 'name')?.startsWith('twitter:') || attribute(node, 'property')?.startsWith('og:');
+  }).map((node) => node.sourceCodeLocation).filter(Boolean).sort((a, b) => a.startOffset - b.startOffset);
+  const insertAt = head.sourceCodeLocation.endTag.startOffset;
+  let cursor = 0;
+  let output = '';
+  for (const location of locations) {
+    output += html.slice(cursor, location.startOffset);
+    cursor = location.endOffset;
+  }
+  return output + html.slice(cursor, insertAt) + `\n  ${metadata.html}\n` + html.slice(insertAt);
+}
+
+function ogImageSvg(entity, metadata, unavailable = false) {
+  const rows = (unavailable ? [] : entity.rows.filter(([, value]) => value !== null && value !== undefined && value !== '')).slice(0, 8);
+  const rowMarkup = rows.map(([label, value], index) => {
+    const column = index % 2;
+    const x = 64 + column * 544;
+    const y = 318 + Math.floor(index / 2) * 67;
+    return `<rect x="${x}" y="${y - 28}" width="518" height="56" fill="${Math.floor(index / 2) % 2 ? '#202537' : '#181c2a'}"/>` +
+      `<text x="${x + 14}" y="${y - 5}" fill="#9ca5c5" font-size="17">${ogEscape(label)}</text>` +
+      `<text x="${x + 14}" y="${y + 19}" fill="#f2f4ff" font-size="20" font-weight="600">${ogEscape(ogShort(value, 32))}</text>`;
+  }).join('');
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${OG_IMAGE_WIDTH}" height="${OG_IMAGE_HEIGHT}" viewBox="0 0 ${OG_IMAGE_WIDTH} ${OG_IMAGE_HEIGHT}">
+    <rect width="1200" height="630" fill="#11141f"/><rect width="1200" height="8" fill="#627eea"/>
+    <text x="64" y="68" fill="#9eafff" font-family="Arial,sans-serif" font-size="22" font-weight="700">ETHEREUM / EXPLORER</text>
+    <text x="1136" y="68" text-anchor="end" fill="#f2f4ff" font-family="Arial,sans-serif" font-size="28" font-weight="700">eth.tx.taxi</text>
+    <path d="M64 94H1136" stroke="#343a51"/>
+    <text x="64" y="176" fill="#f2f4ff" font-family="Arial,sans-serif" font-size="52" font-weight="700">${ogEscape(ogShort(entity.heading, 32))}</text>
+    <text x="64" y="228" fill="#a8b9ff" font-family="Arial,monospace" font-size="24">${ogEscape(ogShort(entity.subtitle, 70))}</text>
+    ${unavailable ? '<text x="64" y="344" fill="#cbd2eb" font-family="Arial,sans-serif" font-size="28">Details temporarily unavailable</text>' : `<g font-family="Arial,sans-serif">${rowMarkup}</g>`}
+    <path d="M64 574H1136" stroke="#343a51"/>
+    <text x="64" y="604" fill="#919bb9" font-family="Arial,sans-serif" font-size="17">Ethereum mainnet</text>
+    <text x="1136" y="604" text-anchor="end" fill="#919bb9" font-family="Arial,sans-serif" font-size="17">${ogEscape(metadata.url)}</text>
+  </svg>`;
+}
+
+async function ogLoad(kind, id) {
+  if (kind === 'tx') return transactionById(id);
+  if (kind === 'block') return blockById(id);
+  if (kind === 'address') return ethereumAddressMetadata(id);
+  return ethereumToken(id);
+}
+
+function ogCachePut(key, result, ttl) {
+  ogImageCache.delete(key);
+  ogImageCache.set(key, { result, expiresAt: Date.now() + ttl });
+  while (ogImageCache.size > OG_CACHE_LIMIT) ogImageCache.delete(ogImageCache.keys().next().value);
+}
+
+async function ogRender(kind, id) {
+  const data = await ogLoad(kind, id);
+  if (kind === 'token' && !data?.name && !data?.symbol) throw new Error('Token metadata unavailable');
+  if (kind === 'tx' && !data?.ethereum) throw new Error('Transaction metadata unavailable');
+  const entity = ogEntity(kind, id, data);
+  const metadata = ogEntityMetadata(kind, id, entity);
+  const body = await sharp(Buffer.from(ogImageSvg(entity, metadata))).png().toBuffer();
+  return { body, ttl: kind === 'tx' && !data.status?.confirmed ? 30_000 : 300_000 };
+}
+
+function ogFallback(kind) {
+  if (!ogFallbackCards.has(kind)) {
+    const entity = { heading: { tx: 'Transaction', block: 'Block', address: 'Address', token: 'Token' }[kind],
+      subtitle: 'Live details unavailable', rows: [] };
+    ogFallbackCards.set(kind, sharp(Buffer.from(ogImageSvg(entity, { url: OG_ORIGIN }, true))).png().toBuffer()
+      .then((body) => ({ body })));
+  }
+  return ogFallbackCards.get(kind);
+}
+
+async function serveOgImage(req, res, kind, id) {
+  const key = `${kind}:${id.toLowerCase()}`;
+  const cached = ogImageCache.get(key);
+  if (cached && cached.expiresAt > Date.now()) {
+    res.writeHead(200, { 'content-type': 'image/png', 'cache-control': `public, max-age=${Math.floor((cached.expiresAt - Date.now()) / 1000)}` });
+    return res.end(req.method === 'HEAD' ? undefined : cached.result.body);
+  }
+  if (cached) ogImageCache.delete(key);
+  let pending = ogImagePending.get(key);
+  if (!pending) {
+    if (ogActiveLoads >= OG_MAX_ACTIVE_LOADS) {
+      const fallback = await ogFallback(kind);
+      res.writeHead(200, { 'content-type': 'image/png', 'cache-control': 'no-store' });
+      return res.end(req.method === 'HEAD' ? undefined : fallback.body);
+    }
+    ogActiveLoads++;
+    pending = ogRender(kind, id).then((result) => { ogCachePut(key, result, result.ttl); return result; });
+    ogImagePending.set(key, pending);
+    pending.finally(() => { ogActiveLoads--; ogImagePending.delete(key); }).catch(() => {});
+  }
+  let timer;
+  let result;
+  try {
+    result = await Promise.race([pending, new Promise((_, reject) => {
+      timer = setTimeout(() => reject(new Error('OG data request timed out')), OG_REQUEST_TIMEOUT_MS);
+    })]);
+  } catch {
+    result = await ogFallback(kind);
+  } finally {
+    clearTimeout(timer);
+  }
+  res.writeHead(200, { 'content-type': 'image/png', 'cache-control': result.ttl ? `public, max-age=${Math.floor(result.ttl / 1000)}` : 'no-store' });
+  res.end(req.method === 'HEAD' ? undefined : result.body);
+}
+
+function ogImageRoute(pathname) {
+  const match = pathname.match(/^\/og\/(tx|block|address|token)\/([^/]+)\.png$/);
+  if (!match) return null;
+  const [, kind, id] = match;
+  return ogEntityIdIsValid(kind, id) ? { kind, id } : null;
+}
+
 function isApiPath(pathname) {
   return pathname === '/api' || pathname.startsWith('/api/');
 }
@@ -1807,6 +2062,10 @@ function isSupportedApiPath(pathname) {
 
 async function serveStatic(pathname, res, spaFallback = true) {
   if (isApiPath(pathname)) return false;
+  const entityRoute = ogEntityRoute(pathname);
+  const entityMetadata = entityRoute
+    ? ogEntityMetadata(entityRoute.kind, entityRoute.id, ogRouteEntity(entityRoute.kind, entityRoute.id))
+    : null;
   const requested = pathname;
   const relative = path.posix.normalize(requested).replace(/^\/+/, '');
   let filePath = path.join(staticRoot, relative);
@@ -1839,7 +2098,7 @@ async function serveStatic(pathname, res, spaFallback = true) {
     try {
       const body = await fs.readFile(indexPath);
       res.writeHead(200, { 'content-type': contentTypes['.html'], 'cache-control': 'no-store' });
-      res.end(body);
+      res.end(entityMetadata ? ogInjectDocument(body.toString(), entityMetadata) : body);
       return true;
     } catch (error) {
       if (error?.code !== 'ENOENT' && error?.code !== 'EISDIR') throw error;
@@ -1852,6 +2111,11 @@ const server = http.createServer(async (req, res) => {
   try {
     const requestUrl = new URL(req.url, `http://${req.headers.host}`);
     const requestPath = requestUrl.pathname;
+    if (requestPath.startsWith('/og/')) {
+      const image = ogImageRoute(requestPath);
+      if (!image || !['GET', 'HEAD'].includes(req.method)) return respond(res, 404, { error: 'Not found' });
+      return await serveOgImage(req, res, image.kind, image.id);
+    }
     if (requestPath === '/healthz') return respond(res, 200, { ok: true, provider: activeProvider });
     if (requestPath.startsWith('/source/')) return respond(res, 404, { error: 'Not found' });
     if (isApiPath(requestPath) && !isSupportedApiPath(requestPath)) {
@@ -1862,6 +2126,7 @@ const server = http.createServer(async (req, res) => {
       return respondJavaScript(res, requestPath.endsWith('/config.js') ? 'window.__env = window.__env || {};\n' : '');
     }
     if (await serveStatic(requestPath, res)) return;
+    if (ogEntityRoute(requestPath)) return respond(res, 503, { error: 'SPA index unavailable' });
     const ethereumAddressMatch = requestPath.match(/^\/api\/v1\/ethereum\/address\/(0x[a-fA-F0-9]{40})$/);
     if (ethereumAddressMatch) return respond(res, 200, await ethereumAddressMetadata(ethereumAddressMatch[1]));
     const ethereumTokenTransfersMatch = requestPath.match(/^\/api\/v1\/ethereum\/token\/(0x[a-fA-F0-9]{40})\/transfers$/);

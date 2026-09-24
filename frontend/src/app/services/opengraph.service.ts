@@ -4,7 +4,6 @@ import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { filter, map, switchMap } from 'rxjs/operators';
 import { combineLatest } from 'rxjs';
 import { StateService } from '@app/services/state.service';
-import { LanguageService } from '@app/services/language.service';
 
 @Injectable({
   providedIn: 'root'
@@ -20,13 +19,12 @@ export class OpenGraphService {
     private ngZone: NgZone,
     private metaService: Meta,
     private stateService: StateService,
-    private LanguageService: LanguageService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
   ) {
     // save og:image tag from original template
     const initialOgImageTag = metaService.getTag('property=\'og:image\'');
-    this.defaultImageUrl = initialOgImageTag?.content || 'https://mempool.space/resources/previews/mempool-space-preview.jpg';
+    this.defaultImageUrl = initialOgImageTag?.content || 'https://tx.taxi/assets/og/explorers/ethereum.png';
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
       map(() => this.activatedRoute),
@@ -51,24 +49,23 @@ export class OpenGraphService {
   }
 
   setOgImage() {
-    const lang = this.LanguageService.getLanguage();
-    const ogImageUrl = `${window.location.protocol}//${window.location.host}/render/${lang}/preview${this.router.url}`;
-    this.metaService.updateTag({ property: 'og:image', content: ogImageUrl });
-    this.metaService.updateTag({ name: 'twitter:image', content: ogImageUrl });
-    this.metaService.updateTag({ property: 'og:image:width', content: '1200' });
-    this.metaService.updateTag({ property: 'og:image:height', content: '600' });
+    // The inherited /render endpoint is not deployed on this host. Keep a
+    // valid default card until a chain-local renderer returns real images.
+    this.clearOgImage();
   }
 
   clearOgImage() {
     this.metaService.updateTag({ property: 'og:image', content: this.defaultImageUrl });
     this.metaService.updateTag({ name: 'twitter:image', content: this.defaultImageUrl });
-    this.metaService.updateTag({ property: 'og:image:width', content: '1000' });
-    this.metaService.updateTag({ property: 'og:image:height', content: '500' });
+    this.metaService.updateTag({ property: 'og:image:type', content: 'image/png' });
+    this.metaService.updateTag({ property: 'og:image:width', content: '1200' });
+    this.metaService.updateTag({ property: 'og:image:height', content: '630' });
   }
 
   setManualOgImage(imageFilename) {
     const ogImage = `${window.location.protocol}//${window.location.host}/resources/previews/${imageFilename}`;
     this.metaService.updateTag({ property: 'og:image', content: ogImage });
+    this.metaService.updateTag({ property: 'og:image:type', content: imageFilename.endsWith('.png') ? 'image/png' : 'image/jpeg' });
     this.metaService.updateTag({ property: 'og:image:width', content: '2000' });
     this.metaService.updateTag({ property: 'og:image:height', content: '1000' });
     this.metaService.updateTag({ name: 'twitter:image', content: ogImage });

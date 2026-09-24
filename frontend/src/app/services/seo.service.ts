@@ -44,13 +44,15 @@ export class SeoService {
       switchMap(route => route.data),
     ).subscribe((data) => {
       this.clearSoft404();
+      this.updateCanonical(this.router.url.split('?')[0].split('#')[0]);
     });
   }
 
   setTitle(newTitle: string): void {
-    this.titleService.setTitle(newTitle + ' - ' + this.getTitle());
-    this.metaService.updateTag({ property: 'og:title', content: newTitle});
-    this.metaService.updateTag({ name: 'twitter:title', content: newTitle});
+    const fullTitle = newTitle + ' - ' + this.getTitle();
+    this.titleService.setTitle(fullTitle);
+    this.metaService.updateTag({ property: 'og:title', content: fullTitle});
+    this.metaService.updateTag({ name: 'twitter:title', content: fullTitle});
     this.metaService.updateTag({ property: 'og:meta:ready', content: 'ready'});
   }
 
@@ -83,7 +85,9 @@ export class SeoService {
   }
 
   updateCanonical(path) {
-    this.canonicalLink.setAttribute('href', 'https://' + this.baseDomain + path);
+    const canonicalUrl = 'https://' + this.baseDomain + path;
+    this.canonicalLink.setAttribute('href', canonicalUrl);
+    this.metaService.updateTag({ property: 'og:url', content: canonicalUrl });
   }
 
   getTitle(): string {
