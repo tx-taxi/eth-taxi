@@ -24,6 +24,7 @@ export class SearchFormComponent implements OnInit {
   readonly sourceChainId = 'ethereum';
   readonly defaultChainIconUrl = 'https://tx.taxi/assets/chains/ethereum.png';
   readonly defaultChainIconAlt = 'Ethereum explorer';
+  readonly defaultSearchPlaceholder = 'Search an Ethereum block, transaction, or address';
   env: Env;
   network = '';
   assets: object = {};
@@ -32,14 +33,15 @@ export class SearchFormComponent implements OnInit {
   isTypeaheading$ = new BehaviorSubject<boolean>(false);
   typeAhead$: Observable<any>;
   explorers$: Observable<TxTaxiExplorer[]>;
-  currentExplorer$: Observable<TxTaxiExplorer | undefined>;
+  selectedChainId$ = new BehaviorSubject<string>(this.sourceChainId);
+  selectedExplorer$: Observable<TxTaxiExplorer | undefined>;
   searchForm: UntypedFormGroup;
   dropdownHidden = false;
   searchError = '';
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event) {
-    if (this.elementRef.nativeElement.contains(event.target)) {
+    if (this.elementRef.nativeElement.contains(event.target) && this.isSourceChainSelected()) {
       this.dropdownHidden = false;
     } else {
       this.dropdownHidden = true;
@@ -76,8 +78,8 @@ export class SearchFormComponent implements OnInit {
     private explorerRegistry: TxTaxiExplorerRegistryService,
   ) {
     this.explorers$ = this.explorerRegistry.explorers$;
-    this.currentExplorer$ = this.explorers$.pipe(
-      map((explorers) => explorers.find((explorer) => explorer.chainId === this.sourceChainId)),
+    this.selectedExplorer$ = combineLatest([this.explorers$, this.selectedChainId$]).pipe(
+      map(([explorers, chainId]) => explorers.find((explorer) => explorer.chainId === chainId)),
     );
   }
 
@@ -127,7 +129,12 @@ export class SearchFormComponent implements OnInit {
       distinctUntilChanged(),
     );
 
-    const searchResults$ = searchText$.pipe(
+    const sourceSearchText$ = combineLatest([searchText$, this.selectedChainId$]).pipe(
+      map(([searchText, chainId]) => chainId === this.sourceChainId ? searchText : ''),
+      distinctUntilChanged(),
+    );
+
+    const searchResults$ = sourceSearchText$.pipe(
       debounceTime(200),
       switchMap((text) => {
         if (!text.length) {
@@ -164,7 +171,7 @@ export class SearchFormComponent implements OnInit {
 
     this.typeAhead$ = combineLatest(
       [
-        searchText$,
+        sourceSearchText$,
         searchResults$.pipe(
         startWith([
           [],
@@ -244,11 +251,32 @@ export class SearchFormComponent implements OnInit {
   }
 
   handleKeyDown($event): void {
-    this.searchResults.handleKeyDown($event);
+    if (this.isSourceChainSelected()) {
+      this.searchResults.handleKeyDown($event);
+    }
   }
 
   trackExplorer(_index: number, explorer: TxTaxiExplorer): string {
     return explorer.chainId;
+  }
+
+  isSelectedExplorer(explorer: TxTaxiExplorer): boolean {
+    return explorer.chainId === this.selectedChainId$.value;
+  }
+
+  isSourceChainSelected(): boolean {
+    return this.selectedChainId$.value === this.sourceChainId;
+  }
+
+  selectExplorer(explorer: TxTaxiExplorer): void {
+    this.selectedChainId$.next(explorer.chainId);
+    this.dropdownHidden = true;
+    this.searchError = '';
+    setTimeout(() => this.dropdownHidden = true);
+  }
+
+  showSourceSuggestions(): void {
+    this.dropdownHidden = !this.isSourceChainSelected();
   }
 
   itemSelected(): void {
@@ -256,6 +284,13 @@ export class SearchFormComponent implements OnInit {
   }
 
   selectedResult(result: any): void {
+    if (!this.isSourceChainSelected()) {
+      if (typeof result === 'string') {
+        this.search(result);
+      }
+      return;
+    }
+
     if (typeof result === 'string') {
       this.search(result);
     } else if (typeof result === 'number' && result <= this.stateService.latestBlockHeight) {
@@ -281,6 +316,11 @@ export class SearchFormComponent implements OnInit {
   search(result?: string): void {
     const searchText = result || this.searchForm.value.searchText.trim();
     if (searchText) {
+      if (!this.isSourceChainSelected()) {
+        this.searchSelectedChain(searchText);
+        return;
+      }
+
       this.isSearching = true;
       this.searchError = '';
 
@@ -329,6 +369,13 @@ export class SearchFormComponent implements OnInit {
         this.showSearchError('Enter an Ethereum address, transaction hash, or block number.');
       }
     }
+  }
+
+  private searchSelectedChain(searchText: string): void {
+    this.isSearching = true;
+    this.searchError = '';
+    this.searchTriggered.emit();
+    window.location.assign(this.explorerRegistry.chainSearchUrl(this.selectedChainId$.value, searchText));
   }
 
   private showSearchError(message: string): void {

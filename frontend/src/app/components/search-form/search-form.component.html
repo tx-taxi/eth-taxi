@@ -3,23 +3,24 @@
     <div class="search-box-container me-2">
       <div class="search-input-row">
         <div ngbDropdown class="search-chain-selector" placement="bottom-start">
-          <button ngbDropdownToggle type="button" class="search-chain-trigger" aria-label="Switch chain explorer" title="Switch chain explorer">
-            <ng-container *ngIf="currentExplorer$ | async as currentExplorer; else defaultChainIcon">
-              <img [src]="currentExplorer.iconUrl" [alt]="currentExplorer.iconAlt">
+          <button ngbDropdownToggle type="button" class="search-chain-trigger" aria-label="Choose search chain" title="Choose search chain">
+            <ng-container *ngIf="selectedExplorer$ | async as selectedExplorer; else defaultChainIcon">
+              <img [src]="selectedExplorer.iconUrl" [alt]="selectedExplorer.iconAlt">
             </ng-container>
             <ng-template #defaultChainIcon>
               <img [src]="defaultChainIconUrl" [alt]="defaultChainIconAlt">
             </ng-template>
           </button>
-          <div ngbDropdownMenu class="search-chain-menu" aria-label="Select chain explorer">
+          <div ngbDropdownMenu class="search-chain-menu" aria-label="Choose search chain">
             <ng-container *ngIf="explorers$ | async as explorers; else explorerRegistryLoading">
-              <a
+              <button
                 *ngFor="let explorer of explorers; trackBy: trackExplorer"
+                type="button"
                 ngbDropdownItem
                 class="search-chain-option"
-                [class.is-current]="explorer.chainId === sourceChainId"
-                [href]="explorer.origin"
-                [attr.aria-current]="explorer.chainId === sourceChainId ? 'page' : null"
+                [class.is-current]="isSelectedExplorer(explorer)"
+                [attr.aria-pressed]="isSelectedExplorer(explorer)"
+                (click)="selectExplorer(explorer)"
               >
                 <img [src]="explorer.iconUrl" alt="">
                 <span class="search-chain-copy">
@@ -30,7 +31,7 @@
                   <span class="search-chain-status-dot" aria-hidden="true"></span>
                   <span>{{ explorer.statusLabel }}</span>
                 </span>
-              </a>
+              </button>
               <span *ngIf="!explorers.length" class="search-chain-message">Explorer registry unavailable</span>
             </ng-container>
             <ng-template #explorerRegistryLoading>
@@ -38,9 +39,9 @@
             </ng-template>
           </div>
         </div>
-        <input #searchInput (focus)="focus$.next($any($event).target.value)" (click)="click$.next($any($event).target.value)" formControlName="searchText" type="text" class="form-control" placeholder="Search an Ethereum block, transaction, or address" aria-label="Search Ethereum" [attr.aria-invalid]="searchError ? 'true' : null" [attr.aria-describedby]="searchError ? 'ethereum-search-error' : null">
+        <input #searchInput (focus)="showSourceSuggestions(); focus$.next($any($event).target.value)" (click)="showSourceSuggestions(); click$.next($any($event).target.value)" formControlName="searchText" type="text" class="form-control" [placeholder]="(selectedExplorer$ | async)?.searchPlaceholder || defaultSearchPlaceholder" [attr.aria-label]="(selectedExplorer$ | async)?.searchPlaceholder || defaultSearchPlaceholder" [attr.aria-invalid]="searchError ? 'true' : null" [attr.aria-describedby]="searchError ? 'ethereum-search-error' : null">
       </div>
-      <app-search-results #searchResults [hidden]="dropdownHidden" [results]="typeAhead$ | async" (selectedResult)="selectedResult($event)"></app-search-results>
+      <app-search-results #searchResults [hidden]="dropdownHidden || !isSourceChainSelected()" [results]="typeAhead$ | async" (selectedResult)="selectedResult($event)"></app-search-results>
       <div *ngIf="searchError" id="ethereum-search-error" class="search-error" role="alert">{{ searchError }}</div>
     </div>
     <div>
