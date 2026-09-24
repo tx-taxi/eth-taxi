@@ -10,54 +10,8 @@
           </div>
         </div>
       </div>
-      <div class="col card-wrapper ethereum-network-card">
-        <div class="main-title">{{ ethereumWidgetMode === 'network' ? 'Ethereum Network' : 'Latest Block Rewards' }}</div>
-        <div class="card">
-          <div class="widget-toggler" role="group" aria-label="Ethereum dashboard panel">
-            <button type="button" class="toggler-option" [class.active]="ethereumWidgetMode === 'network'" [attr.aria-pressed]="ethereumWidgetMode === 'network'" (click)="setEthereumWidgetMode('network')">network</button>
-            <span aria-hidden="true"> | </span>
-            <button type="button" class="toggler-option" [class.active]="ethereumWidgetMode === 'rewards'" [attr.aria-pressed]="ethereumWidgetMode === 'rewards'" (click)="setEthereumWidgetMode('rewards')">rewards</button>
-          </div>
-          <div class="card-body">
-            <div class="mempool-info-data" *ngIf="ethereumWidgetMode === 'network'; else blockRewards">
-              <div class="item">
-                <h5 class="card-title">Consensus</h5>
-                <p class="card-text">Proof of Stake</p>
-              </div>
-              <div class="item">
-                <h5 class="card-title">Slot time</h5>
-                <p class="card-text">~12 seconds</p>
-              </div>
-              <div class="item">
-                <h5 class="card-title">Block gas limit</h5>
-                <p class="card-text">60,000,000 gas</p>
-              </div>
-            </div>
-            <ng-template #blockRewards>
-              <div class="mempool-info-data ethereum-rewards-data" *ngIf="ethereumBlockEconomics$ | async as economics; else loadingBlockRewards">
-                <div class="item">
-                  <h5 class="card-title">Validator reward</h5>
-                  <p class="card-text"><app-amount [satoshis]="economics.validatorReward" digitsInfo="1.2-6" [noFiat]="true"></app-amount><span class="fiat"><app-fiat [value]="economics.validatorReward" digitsInfo="1.0-0"></app-fiat></span></p>
-                </div>
-                <div class="item">
-                  <h5 class="card-title">Total fees</h5>
-                  <p class="card-text"><app-amount [satoshis]="economics.totalFees" digitsInfo="1.2-6" [noFiat]="true"></app-amount><span class="fiat"><app-fiat [value]="economics.totalFees" digitsInfo="1.0-0"></app-fiat></span></p>
-                </div>
-                <div class="item">
-                  <h5 class="card-title">Base fee</h5>
-                  <p class="card-text"><app-fee-rate [fee]="economics.baseFee" [dp]="1"></app-fee-rate></p>
-                </div>
-              </div>
-            </ng-template>
-            <ng-template #loadingBlockRewards>
-              <div class="mempool-info-data ethereum-rewards-data" aria-label="Loading latest block rewards">
-                <div class="item"><h5 class="card-title">Validator reward</h5><span class="skeleton-loader"></span></div>
-                <div class="item"><h5 class="card-title">Total fees</h5><span class="skeleton-loader"></span></div>
-                <div class="item"><h5 class="card-title">Base fee</h5><span class="skeleton-loader"></span></div>
-              </div>
-            </ng-template>
-          </div>
-        </div>
+      <div class="col">
+        <app-difficulty></app-difficulty>
       </div>
     </ng-container>
     <div class="col">

@@ -22,12 +22,6 @@ interface MempoolInfoData {
   progressColor: string;
 }
 
-interface EthereumBlockEconomics {
-  validatorReward: number;
-  totalFees: number;
-  baseFee: number;
-}
-
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -40,7 +34,6 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   mempoolBlocksData$: Observable<MempoolBlocksData>;
   mempoolInfoData$: Observable<MempoolInfoData>;
   mempoolLoadingStatus$: Observable<number>;
-  ethereumBlockEconomics$: Observable<EthereumBlockEconomics | null>;
   vBytesPerSecondLimit = 1667;
   blocks$: Observable<BlockExtended[]>;
   replacements$: Observable<ReplacementInfo[]>;
@@ -81,7 +74,6 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   goggleMode: FilterMode = 'and';
   gradientMode: GradientMode = 'category';
   goggleIndex = 0;
-  ethereumWidgetMode: 'network' | 'rewards' = 'network';
 
   private destroy$ = new Subject();
 
@@ -194,19 +186,6 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
           };
         })
       );
-
-    this.ethereumBlockEconomics$ = this.stateService.blocks$.pipe(
-      map((blocks) => {
-        const block = blocks?.[0];
-        if (!block?.extras) return null;
-        return {
-          validatorReward: block.extras.reward ?? 0,
-          totalFees: block.extras.totalFees ?? 0,
-          baseFee: block.extras.medianFee ?? 0,
-        };
-      }),
-      shareReplay(1),
-    );
 
     this.blocks$ = this.stateService.blocks$
       .pipe(
@@ -396,10 +375,6 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
 
   getArrayFromNumber(num: number): number[] {
     return Array.from({ length: num }, (_, i) => i + 1);
-  }
-
-  setEthereumWidgetMode(mode: 'network' | 'rewards'): void {
-    this.ethereumWidgetMode = mode;
   }
 
   setFilter(index): void {
