@@ -138,7 +138,7 @@ $dropdown-link-active-bg: $active-bg;
   --liquid: #116761;
   --liquidtestnet: #494a4a;
 
-  --mainnet-alt: #9339f4;
+  --mainnet-alt: #4e61c7;
   --testnet-alt: #183550;
   --signet-alt: #471850;
   --regtest-alt: #4a4a4a;
@@ -1700,3 +1700,7 @@ form label:not(.form-check-label):not(.btn) {
 .ngb-dp-header, .ngb-dp-week {
   background-color: var(--bg) !important;
 }
+
+.fiat-color { color: var(--fiat-color, var(--info)); }
+
+:root { --eth-utilization: #b8c2ee; }

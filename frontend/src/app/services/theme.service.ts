@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { defaultMempoolFeeColors, contrastMempoolFeeColors, lightMempoolFeeColors } from '@app/app.constants';
+import { nativeMempoolFeeColors, defaultMempoolFeeColors, contrastMempoolFeeColors, lightMempoolFeeColors } from '@app/app.constants';
 import { StorageService } from '@app/services/storage.service';
 import { StateService } from '@app/services/state.service';
 
@@ -11,7 +11,7 @@ export class ThemeService {
   style: HTMLLinkElement | null = null;
   theme: string = 'default';
   themeState$: BehaviorSubject<{ theme: string; loading: boolean; }>;
-  mempoolFeeColors: string[] = defaultMempoolFeeColors;
+  mempoolFeeColors: string[] = nativeMempoolFeeColors;
   initialLoad: boolean = true;
   private themeLoadVersion = 0;
 
@@ -53,7 +53,7 @@ export class ThemeService {
       if (!this.stateService.env.customize?.theme) {
         this.storageService.setValue('theme-preference', theme);
       }
-      this.mempoolFeeColors = defaultMempoolFeeColors;
+      this.mempoolFeeColors = nativeMempoolFeeColors;
       this.themeState$.next({ theme, loading: false });
       return;
     }

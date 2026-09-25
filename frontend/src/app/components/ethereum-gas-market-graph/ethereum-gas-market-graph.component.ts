@@ -237,13 +237,13 @@ export class EthereumGasMarketGraphComponent implements OnChanges {
           symbolSize: isCurrentSample ? 9 : 4,
           smooth: false,
           lineStyle: {
-            color: '#2ec4b6',
+            color: 'var(--eth-utilization)',
             type: 'dashed',
             width: 2,
           },
-          itemStyle: { color: '#2ec4b6' },
+          itemStyle: { color: 'var(--eth-utilization)' },
           areaStyle: {
-            color: '#2ec4b6',
+            color: 'var(--eth-utilization)',
             opacity: 0.1,
           },
           emphasis: { focus: 'series' },

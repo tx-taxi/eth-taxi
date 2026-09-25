@@ -1,4 +1,4 @@
-import { feeLevels, defaultMempoolFeeColors, contrastMempoolFeeColors } from '@app/app.constants';
+import { feeLevels, nativeMempoolFeeColors, defaultMempoolFeeColors, contrastMempoolFeeColors } from '@app/app.constants';
 import { Color } from '@components/block-overview-graph/sprite-types';
 import TxView from '@components/block-overview-graph/tx-view';
 import { TransactionFlags } from '@app/shared/filters.utils';
@@ -8,6 +8,11 @@ const ethereumCategoryColors = {
   contractCall: hexToColor('2ec4b6'),
   tokenTransfer: hexToColor('f2b84b'),
   fallback: hexToColor('68738d'),
+};
+const nativeCategoryColors = {
+  ...ethereumCategoryColors,
+  contractCall: hexToColor('aab7ff'),
+  tokenTransfer: hexToColor('d9ddeb'),
 };
 
 export function hexToColor(hex: string): Color {
@@ -61,18 +66,19 @@ export function setOpacity(color: Color, opacity: number): Color {
 }
 
 export function ethereumCategoryColorFunction(tx: TxView): Color {
+  const colors = tx.scene?.theme.theme === 'default' ? nativeCategoryColors : ethereumCategoryColors;
   const flags = tx.bigintFlags || 0n;
 
   if ((flags & TransactionFlags.eth_token_transfer) !== 0n) {
-    return ethereumCategoryColors.tokenTransfer;
+    return colors.tokenTransfer;
   }
   if ((flags & TransactionFlags.eth_contract_call) !== 0n) {
-    return ethereumCategoryColors.contractCall;
+    return colors.contractCall;
   }
   if ((flags & TransactionFlags.eth_transfer) !== 0n) {
-    return ethereumCategoryColors.transfer;
+    return colors.transfer;
   }
-  return ethereumCategoryColors.fallback;
+  return colors.fallback;
 }
 
 interface ColorPalette {
@@ -100,6 +106,18 @@ for (const key in defaultColors) {
     audit: defaultColors[key].audit.map(c => setOpacity(c, 0.2)),
     marginal: defaultColors[key].marginal.map(c => setOpacity(c, 0.2)),
     baseLevel: defaultColors[key].baseLevel,
+  };
+}
+
+const nativeColors: { [key: string]: ColorPalette } = {};
+for (const key of ['fee', 'unmatchedfee']) {
+  const base = nativeMempoolFeeColors.map(hexToColor);
+  const opacity = key === 'unmatchedfee' ? 0.2 : 1;
+  nativeColors[key] = {
+    base: base.map(c => setOpacity(c, opacity)),
+    audit: base.map(c => setOpacity(darken(desaturate(c, 0.3), 0.9), opacity)),
+    marginal: base.map(c => setOpacity(darken(desaturate(c, 0.8), 1.1), opacity)),
+    baseLevel: defaultColors.fee.baseLevel,
   };
 }
 
@@ -151,6 +169,10 @@ export function defaultColorFunction(
   auditColors: { [status: string]: Color } = defaultAuditColors,
   relativeTime?: number,
 ): Color {
+  if (tx.scene?.theme.theme === 'default') {
+    if (colors === defaultColors.fee) colors = nativeColors.fee;
+    if (colors === defaultColors.unmatchedfee) colors = nativeColors.unmatchedfee;
+  }
   const rate = tx.fee / tx.vsize; // color by simple single-tx fee rate
   const levelIndex = colors.baseLevel(tx, rate, relativeTime || (Date.now() / 1000));
   const levelColor = colors.base[levelIndex] || colors.base[defaultMempoolFeeColors.length - 1];

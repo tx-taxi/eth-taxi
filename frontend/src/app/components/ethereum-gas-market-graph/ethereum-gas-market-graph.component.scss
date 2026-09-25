@@ -58,7 +58,7 @@
 }
 
 .gas-market__swatch--utilization {
-  border-top: 2px dashed #2ec4b6;
+  border-top: 2px dashed var(--eth-utilization);
 }
 
 .gas-market__chart {
