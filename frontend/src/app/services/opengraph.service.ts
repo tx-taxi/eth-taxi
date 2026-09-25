@@ -22,9 +22,7 @@ export class OpenGraphService {
     private router: Router,
     private activatedRoute: ActivatedRoute,
   ) {
-    // save og:image tag from original template
-    const initialOgImageTag = metaService.getTag('property=\'og:image\'');
-    this.defaultImageUrl = initialOgImageTag?.content || 'https://tx.taxi/assets/og/explorers/ethereum.png';
+    this.defaultImageUrl = 'https://tx.taxi/assets/og/explorers/ethereum.png?v=20260925-brand';
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
       map(() => this.activatedRoute),
@@ -49,26 +47,22 @@ export class OpenGraphService {
   }
 
   setOgImage() {
-    // The inherited /render endpoint is not deployed on this host. Keep a
-    // valid default card until a chain-local renderer returns real images.
+    // Use the native entity renderer, or the chain card for general pages.
     this.clearOgImage();
   }
 
   clearOgImage() {
-    this.metaService.updateTag({ property: 'og:image', content: this.defaultImageUrl });
-    this.metaService.updateTag({ name: 'twitter:image', content: this.defaultImageUrl });
+    const entity = this.router.url.split('?')[0].match(/^\/(tx|block|address|token)\/([^/]+)$/);
+    const image = entity ? `https://eth.tx.taxi/og/${entity[1]}/${entity[2]}.png?v=4` : this.defaultImageUrl;
+    this.metaService.updateTag({ property: 'og:image', content: image });
+    this.metaService.updateTag({ name: 'twitter:image', content: image });
     this.metaService.updateTag({ property: 'og:image:type', content: 'image/png' });
     this.metaService.updateTag({ property: 'og:image:width', content: '1200' });
     this.metaService.updateTag({ property: 'og:image:height', content: '630' });
   }
 
-  setManualOgImage(imageFilename) {
-    const ogImage = `${window.location.protocol}//${window.location.host}/resources/previews/${imageFilename}`;
-    this.metaService.updateTag({ property: 'og:image', content: ogImage });
-    this.metaService.updateTag({ property: 'og:image:type', content: imageFilename.endsWith('.png') ? 'image/png' : 'image/jpeg' });
-    this.metaService.updateTag({ property: 'og:image:width', content: '2000' });
-    this.metaService.updateTag({ property: 'og:image:height', content: '1000' });
-    this.metaService.updateTag({ name: 'twitter:image', content: ogImage });
+  setManualOgImage(_imageFilename) {
+    this.clearOgImage();
   }
 
   /// register an event that needs to resolve before we can take a screenshot

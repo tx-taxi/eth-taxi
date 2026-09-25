@@ -68,7 +68,7 @@ const OG_REQUEST_TIMEOUT_MS = 8_000;
 const OG_IMAGE_WIDTH = 1200;
 const OG_IMAGE_HEIGHT = 630;
 const OG_ORIGIN = 'https://eth.tx.taxi';
-const OG_CARD_VERSION = '3';
+const OG_CARD_VERSION = '4';
 const TRANSACTION_TOKEN_METADATA_LIMIT = 12;
 const ETH_PRICE_API_URL = (process.env.ETH_PRICE_API_URL || 'https://api.coingecko.com/api/v3').replace(/\/$/, '');
 const ETH_COINBASE_API_URL = (process.env.ETH_COINBASE_API_URL || 'https://api.exchange.coinbase.com').replace(/\/$/, '');
@@ -1940,7 +1940,7 @@ function ogInjectDocument(html, metadata) {
 function ogBrandLogo() {
   if (ogBrandLogoDataUri !== undefined) return ogBrandLogoDataUri;
   try {
-    const asset = fsSync.readFileSync(path.join(staticRoot, 'resources', 'branding', 'eth-dark-full.svg'));
+    const asset = fsSync.readFileSync(path.join(staticRoot, 'resources', 'branding', 'eth-dark-navbar.svg'));
     ogBrandLogoDataUri = `data:image/svg+xml;base64,${asset.toString('base64')}`;
   } catch {
     ogBrandLogoDataUri = null;
@@ -1951,9 +1951,9 @@ function ogBrandLogo() {
 function ogImageSvg(entity, metadata, unavailable = false) {
   const brandLogo = ogBrandLogo();
   const brandLogoMarkup = brandLogo
-    ? `<image href="${brandLogo}" x="64" y="20" width="224" height="75" preserveAspectRatio="xMinYMid meet"/>`
+    ? `<image href="${brandLogo}" x="64" y="24" width="290" height="80" preserveAspectRatio="xMinYMid meet"/>`
     : '';
-  const eyebrowX = brandLogo ? 314 : 64;
+  const eyebrowX = brandLogo ? 420 : 64;
   const rows = (unavailable ? [] : entity.rows.filter(([, value]) => value !== null && value !== undefined && value !== '')).slice(0, 8);
   const rowMarkup = rows.map(([label, value], index) => {
     const column = index % 2;
@@ -1964,10 +1964,9 @@ function ogImageSvg(entity, metadata, unavailable = false) {
       `<text x="${x + 14}" y="${y + 19}" fill="#f2f4ff" font-size="20" font-weight="600">${ogEscape(ogShort(value, 32))}</text>`;
   }).join('');
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${OG_IMAGE_WIDTH}" height="${OG_IMAGE_HEIGHT}" viewBox="0 0 ${OG_IMAGE_WIDTH} ${OG_IMAGE_HEIGHT}">
-    <rect width="1200" height="630" fill="#11141f"/><rect width="1200" height="8" fill="#627eea"/>
+    <rect width="1200" height="630" fill="#11141f"/><rect width="1200" height="8" fill="#8c9eff"/>
     ${brandLogoMarkup}
     <text x="${eyebrowX}" y="68" fill="#9eafff" font-family="DejaVu Sans, sans-serif" font-size="22" font-weight="700">ETHEREUM / EXPLORER</text>
-    <text x="950" y="68" fill="#f2f4ff" font-family="DejaVu Sans, sans-serif" font-size="26" font-weight="700">eth.tx.taxi</text>
     <path d="M64 108H1136" stroke="#343a51"/>
     <text x="64" y="190" fill="#f2f4ff" font-family="DejaVu Sans, sans-serif" font-size="52" font-weight="700">${ogEscape(ogShort(entity.heading, 32))}</text>
     <text x="64" y="242" fill="#a8b9ff" font-family="DejaVu Sans Mono, monospace" font-size="24">${ogEscape(ogShort(entity.subtitle, 70))}</text>
