@@ -2,7 +2,7 @@
   <div class="d-flex search-form-row" [style.--search-chain-accent]="(activeTarget$ | async)?.accentColor || defaultChainAccent">
     <div class="search-box-container me-2">
       <div class="search-input-row">
-        <div ngbDropdown class="search-chain-selector" placement="bottom-start">
+        <div ngbDropdown #chainMenu="ngbDropdown" [autoClose]="false" class="search-chain-selector" placement="bottom-start">
           <button ngbDropdownToggle type="button" class="search-chain-trigger" aria-label="Choose search chain" title="Choose search chain">
             <ng-container *ngIf="activeTarget$ | async as activeTarget; else defaultChainIcon">
               <img [src]="activeTarget.iconUrl" [alt]="activeTarget.iconAlt">
