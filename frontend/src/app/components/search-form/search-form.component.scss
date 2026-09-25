@@ -355,3 +355,5 @@ input[aria-invalid='true'] {
   line-height: 1.35;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.32);
 }
+
+.search-chain-option[hidden] { display: none !important; }
