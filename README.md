@@ -1,5 +1,8 @@
 <p align="center">
-  <img src="frontend/src/resources/eth-favicon.svg" width="88" height="88" alt="eth.tx.taxi logo">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="frontend/src/resources/branding/eth-dark-full.svg">
+    <img src="frontend/src/resources/branding/eth-light-full.svg" width="360" alt="eth.tx.taxi banner logo">
+  </picture>
 </p>
 
 <h1 align="center">Ethereum Explorer · eth.tx.taxi</h1>
