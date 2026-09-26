@@ -55,6 +55,25 @@ function createPendingPool(rpcUrl) {
     return reconciling;
   }
 
+  async function removeMinedBlock(hash) {
+    for (let attempt = 0; attempt < 5; attempt++) {
+      try {
+        const block = await rpc('eth_getBlockByHash', [hash, false]);
+        for (const txHash of block.transactions || []) {
+          const normalizedHash = txHash.toLowerCase();
+          confirmed.set(normalizedHash, Date.now());
+          transactions.delete(normalizedHash);
+        }
+        return;
+      } catch {
+        // The head subscription can precede the block's availability on the
+        // HTTP RPC endpoint. Retry before treating this as a provider failure.
+        if (attempt < 4) await new Promise((resolve) => setTimeout(resolve, 500 * (attempt + 1)));
+      }
+    }
+    await reconcile().catch(() => {});
+  }
+
   function connect() {
     socket = new WebSocket(wsUrl);
     socket.on('open', () => {
@@ -71,6 +90,7 @@ function createPendingPool(rpcUrl) {
       if (message.id === 2) headsId = message.result;
       if (subscriptionId && message.params?.subscription === subscriptionId && message.params?.result?.hash) {
         const tx = message.params.result;
+        if (confirmed.has(tx.hash.toLowerCase())) return;
         tx.__receivedAt = Date.now();
         transactions.set(tx.hash.toLowerCase(), tx);
         if (transactions.size > MAX_PENDING) transactions.delete(transactions.keys().next().value);
@@ -78,12 +98,7 @@ function createPendingPool(rpcUrl) {
       }
       if (headsId && message.params?.subscription === headsId && message.params?.result?.hash) {
         lastObservedAt = Date.now();
-        rpc('eth_getBlockByHash', [message.params.result.hash, false]).then((block) => {
-          for (const hash of block.transactions || []) {
-            confirmed.set(hash.toLowerCase(), Date.now());
-            transactions.delete(hash.toLowerCase());
-          }
-        }).catch(() => {});
+        removeMinedBlock(message.params.result.hash).catch(() => {});
       }
     });
     socket.on('error', () => {});
