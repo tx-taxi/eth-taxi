@@ -1,20 +1,6 @@
 :host { display: block; }
 .docs-layout { min-height: 70vh; }
 
-#doc-nav-desktop {
-  width: 300px;
-  margin-top: 0;
-  padding-right: 28px;
-}
-#doc-nav-desktop.relative { float: left; }
-#doc-nav-desktop.fixed {
-  position: fixed;
-  top: 80px;
-  max-height: calc(100vh - 100px);
-  overflow-y: auto;
-  scrollbar-color: var(--secondary) var(--active-bg);
-  scrollbar-width: thin;
-}
 
 .doc-content {
   width: calc(100% - 300px);
@@ -159,4 +145,11 @@ pre code { color: inherit; overflow-wrap: anywhere; }
 
 @media (min-width: 993px) {
   .doc-content { min-height: 620px; }
+}
+
+/* Keep navigation below the shared intro and within the documentation. */
+@media (min-width: 993px) {
+  .docs-layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 10px; align-items: start; }
+  #doc-nav-desktop { position: sticky; top: 80px; max-height: calc(100vh - 100px); overflow-y: auto; scrollbar-color: var(--secondary) var(--active-bg); scrollbar-width: thin; }
+  .doc-content { width: auto; float: none; min-width: 0; }
 }

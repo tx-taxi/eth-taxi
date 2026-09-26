@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, HostListener, Input, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, HostListener, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import {
   EthereumDocEntry,
@@ -14,12 +14,11 @@ import {
   styleUrls: ['./api-docs.component.scss'],
   standalone: false,
 })
-export class ApiDocsComponent implements OnInit, AfterViewInit, OnDestroy {
+export class ApiDocsComponent implements OnInit, AfterViewInit {
   @Input() whichTab: 'faq' | 'rest' | 'websocket';
 
   hostname = `${document.location.protocol}//${document.location.host}`;
   mobileViewport = window.innerWidth <= 992;
-  desktopDocsNavPosition: 'fixed' | 'relative' = 'relative';
   expandedFragments = new Set<string>();
   docs: EthereumDocItem[] = [];
 
@@ -38,11 +37,6 @@ export class ApiDocsComponent implements OnInit, AfterViewInit, OnDestroy {
     if (fragment) {
       setTimeout(() => this.openAndScroll(fragment), 0);
     }
-    window.addEventListener('scroll', this.onDocScroll, { passive: true });
-  }
-
-  ngOnDestroy(): void {
-    window.removeEventListener('scroll', this.onDocScroll);
   }
 
   @HostListener('window:resize')
@@ -50,9 +44,6 @@ export class ApiDocsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.mobileViewport = window.innerWidth <= 992;
   }
 
-  onDocScroll = (): void => {
-    this.desktopDocsNavPosition = window.pageYOffset > 115 ? 'fixed' : 'relative';
-  };
 
   anchorLinkClick(event: { event?: Event; fragment: string }): void {
     event.event?.preventDefault();
