@@ -45,6 +45,8 @@ let activeProvider = providers[0];
 let activeRpcProvider = rpcProviders[0];
 let cachedSnapshot;
 let cachedAt = 0;
+let recentSnapshotBlocks = new Map();
+let snapshotInFlight;
 let mempoolSamples = [];
 let lastBroadcastSignature = '';
 let lastBroadcastAt = 0;
@@ -994,6 +996,7 @@ function mapBlock(block) {
     tx_count: number(block.transactions_count),
     size: number(block.size),
     weight: number(block.gas_used),
+    gasLimit: number(block.gas_limit),
     previousblockhash: block.parent_hash,
     extras: {
       reward,
@@ -1027,6 +1030,7 @@ function mapRpcBlock(block, feeMetrics = null) {
     tx_count: transactionCount,
     size: hexNumber(block?.size),
     weight: hexNumber(block?.gasUsed),
+    gasLimit: hexNumber(block?.gasLimit),
     previousblockhash: block?.parentHash || '',
     extras: {
       reward: wei(validatorRewardWei.toString()),
@@ -1385,6 +1389,17 @@ async function latestBlocks() {
   return blocksEndingAt(hexNumber(await rpcJson('eth_blockNumber', [], { requireResult: true })));
 }
 
+async function contiguousSnapshotBlocks(tipHeight) {
+  const heights = Array.from({ length: 6 }, (_, index) => tipHeight - index).filter((height) => height >= 0);
+  const blocks = await Promise.all(heights.map((height) =>
+    recentSnapshotBlocks.get(height) || blockById(String(height))));
+  if (blocks.some((block, index) => block.height !== heights[index])) {
+    throw new Error('Ethereum block source returned a mismatched height');
+  }
+  recentSnapshotBlocks = new Map(blocks.map((block) => [block.height, block]));
+  return blocks.reverse();
+}
+
 async function blockById(id) {
   try {
     return mapBlock(await providerJson(`/api/v2/blocks/${encodeURIComponent(id)}`));
@@ -1661,13 +1676,14 @@ async function ethereumTokenTransfers(address, searchParams) {
 
 async function blockscoutSnapshot() {
   const observedPool = pendingPool.snapshot();
-  const [blocks, transactions, pending, stats] = await Promise.all([
-    providerJson('/api/v2/blocks'),
+  const [tipHeightHex, transactions, pending, stats] = await Promise.all([
+    rpcJson('eth_blockNumber', [], { requireResult: true }),
     providerJson('/api/v2/main-page/transactions'),
     observedPool ? Promise.resolve(null) : providerJson('/api/v2/transactions?filter=pending'),
     providerJson('/api/v2/stats'),
   ]);
-  const mappedBlocks = blocks.items.slice(0, 6).map(mapBlock).reverse();
+  const mappedBlocks = await contiguousSnapshotBlocks(hexNumber(tipHeightHex));
+  const latestBlock = mappedBlocks.at(-1);
   const pendingItems = observedPool
     ? observedPool.transactions.map((transaction) => mapRpcTransaction(transaction, null, null, 0, true))
     : pending.items || [];
@@ -1678,11 +1694,12 @@ async function blockscoutSnapshot() {
   const fast = number(gasPrices.fast);
   const gasUsed = pendingItems.reduce((sum, item) => sum + number(item.gas_limit || item.gas_used), 0);
   const gasFees = pendingItems.reduce((sum, item) => sum + wei(transactionFeeParts(item).totalFeeWei), 0);
-  const blockGasLimit = number(blocks.items[0]?.gas_limit, 60_000_000);
-  const projectedBlocks = projectedPendingBlocks(pendingItems, blockGasLimit, average, number(blocks.items[0]?.base_fee_per_gas));
+  const blockGasLimit = latestBlock?.gasLimit || 60_000_000;
+  const baseFeeWei = latestBlock?.extras?.medianFee || 0;
+  const projectedBlocks = projectedPendingBlocks(pendingItems, blockGasLimit, average, baseFeeWei);
   const projectedGas = projectedBlocks.reduce((sum, block) => sum + block.blockSize, 0);
   const liveMempoolSample = sampleMempool(pendingItems, gasUsed, gasFees, {
-    baseFeeGwei: gwei(blocks.items[0]?.base_fee_per_gas),
+    baseFeeGwei: gwei(baseFeeWei),
     networkUtilization: number(stats.network_utilization_percentage),
     slow,
     average,
@@ -1795,11 +1812,16 @@ async function rpcSnapshot() {
 
 async function snapshot(force = false) {
   if (!force && cachedSnapshot && Date.now() - cachedAt < 4_000) return cachedSnapshot;
-  try {
-    return await blockscoutSnapshot();
-  } catch {
-    return rpcSnapshot();
-  }
+  if (snapshotInFlight) return snapshotInFlight;
+  snapshotInFlight = (async () => {
+    try {
+      return await blockscoutSnapshot();
+    } catch {
+      return rpcSnapshot();
+    }
+  })();
+  try { return await snapshotInFlight; }
+  finally { snapshotInFlight = null; }
 }
 
 function respond(res, status, value) {
