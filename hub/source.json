@@ -1,0 +1,7 @@
+{
+  "commit": "dfe5b38130078db146494dda4fca72741d77bc3c",
+  "repository": "tx-taxi/eth-taxi",
+  "approval": "explorer-kit verified shared palette/promotion rollout 2026-09-24",
+  "formattingBaseline": "81aa2425d2037767665bf48fc1dca04bea026b00",
+  "formattingReconciliation": "2026-09-26: preserve deployed native source and approved extraction wrapper; compact display only, exact overlay tooltips, DOGE consistent ETA/count. Generated provenance records actual build commit and source hashes."
+}

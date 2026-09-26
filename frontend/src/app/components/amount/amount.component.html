@@ -1,3 +1,10 @@
+@if (compactBlock) {
+  @if ((viewAmountMode$ | async) === 'btc' || (viewAmountMode$ | async) === 'fiat' || ignoreViewMode) {
+    {{ compactBlockAmount(satoshis) }} <span class="symbol" [style]="unitStyle">ETH</span>
+  } @else {
+    {{ compactBlockAmount(satoshis, true) }} <span class="symbol" [style]="unitStyle">wei</span>
+  }
+} @else {
 <ng-container *ngIf="!noFiat && ignoreViewMode === false && (viewAmountMode$ | async) === 'fiat' && (conversions$ | async) as conversions; else viewFiatVin">
   <span class="fiat" *ngIf="blockConversion; else noblockconversion">
     {{ addPlus && satoshis >= 0 ? '+' : '' }}{{
@@ -46,3 +53,5 @@
   <ng-template [ngIf]="network === 'testnet4'">t</ng-template>
   <ng-template [ngIf]="network === 'signet'">s</ng-template>
 </ng-template>
+
+}

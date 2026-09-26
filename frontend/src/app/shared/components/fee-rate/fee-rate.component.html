@@ -1,6 +1,6 @@
 <ng-container *ngIf="rateUnits$ | async as units">
   <ng-container *ngIf="fee !== undefined; else noFee">
-    <ng-container>{{ fee / (weight / 4) / 1000000000 | feeRounding:rounding:dp }} <span *ngIf="showUnit" [class]="unitClass" [style]="unitStyle">gwei</span></ng-container>
+    <ng-container>{{ compactBlock ? compactBlockNumber(fee / (weight / 4) / 1000000000) : (fee / (weight / 4) / 1000000000 | feeRounding:rounding:dp) }} <span *ngIf="showUnit" [class]="unitClass" [style]="unitStyle">gwei</span></ng-container>
   </ng-container>
   <ng-template #noFee>
       <ng-container>- <span *ngIf="showUnit" [class]="unitClass" [style]="unitStyle">gwei</span></ng-container>
