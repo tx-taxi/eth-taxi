@@ -111,7 +111,7 @@ export const TransactionFilters: { [key: string]: Filter } = {
     annex: { key: 'annex', label: 'Annex', flag: TransactionFlags.annex, important: false, tooltip: true, txPage: true,},
     eth_transfer: { key: 'eth_transfer', label: 'ETH transfer', flag: TransactionFlags.eth_transfer, important: true, tooltip: true, txPage: true },
     eth_contract_call: { key: 'eth_contract_call', label: 'Contract call', flag: TransactionFlags.eth_contract_call, important: true, tooltip: true, txPage: true },
-    eth_token_transfer: { key: 'eth_token_transfer', label: 'Token transfer', flag: TransactionFlags.eth_token_transfer, important: true, tooltip: true, txPage: true },
+    eth_token_transfer: { key: 'eth_token_transfer', label: 'Token transfer / call', flag: TransactionFlags.eth_token_transfer, important: true, tooltip: true, txPage: true },
     /* heuristics */
     coinjoin: { key: 'coinjoin', label: $localize`Coinjoin`, flag: TransactionFlags.coinjoin, important: true, tooltip: true, txPage: true, },
     consolidation: { key: 'consolidation', label: $localize`Consolidation`, flag: TransactionFlags.consolidation, tooltip: true, txPage: true, },

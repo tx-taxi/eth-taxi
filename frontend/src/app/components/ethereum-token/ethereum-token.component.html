@@ -77,7 +77,7 @@
 
     <section class="token-transfers" aria-labelledby="token-transfers-heading">
       <div class="section-heading">
-        <h2 id="token-transfers-heading">{{ transfers.length && (transfersRecentOnly || transfersUnavailable) ? 'Recent transfer sample' : 'Transfer history' }}</h2>
+        <h2 id="token-transfers-heading">{{ transfers.length && (transfersRecentOnly || transfersUnavailable) ? 'Recent transfer sample' : nextPageParams ? 'Recent transfers' : 'Transfer history' }}</h2>
         <span>{{ transfers.length }} shown</span>
       </div>
 
@@ -135,6 +135,10 @@
         >
           {{ showAllTransfers ? 'Show fewer transfers' : 'Show ' + hiddenTransferCount + ' more transfers' }}
         </button>
+        <button *ngIf="nextPageParams" type="button" class="transfer-list__toggle" [disabled]="loadingMore" (click)="loadMoreTransfers()">
+          {{ loadingMore ? 'Loading older transfers...' : 'Load older transfers' }}
+        </button>
+        <span *ngIf="loadMoreError" role="alert">Older transfers could not be loaded. Try again.</span>
       </div>
 
       <ng-template #noTransfers>

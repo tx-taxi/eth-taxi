@@ -1,0 +1,17 @@
+# Ethereum transaction-data audit — 2026-09-26
+
+The first release, `3c1514fe3`, was observed in the ETH production container and public API before this audit. Its pending tiles use a node-local PublicNode sample and estimated execution fees. The second set of changes below was checked locally before release; production status is tracked separately.
+
+| Surface | Observed issue or check | Local verification |
+| --- | --- | --- |
+| Native ETH transfer | Value, actual fee, gas used, and status were compared with Blockscout transaction `0x4f3d55456ef15316d6f53296d408543d83a4abf049a579c6a3a741c9b31aa3d0`. | Exact raw values matched. |
+| Failed transaction | Compared transaction `0xa7799a6cddd84122d63b5f96fa3405256246bb2e338de8c886160646e2561fac`. | Error status, actual fee, and gas used matched. |
+| ERC-20 transfers | USDT `0x7f7fed9bb67e3dae251051025a8cf8b5030370f42778624588ce1cf20e53b7ce`, USDC `0xc752363af0d61742a46ac82fb9e6f15fd9eb67f272a5e6059ce568ce7fc58312`, DAI `0x2f87d177ea0d5626f367f70aaa5003ddba0c0c2572d8550f4a881b96aed73009`, and WETH `0x7163c776cf858d097746a2f0584f1151d7b15007b9915cdbde0c9ce05b90fbc1`. | Raw values, decimals, counts, transaction fees and status matched Blockscout. RPC-only fallback also reproduced the USDT raw amount and six decimals. |
+| ERC-721 transfer | BAYC transaction `0xa92a3dae2dfc52420bc73366a279ad868a7fda5fc352c1152311afdf48be4573` had shown `0` and no ID because Blockscout nests `token_id` in `total`. | Local API and browser now show quantity `1`, BAYC `#5122`. |
+| ERC-1155 transfer | An OpenSea Shared Storefront sample had the same nested-ID defect. | Local indexed and forced RPC-only transaction routes both showed its token ID and quantity `1`; single and batch receipt decoding have focused tests. |
+| Pending direct token calls | Pending USDC and USDT `transfer` calldata had only `contract_call` flags and no token amount in detail. | Local pending USDC detail showed a **Proposed** token intent with decoded amount and recipient; `tokenTransfers` stayed empty until confirmation. Pending tile payload included token-call flags. |
+| Token history | The token page exposed only the first 50 indexed transfers while calling it “Transfer history.” | Browser showed “Recent transfers,” loaded the next page on demand, and advanced from 50 to 100 shown without page errors. |
+
+The pending filter matches ABI-shaped direct transfer calls; it does not assert that a call will succeed. Router and contract-internal transfers cannot be known from calldata alone and are identified from emitted logs after confirmation. PublicNode supplies a node-local pending pool, not a network-wide mempool. RPC-only token-history fallback is a bounded recent sample; it is labeled as such. These limitations remain unresolved source constraints, not verified full coverage.
+
+Behavioral checks: `node --test adapter/token-transfer-intent.test.cjs adapter/project-pending-blocks.test.cjs`, production frontend build with `SKIP_SYNC=1`, forced RPC-only USDT/ERC-1155 transaction probes, and local browser checks for NFT/pending-token rendering and token-history pagination. Protocol references: [ERC-20](https://eips.ethereum.org/EIPS/eip-20), [ERC-721](https://eips.ethereum.org/EIPS/eip-721), [ERC-1155](https://eips.ethereum.org/EIPS/eip-1155), [ERC-165](https://eips.ethereum.org/EIPS/eip-165), and [Geth pending subscriptions](https://geth.ethereum.org/docs/interacting-with-geth/rpc/pubsub).

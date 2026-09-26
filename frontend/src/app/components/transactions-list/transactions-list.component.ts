@@ -19,6 +19,7 @@ import { processInputSignatures, Sighash, SigInfo, SighashLabels, parseTaproot }
 import { ActivatedRoute } from '@angular/router';
 import { SighashFlag } from '@app/shared/transaction.utils';
 import { EthereumTokenTransfer } from '@interfaces/ethereum-api.interface';
+import { TransactionFlags } from '@app/shared/filters.utils';
 
 @Component({
   selector: 'app-transactions-list',
@@ -223,6 +224,11 @@ export class TransactionsListComponent implements OnInit, OnChanges, OnDestroy {
   ethereumTransferLabel(transfer: EthereumTokenTransfer): string {
     const amount = this.formatEthereumTransferAmount(transfer);
     if (amount === 'Unavailable') return amount;
+    if (transfer.token.type === 'ERC-721' || transfer.token.type === 'ERC-1155') {
+      const id = transfer.tokenId;
+      const shortId = id && id.length > 16 ? `${id.slice(0, 6)}…${id.slice(-6)}` : id;
+      return `${amount} ${transfer.token.symbol || 'token'}${shortId ? ` #${shortId}` : ''}`;
+    }
     if (this.parseEthereumDecimals(transfer.token.decimals) === null) {
       return `${amount} raw units`;
     }
@@ -232,6 +238,9 @@ export class TransactionsListComponent implements OnInit, OnChanges, OnDestroy {
   ethereumTransferTitle(transfer: EthereumTokenTransfer): string {
     const normalizedValue = this.normalizeEthereumInteger(transfer.value);
     if (normalizedValue === null) return 'Unavailable';
+    if (transfer.token.type === 'ERC-721' || transfer.token.type === 'ERC-1155') {
+      return `${this.groupEthereumInteger(normalizedValue)} ${transfer.token.symbol || 'token'}${transfer.tokenId ? ` #${transfer.tokenId}` : ''}`;
+    }
     if (this.parseEthereumDecimals(transfer.token.decimals) === null) {
       return `${this.groupEthereumInteger(normalizedValue)} raw units`;
     }
@@ -240,6 +249,9 @@ export class TransactionsListComponent implements OnInit, OnChanges, OnDestroy {
 
   ethereumListSummary(tx: Transaction): string | null {
     const ethereum = tx.ethereum;
+    if (!ethereum && !tx.status?.confirmed && tx.flags && (BigInt(tx.flags) & TransactionFlags.eth_token_transfer)) {
+      return 'Token transfer call';
+    }
     if (!ethereum || ethereum.valueWei !== '0') {
       return null;
     }

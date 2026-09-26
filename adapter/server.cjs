@@ -11,6 +11,7 @@ const sharp = require('sharp');
 const { WebSocketServer } = require('ws');
 const {createPendingPool} = require('./pending-pool.cjs');
 const {pendingExecutionRate, projectPendingBlocks} = require('./project-pending-blocks.cjs');
+const {ERC1155_TRANSFER_TOPICS, decodeErc1155Log, decodeTokenTransferIntent, isDirectTokenTransferCall, tokenTransferAmount} = require('./token-transfer-intent.cjs');
 
 const host = process.env.ETH_ADAPTER_HOST || '0.0.0.0';
 const port = Number(process.env.PORT || 8080);
@@ -478,6 +479,7 @@ function mapEthereumIdentity(entity, fallbackAddress = '') {
 
 function mapEthereumTokenTransfer(transfer) {
   const token = mapEthereumToken(transfer?.token, transfer?.token?.address_hash || '');
+  const amount = tokenTransferAmount(transfer);
   return {
     transactionHash: nullableString(transfer?.transaction_hash) || '',
     logIndex: nullableString(transfer?.log_index),
@@ -501,8 +503,8 @@ function mapEthereumTokenTransfer(transfer) {
       reputation: null,
       palette: paletteFromToken(null, transfer?.token?.address_hash || ''),
     },
-    tokenId: nullableString(transfer?.token_id),
-    value: decimalString(transfer?.total?.value ?? transfer?.value),
+    tokenId: amount.tokenId,
+    value: amount.value === null ? null : decimalString(amount.value),
     type: nullableString(transfer?.type) || 'token_transfer',
     method: nullableString(transfer?.method),
   };
@@ -576,6 +578,7 @@ function mapEthereumTransactionMetadata(tx, blockHash) {
     input: nullableString(tx.raw_input) || '0x',
     decodedInput: mapDecodedInput(tx.decoded_input),
     tokenTransfers: (Array.isArray(tx.token_transfers) ? tx.token_transfers : []).map(mapEthereumTokenTransfer),
+    pendingTokenIntents: [],
     tokenTransfersOverflow: Boolean(tx.token_transfers_overflow),
     revertReason: mapRevertReason(tx.revert_reason),
     hasError: Boolean(tx.has_error || tx.has_error_in_internal_transactions || tx.status === 'error' || tx.result === 'error'),
@@ -677,23 +680,34 @@ function rpcTopicAddress(topic) {
 
 function rpcTokenTransfers(receipt, blockTimestamp) {
   if (!receipt || !Array.isArray(receipt.logs)) return [];
-  return receipt.logs
-    .filter((log) => String(log?.topics?.[0] || '').toLowerCase() === ERC20_TRANSFER_TOPIC && log.topics.length >= 3)
-    .map((log) => {
+  return receipt.logs.flatMap((log) => {
+    if (String(log?.topics?.[0] || '').toLowerCase() === ERC20_TRANSFER_TOPIC && log.topics.length >= 3) {
       const isNft = log.topics.length >= 4;
-      return {
+      return [{
         transaction_hash: receipt.transactionHash,
         log_index: hexDecimalString(log.logIndex),
         block_number: hexDecimalString(receipt.blockNumber),
         timestamp: blockTimestamp,
         from: rpcIdentity(rpcTopicAddress(log.topics[1])),
         to: rpcIdentity(rpcTopicAddress(log.topics[2])),
-        token: { address_hash: log.address },
+        token: { address_hash: log.address, type: isNft ? 'ERC-721' : 'ERC-20' },
         token_id: isNft ? hexDecimalString(log.topics[3]) : null,
         total: { value: isNft ? '1' : hexDecimalString(log.data) },
         type: isNft ? 'ERC-721' : 'ERC-20',
-      };
-    });
+      }];
+    }
+    return decodeErc1155Log(log).map((transfer) => ({
+      transaction_hash: receipt.transactionHash,
+      log_index: hexDecimalString(log.logIndex),
+      block_number: hexDecimalString(receipt.blockNumber),
+      timestamp: blockTimestamp,
+      from: rpcIdentity(transfer.from),
+      to: rpcIdentity(transfer.to),
+      token: {address_hash: log.address, type: 'ERC-1155'},
+      total: {token_id: transfer.tokenId, value: transfer.value},
+      type: 'ERC-1155',
+    }));
+  });
 }
 
 function decodeRpcAbiString(value) {
@@ -714,37 +728,26 @@ function decodeRpcAbiString(value) {
 
 async function rpcTokenMetadata(address) {
   const call = (data) => rpcJson('eth_call', [{ to: address, data }, 'latest'], { requireResult: true });
-  const [nameResult, symbolResult, decimalsResult, totalSupplyResult] = await Promise.all([
+  const supports = (id) => call(`0x01ffc9a7${id.padEnd(64, '0')}`)
+    .then((result) => hexBigInt(result) === 1n)
+    .catch(() => false);
+  const [nameResult, symbolResult, decimalsResult, totalSupplyResult, erc721, erc1155] = await Promise.all([
     call('0x06fdde03').catch(() => null),
     call('0x95d89b41').catch(() => null),
     call('0x313ce567').catch(() => null),
     call('0x18160ddd').catch(() => null),
+    supports('80ac58cd'),
+    supports('d9b67a26'),
   ]);
+  const symbol = decodeRpcAbiString(symbolResult);
   return mapEthereumToken({
     address_hash: address,
     name: decodeRpcAbiString(nameResult),
-    symbol: decodeRpcAbiString(symbolResult),
-    type: 'ERC-20',
+    symbol,
+    type: erc1155 ? 'ERC-1155' : erc721 ? 'ERC-721' : symbol || decimalsResult ? 'ERC-20' : 'Token',
     decimals: decimalsResult ? hexDecimalString(decimalsResult) : null,
     total_supply: totalSupplyResult ? hexDecimalString(totalSupplyResult) : null,
   }, address);
-}
-
-function mapRpcTokenTransfer(log, token) {
-  const isNft = log?.topics?.length >= 4;
-  return {
-    transactionHash: log?.transactionHash || '',
-    logIndex: hexDecimalString(log?.logIndex),
-    blockNumber: hexDecimalString(log?.blockNumber),
-    timestamp: null,
-    from: mapEthereumIdentity(rpcIdentity(rpcTopicAddress(log?.topics?.[1]))),
-    to: mapEthereumIdentity(rpcIdentity(rpcTopicAddress(log?.topics?.[2]))),
-    token,
-    tokenId: isNft ? hexDecimalString(log.topics[3]) : null,
-    value: isNft ? '1' : hexDecimalString(log?.data),
-    type: isNft ? 'ERC-721' : 'ERC-20',
-    method: null,
-  };
 }
 
 async function rpcRecentTokenTransfers(address, searchParams) {
@@ -758,12 +761,14 @@ async function rpcRecentTokenTransfers(address, searchParams) {
     address,
     fromBlock: `0x${from.toString(16)}`,
     toBlock: 'latest',
-    topics: [ERC20_TRANSFER_TOPIC],
+    topics: [token.type === 'ERC-1155' ? ERC1155_TRANSFER_TOPICS : ERC20_TRANSFER_TOPIC],
   }], { requireResult: true });
   const requestedCount = number(searchParams.get('items_count'), RPC_TOKEN_TRANSFER_LIMIT);
   const limit = Math.min(Math.max(requestedCount, 1), RPC_TOKEN_TRANSFER_LIMIT);
   return {
-    items: (Array.isArray(logs) ? logs : []).slice(-limit).reverse().map((log) => mapRpcTokenTransfer(log, token)),
+    items: (Array.isArray(logs) ? logs : []).slice(-limit).reverse().flatMap((log) =>
+      rpcTokenTransfers({transactionHash: log.transactionHash, blockNumber: log.blockNumber, logs: [log]}, null)
+        .map((transfer) => ({...mapEthereumTokenTransfer(transfer), token}))),
     nextPageParams: null,
     historyUnavailable: true,
     recentOnly: true,
@@ -1086,7 +1091,8 @@ function mapTransaction(tx) {
   let flags = 0;
   if (types.has('coin_transfer')) flags += ETHEREUM_TRANSACTION_FLAGS.transfer;
   if (types.has('contract_call')) flags += ETHEREUM_TRANSACTION_FLAGS.contractCall;
-  if (types.has('token_transfer') || (tx.token_transfers?.length ?? 0) > 0) flags += ETHEREUM_TRANSACTION_FLAGS.tokenTransfer;
+  if (types.has('token_transfer') || (tx.token_transfers?.length ?? 0) > 0
+    || (!tx.block_number && isDirectTokenTransferCall(tx.raw_input, tx.to?.hash))) flags += ETHEREUM_TRANSACTION_FLAGS.tokenTransfer;
   return {
     txid: tx.hash,
     fee: wei(fee.totalFeeWei),
@@ -1584,7 +1590,9 @@ async function cachedEthereumTokenMetadata(address) {
 
 function tokenTransferKey(transfer) {
   const logIndex = transfer?.logIndex;
-  if (logIndex !== undefined && logIndex !== null && logIndex !== '') return `log:${logIndex}`;
+  if (logIndex !== undefined && logIndex !== null && logIndex !== '') {
+    return `log:${logIndex}:${transfer?.token?.address?.toLowerCase() || ''}:${transfer?.tokenId || ''}:${transfer?.value || ''}`;
+  }
   return [
     transfer?.token?.address?.toLowerCase() || '',
     transfer?.from?.address?.toLowerCase() || '',
@@ -1625,6 +1633,29 @@ async function hydrateOverflowedTokenTransfers(transaction) {
 
 async function hydrateTransactionTokenMetadata(transaction) {
   await hydrateOverflowedTokenTransfers(transaction);
+  const ethereum = transaction?.ethereum;
+  if (ethereum && !transaction.status?.confirmed
+    && isDirectTokenTransferCall(ethereum.input, ethereum.to?.address)) {
+    const token = await cachedEthereumTokenMetadata(ethereum.to.address);
+    if (token && (token.symbol || token.decimals !== null && token.decimals !== undefined || token.type === 'ERC-721' || token.type === 'ERC-1155')) {
+      const intent = decodeTokenTransferIntent(ethereum.input, ethereum.from?.address, token.address, token.type);
+      if (intent) {
+        ethereum.pendingTokenIntents = [{
+          transactionHash: transaction.txid,
+          logIndex: null,
+          blockNumber: null,
+          timestamp: null,
+          from: mapEthereumIdentity({hash: intent.from}),
+          to: mapEthereumIdentity({hash: intent.to}),
+          token,
+          tokenId: intent.tokenId,
+          value: intent.value,
+          type: 'pending_intent',
+          method: ethereum.method,
+        }];
+      }
+    }
+  }
   const transfers = transaction?.ethereum?.tokenTransfers || [];
   const addresses = new Set();
   for (const transfer of transfers) {
@@ -1673,9 +1704,8 @@ async function ethereumTokenTransfers(address, searchParams) {
 
 async function blockscoutSnapshot() {
   const observedPool = pendingPool.snapshot();
-  const [tipHeightHex, transactions, pending, stats] = await Promise.all([
+  const [tipHeightHex, pending, stats] = await Promise.all([
     rpcJson('eth_blockNumber', [], { requireResult: true }),
-    providerJson('/api/v2/main-page/transactions'),
     observedPool ? Promise.resolve(null) : providerJson('/api/v2/transactions?filter=pending'),
     providerJson('/api/v2/stats'),
   ]);

@@ -40,7 +40,7 @@ export interface EthereumTokenTransfer {
   to?: EthereumIdentity | null;
   token: EthereumToken;
   tokenId?: string | null;
-  value: string;
+  value: string | null;
   type: string;
   method?: string | null;
 }
@@ -92,6 +92,7 @@ export interface EthereumTransactionMetadata {
   input: string;
   decodedInput?: EthereumDecodedInput | null;
   tokenTransfers: EthereumTokenTransfer[];
+  pendingTokenIntents?: EthereumTokenTransfer[];
   tokenTransfersOverflow: boolean;
   revertReason?: string | null;
   hasError: boolean;

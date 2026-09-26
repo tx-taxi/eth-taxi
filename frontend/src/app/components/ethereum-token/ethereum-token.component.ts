@@ -6,6 +6,7 @@ import { catchError } from 'rxjs/operators';
 import { EthereumIdentityEntity } from '@components/ethereum-identity/ethereum-identity.component';
 import {
   EthereumIdentity,
+  EthereumPaginationParams,
   EthereumToken,
   EthereumTokenTransfer,
 } from '@interfaces/ethereum-api.interface';
@@ -32,11 +33,15 @@ export class EthereumTokenComponent implements OnInit, OnDestroy {
   errorMessage = '';
   transfersUnavailable = false;
   transfersRecentOnly = false;
+  nextPageParams: EthereumPaginationParams | null = null;
+  loadingMore = false;
+  loadMoreError = false;
   showAllTransfers = false;
   logoFailed = false;
 
   private routeSubscription?: Subscription;
   private loadSubscription?: Subscription;
+  private loadMoreSubscription?: Subscription;
 
   constructor(
     private route: ActivatedRoute,
@@ -54,6 +59,7 @@ export class EthereumTokenComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.routeSubscription?.unsubscribe();
     this.loadSubscription?.unsubscribe();
+    this.loadMoreSubscription?.unsubscribe();
   }
 
   retry(): void {
@@ -78,11 +84,16 @@ export class EthereumTokenComponent implements OnInit, OnDestroy {
   }
 
   transferExactAmount(transfer: EthereumTokenTransfer): string {
-    return this.formatUnits(transfer.value, this.transferDecimals(transfer));
+    const amount = this.formatUnits(transfer.value, this.transferDecimals(transfer));
+    const symbol = transfer.token.symbol?.trim() || this.token?.symbol?.trim() || 'tokens';
+    return transfer.tokenId ? `${amount} ${symbol} #${transfer.tokenId}` : `${amount} ${symbol}`;
   }
 
   transferSymbol(transfer: EthereumTokenTransfer): string {
-    return transfer.token.symbol?.trim() || this.token?.symbol?.trim() || 'tokens';
+    const symbol = transfer.token.symbol?.trim() || this.token?.symbol?.trim() || 'tokens';
+    const id = transfer.tokenId;
+    if (!id) return symbol;
+    return `${symbol} #${id.length > 16 ? `${id.slice(0, 6)}…${id.slice(-6)}` : id}`;
   }
 
   formatSupply(value: string | null | undefined): string {
@@ -148,13 +159,44 @@ export class EthereumTokenComponent implements OnInit, OnDestroy {
     this.showAllTransfers = !this.showAllTransfers;
   }
 
+  loadMoreTransfers(): void {
+    if (!this.nextPageParams || this.loadingMore) return;
+    this.loadingMore = true;
+    this.loadMoreError = false;
+    const address = this.tokenAddress;
+    this.loadMoreSubscription = this.ethereumApiService.getTokenTransfers$(address, this.nextPageParams).subscribe({
+      next: (page) => {
+        const seen = new Set(this.transfers.map(({transfer}) => `${transfer.transactionHash}:${transfer.logIndex}`));
+        const older = page.items.filter((transfer) => !seen.has(`${transfer.transactionHash}:${transfer.logIndex}`));
+        this.transfers.push(...older.map((transfer) => ({
+          transfer,
+          from: this.toIdentityEntity(transfer.from),
+          to: transfer.to ? this.toIdentityEntity(transfer.to) : null,
+        })));
+        this.nextPageParams = page.nextPageParams || null;
+        this.showAllTransfers = true;
+        this.loadingMore = false;
+        this.changeDetectorRef.markForCheck();
+      },
+      error: () => {
+        this.loadingMore = false;
+        this.loadMoreError = true;
+        this.changeDetectorRef.markForCheck();
+      },
+    });
+  }
+
   private loadToken(): void {
     this.loadSubscription?.unsubscribe();
+    this.loadMoreSubscription?.unsubscribe();
     this.token = null;
     this.transfers = [];
     this.errorMessage = '';
     this.transfersUnavailable = false;
     this.transfersRecentOnly = false;
+    this.nextPageParams = null;
+    this.loadingMore = false;
+    this.loadMoreError = false;
     this.showAllTransfers = false;
     this.logoFailed = false;
 
@@ -185,6 +227,7 @@ export class EthereumTokenComponent implements OnInit, OnDestroy {
         this.token = token;
         this.transfersUnavailable = this.transfersUnavailable || transfers.historyUnavailable === true || token.historyUnavailable === true;
         this.transfersRecentOnly = transfers.recentOnly === true || token.recentOnly === true;
+        this.nextPageParams = transfers.nextPageParams || null;
         this.transfers = transfers.items.map((transfer) => ({
           transfer,
           from: this.toIdentityEntity(transfer.from),

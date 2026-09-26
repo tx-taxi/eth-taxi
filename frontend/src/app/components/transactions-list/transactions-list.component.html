@@ -412,7 +412,7 @@
                     </ng-template>
                   </ng-template>
                   <ng-template #defaultOutput>
-                    <ng-container *ngIf="tx.ethereum?.tokenTransfers?.[0] as transfer; else nativeAmount">
+                    <ng-container *ngIf="tx.ethereum?.tokenTransfers?.[0] as transfer; else pendingTokenIntentAmount">
                       <span class="ethereum-list-token-amount" [title]="ethereumTransferTitle(transfer)">
                         {{ ethereumTransferLabel(transfer) }}
                       </span>
@@ -420,6 +420,13 @@
                         +{{ tx.ethereum.tokenTransfers.length - 1 }} {{ tx.ethereum.tokenTransfers.length === 2 ? 'transfer' : 'transfers' }}
                       </span>
                     </ng-container>
+                    <ng-template #pendingTokenIntentAmount>
+                      <ng-container *ngIf="tx.ethereum?.pendingTokenIntents?.[0] as intent; else nativeAmount">
+                        <span class="ethereum-list-token-amount" [title]="'Proposed call: ' + ethereumTransferTitle(intent)">
+                          Proposed {{ ethereumTransferLabel(intent) }}
+                        </span>
+                      </ng-container>
+                    </ng-template>
                     <ng-template #nativeAmount>
                       <ng-container *ngIf="ethereumListSummary(tx) as activity; else nativeEthAmount">
                         <span class="ethereum-list-activity">{{ activity }}</span>
