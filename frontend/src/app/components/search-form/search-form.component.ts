@@ -62,7 +62,7 @@ export class SearchFormComponent implements OnInit {
   dropdownHidden = false;
   searchError = '';
   private explorers: TxTaxiExplorer[] = [];
-  private manualChainId = this.sourceChainId;
+  private manualChainId: string | undefined = this.sourceChainId;
   private manualOverrideSearchText: string | undefined;
   private manualOverrideTarget: SearchTarget | undefined;
   private searchOptions: TxTaxiSearchOptions | undefined;
@@ -352,6 +352,19 @@ export class SearchFormComponent implements OnInit {
     return this.selectedChainId$.value === this.sourceChainId;
   }
 
+  isAutomaticRoutingSelected(): boolean {
+    return this.manualChainId === undefined && !this.currentManualTarget();
+  }
+
+  selectAutomaticRouting(): void {
+    this.manualChainId = undefined;
+    this.manualOverrideSearchText = undefined;
+    this.manualOverrideTarget = undefined;
+    this.updateActiveTarget();
+    this.dropdownHidden = true;
+    setTimeout(() => this.dropdownHidden = true);
+  }
+
   selectExplorer(explorer: TxTaxiExplorer): void {
     this.manualChainId = explorer.chainId;
     this.manualOverrideSearchText = this.currentSearchText();
@@ -602,6 +615,7 @@ export class SearchFormComponent implements OnInit {
   }
 
   private defaultSearchTarget(): SearchTarget {
+    if (this.manualChainId === undefined) return this.routerSearchTarget;
     const explorer = this.explorers.find((candidate) => candidate.chainId === this.manualChainId);
     return explorer ? this.targetForExplorer(explorer) : {
       kind: 'explorer',

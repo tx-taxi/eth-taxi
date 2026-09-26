@@ -357,3 +357,8 @@ input[aria-invalid='true'] {
 }
 
 .search-chain-option[hidden] { display: none !important; }
+
+// Keep the full routing label readable beside the hub actions.
+.search-chain-automatic .search-chain-name {
+  white-space: normal;
+}
