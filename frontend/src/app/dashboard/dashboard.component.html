@@ -273,7 +273,7 @@
       </div>
     </div>
     <div class="item">
-      <h5 class="card-title">Fee ceilings</h5>
+      <h5 class="card-title">Estimated execution fees</h5>
       <p class="card-text" *ngIf="(isLoadingWebSocket$ | async) === false && mempoolInfoData.value; else loading">
         <app-amount [satoshis]="mempoolInfoData.value.memPoolInfo.total_fee" digitsInfo="1.2-6" [noFiat]="true"></app-amount>
       </p>

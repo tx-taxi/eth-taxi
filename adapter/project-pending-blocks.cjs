@@ -1,5 +1,15 @@
 'use strict';
 
+function pendingExecutionRate(tx, baseFeeWei, fallbackRate) {
+  const maxFee = Number(tx.max_fee_per_gas);
+  const priorityFee = Number(tx.max_priority_fee_per_gas);
+  if (maxFee > 0 && tx.max_priority_fee_per_gas != null && Number.isFinite(priorityFee) && baseFeeWei > 0) {
+    return Math.min(maxFee, baseFeeWei + priorityFee);
+  }
+  const legacyRate = Number(tx.gas_price || tx.max_fee_per_gas || fallbackRate);
+  return Number.isFinite(legacyRate) && legacyRate > 0 ? legacyRate : fallbackRate;
+}
+
 // Each projected tile represents at most one Ethereum block's gas capacity.
 // The frontend stacks only tiles that exceed its available display slots.
 function projectPendingBlocks(transactions, gasLimit, fallbackRate) {
@@ -41,4 +51,4 @@ function projectPendingBlocks(transactions, gasLimit, fallbackRate) {
   });
 }
 
-module.exports = {projectPendingBlocks};
+module.exports = {pendingExecutionRate, projectPendingBlocks};

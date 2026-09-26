@@ -2,7 +2,19 @@
 
 const {test} = require('node:test');
 const assert = require('node:assert/strict');
-const {projectPendingBlocks} = require('./project-pending-blocks.cjs');
+const {pendingExecutionRate, projectPendingBlocks} = require('./project-pending-blocks.cjs');
+
+test('pending EIP-1559 projection uses the effective price instead of the submitted cap', () => {
+  const baseFee = 50_000_000;
+  const fallback = 100_000_000;
+  const transaction = {max_fee_per_gas: '100000000000', max_priority_fee_per_gas: '1000000000'};
+  const rate = pendingExecutionRate(transaction, baseFee, fallback);
+  const [block] = projectPendingBlocks([{gas: 21_000, fee: 21_000 * rate, rate}], 60_000_000, fallback);
+
+  assert.equal(rate, 1_050_000_000);
+  assert.equal(block.totalFees, 22_050_000_000_000);
+  assert.equal(pendingExecutionRate({gas_price: '2000000000'}, baseFee, fallback), 2_000_000_000);
+});
 
 test('pending transactions occupy separate tiles until a tile exceeds the gas limit', () => {
   const transactions = [

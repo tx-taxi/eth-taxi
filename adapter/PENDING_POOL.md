@@ -4,5 +4,5 @@ The dashboard uses PublicNode's free Ethereum RPC endpoint for a node-local view
 
 If the feed is unavailable, the adapter uses Blockscout's first pending-transactions page (or the RPC pending block when Blockscout itself fails). The API marks the source in `mempoolInfo.source`; Blockscout sets `pending_sample_truncated` when it has more pages. None of these sources represents a network-wide Ethereum mempool.
 
-Projected tiles use transaction gas limits and observed fee caps. They are estimates; the fee amounts are ceilings, not final fees paid. The frontend combines tiles only after they exceed the available display slots.
+Projected tiles use transaction gas limits and effective gas prices at the current base fee. Their aggregate execution fees assume every transaction uses its full gas limit; they are estimates, not final fees paid, and omit blob fees. Individual pending transaction details still show the submitted maximum fee cap. The frontend combines tiles only after they exceed the available display slots.
 The gas meter shows sampled gas limits against the combined capacity of those projected tiles.

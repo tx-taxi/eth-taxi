@@ -25,8 +25,8 @@
               </span></td>
             </tr>
             <tr>
-              <td i18n="block.total-fees|Total fees in a block">Total fees</td>
-              <td>≤<app-amount [satoshis]="mempoolBlock.totalFees" [digitsInfo]="'1.2-6'" [noFiat]="true"></app-amount> <span class="fiat"><app-fiat [value]="mempoolBlock.totalFees" digitsInfo="1.0-0"></app-fiat></span></td>
+              <td>Estimated execution fees</td>
+              <td>~<app-amount [satoshis]="mempoolBlock.totalFees" [digitsInfo]="'1.2-6'" [noFiat]="true" ngbTooltip="Estimated execution fees at the current base fee, assuming each transaction uses its full gas limit"></app-amount> <span class="fiat"><app-fiat [value]="mempoolBlock.totalFees" digitsInfo="1.0-0"></app-fiat></span></td>
             </tr>
             <tr>
               <td i18n="mempool-block.transactions">Transactions</td>

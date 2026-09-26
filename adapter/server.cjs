@@ -10,7 +10,7 @@ const parse5 = require('parse5');
 const sharp = require('sharp');
 const { WebSocketServer } = require('ws');
 const {createPendingPool} = require('./pending-pool.cjs');
-const {projectPendingBlocks} = require('./project-pending-blocks.cjs');
+const {pendingExecutionRate, projectPendingBlocks} = require('./project-pending-blocks.cjs');
 
 const host = process.env.ETH_ADAPTER_HOST || '0.0.0.0';
 const port = Number(process.env.PORT || 8080);
@@ -1186,14 +1186,11 @@ function sampleMempool(pendingItems, gasUsed, gasFees, market) {
 
 function projectedPendingBlocks(pendingItems, gasLimit, averageGwei, baseFeeWei = 0) {
   const fallbackRate = gweiToWei(averageGwei);
-  return projectPendingBlocks(pendingItems.map((item) => ({
-    txid: item.hash,
-    gas: number(item.gas_limit || item.gas_used),
-    fee: wei(transactionFeeParts(item).totalFeeWei),
-    rate: number(item.max_fee_per_gas) && item.max_priority_fee_per_gas != null && baseFeeWei
-      ? Math.min(number(item.max_fee_per_gas), baseFeeWei + number(item.max_priority_fee_per_gas))
-      : number(item.gas_price || item.max_fee_per_gas, fallbackRate),
-  })), gasLimit, fallbackRate);
+  return projectPendingBlocks(pendingItems.map((item) => {
+    const gas = number(item.gas_limit || item.gas_used);
+    const rate = pendingExecutionRate(item, baseFeeWei, fallbackRate);
+    return { txid: item.hash, gas, rate, fee: gas * rate };
+  }), gasLimit, fallbackRate);
 }
 
 function snapshotSignature(data) {
@@ -1693,11 +1690,11 @@ async function blockscoutSnapshot() {
   const average = number(gasPrices.average);
   const fast = number(gasPrices.fast);
   const gasUsed = pendingItems.reduce((sum, item) => sum + number(item.gas_limit || item.gas_used), 0);
-  const gasFees = pendingItems.reduce((sum, item) => sum + wei(transactionFeeParts(item).totalFeeWei), 0);
   const blockGasLimit = latestBlock?.gasLimit || 60_000_000;
   const baseFeeWei = latestBlock?.extras?.medianFee || 0;
   const projectedBlocks = projectedPendingBlocks(pendingItems, blockGasLimit, average, baseFeeWei);
   const projectedGas = projectedBlocks.reduce((sum, block) => sum + block.blockSize, 0);
+  const gasFees = projectedBlocks.reduce((sum, block) => sum + block.totalFees, 0);
   const liveMempoolSample = sampleMempool(pendingItems, gasUsed, gasFees, {
     baseFeeGwei: gwei(baseFeeWei),
     networkUtilization: number(stats.network_utilization_percentage),
@@ -1767,10 +1764,10 @@ async function rpcSnapshot() {
   const average = marketPrice(1);
   const fast = marketPrice(2);
   const gasUsed = pendingItems.reduce((sum, item) => sum + number(item.gas_limit || item.gas_used), 0);
-  const gasFees = pendingItems.reduce((sum, item) => sum + wei(transactionFeeParts(item).totalFeeWei), 0);
   const blockGasLimit = hexNumber(latestBlock?.gasLimit) || 60_000_000;
   const projectedBlocks = projectedPendingBlocks(pendingItems, blockGasLimit, average, Number(baseFee));
   const projectedGas = projectedBlocks.reduce((sum, block) => sum + block.blockSize, 0);
+  const gasFees = projectedBlocks.reduce((sum, block) => sum + block.totalFees, 0);
   const liveMempoolSample = sampleMempool(pendingItems, gasUsed, gasFees, {
     baseFeeGwei: gwei(baseFee.toString()),
     networkUtilization: number(feeHistory?.gasUsedRatio?.at(-1)) * 100,

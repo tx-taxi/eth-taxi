@@ -9,7 +9,7 @@
         ></div>
         <div @blockEntryTrigger [@.disabled]="i > 0 || !animateEntry" [attr.data-cy]="'mempool-block-' + i" class="bitcoin-block text-center mempool-block" [class.hide-block]="count && i >= count" id="mempool-block-{{ i }}" [ngStyle]="mempoolBlockStyles[i]" [class.blink-bg]="projectedBlock.blink" [style]="blockTransformation">
           <a draggable="false" [routerLink]="[getHref(i) | relativeUrl]"
-            [attr.title]="blockValueDetails(projectedBlock.totalFees, projectedBlock.medianFee, projectedBlock.feeRange?.[0], projectedBlock.feeRange?.[projectedBlock.feeRange.length - 1])" class="blockLink" [ngClass]="{'disabled': (this.stateService.blockScrolling$ | async)}">&nbsp;</a>
+            [attr.title]="blockValueDetails(projectedBlock.totalFees, projectedBlock.medianFee, projectedBlock.feeRange?.[0], projectedBlock.feeRange?.[projectedBlock.feeRange.length - 1], 'Estimated execution fees')" class="blockLink" [ngClass]="{'disabled': (this.stateService.blockScrolling$ | async)}">&nbsp;</a>
           <div class="block-body">
             <ng-container *ngIf="!minimal">
               <div [attr.data-cy]="'mempool-block-' + i + '-fees'" class="fees">
@@ -21,7 +21,7 @@
                 <app-fee-rate [compactBlock]="true" [fee]="projectedBlock.feeRange[projectedBlock.feeRange.length - 1]" unitClass=""></app-fee-rate>
               </div>
               <div *ngIf="blockDisplayMode === 'fees'; else noMiningInfo" class="block-size">
-                ≤<app-amount [compactBlock]="true" [attr.data-cy]="'mempool-block-' + i + '-total-fees'" [satoshis]="projectedBlock.totalFees" digitsInfo="1.2-3" [noFiat]="true" title="Maximum fees based on transaction fee caps"></app-amount>
+                ~<app-amount [compactBlock]="true" [attr.data-cy]="'mempool-block-' + i + '-total-fees'" [satoshis]="projectedBlock.totalFees" digitsInfo="1.2-3" [noFiat]="true" title="Estimated execution fees at the current base fee, assuming each transaction uses its full gas limit"></app-amount>
               </div>
               <ng-template #noMiningInfo>
                 <div class="block-size" [innerHTML]="'&lrm;' + (projectedBlock.blockSize | bytes: 2)"></div>
