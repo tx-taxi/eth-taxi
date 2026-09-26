@@ -258,13 +258,13 @@
       </p>
     </div>
     <div class="item">
-      <h5 class="card-title">Pending sample</h5>
+      <h5 class="card-title" title="Observed pending transactions from the current provider; not a network-wide total">Pending sample</h5>
       <p class="card-text" *ngIf="(isLoadingWebSocket$ | async) === false && mempoolInfoData.value; else loading">
         {{ mempoolInfoData.value.memPoolInfo.size | number }} <span i18n="dashboard.txs">TXs</span>
       </p>
     </div>
     <div class="item bar">
-      <h5 class="card-title">Sampled gas</h5>
+      <h5 class="card-title" title="Share of the projected blocks' gas capacity used by this pending sample">Sampled gas limits</h5>
       <div class="card-text" *ngIf="(isLoadingWebSocket$ | async) === false && mempoolInfoData.value; else loadingbig">
         <div class="progress">
           <div class="progress-bar bg-primary" role="progressbar" [ngStyle]="{'width': (mempoolInfoData.value.memPoolInfo.usage / mempoolInfoData.value.memPoolInfo.maxmempool * 100) + '%' }">&nbsp;</div>
@@ -273,7 +273,7 @@
       </div>
     </div>
     <div class="item">
-      <h5 class="card-title">Sampled fees</h5>
+      <h5 class="card-title">Fee ceilings</h5>
       <p class="card-text" *ngIf="(isLoadingWebSocket$ | async) === false && mempoolInfoData.value; else loading">
         <app-amount [satoshis]="mempoolInfoData.value.memPoolInfo.total_fee" digitsInfo="1.2-6" [noFiat]="true"></app-amount>
       </p>

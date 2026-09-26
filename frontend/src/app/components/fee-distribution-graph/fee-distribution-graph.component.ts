@@ -111,7 +111,7 @@ export class FeeDistributionGraphComponent implements OnInit, OnChanges, OnDestr
       xAxis: {
         type: 'category',
         boundaryGap: false,
-        name: '% Weight',
+        name: '% Gas limit',
         nameLocation: 'middle',
         nameGap: 0,
         nameTextStyle: {

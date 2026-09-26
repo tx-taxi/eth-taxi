@@ -9,6 +9,8 @@ const { URL } = require('node:url');
 const parse5 = require('parse5');
 const sharp = require('sharp');
 const { WebSocketServer } = require('ws');
+const {createPendingPool} = require('./pending-pool.cjs');
+const {projectPendingBlocks} = require('./project-pending-blocks.cjs');
 
 const host = process.env.ETH_ADAPTER_HOST || '0.0.0.0';
 const port = Number(process.env.PORT || 8080);
@@ -21,6 +23,7 @@ const rpcProviders = (process.env.ETH_RPC_URLS || 'https://ethereum-rpc.publicno
   .split(',')
   .map((provider) => provider.trim().replace(/\/$/, ''))
   .filter(Boolean);
+const pendingPool = createPendingPool(process.env.ETH_PENDING_POOL_RPC_URL || 'https://ethereum-rpc.publicnode.com');
 const sockets = new Set();
 const mempoolBlockSubscriptions = new Map();
 const transactionSubscriptions = new Map();
@@ -1177,6 +1180,18 @@ function sampleMempool(pendingItems, gasUsed, gasFees, market) {
   return mempoolSamples.at(-1);
 }
 
+function projectedPendingBlocks(pendingItems, gasLimit, averageGwei, baseFeeWei = 0) {
+  const fallbackRate = gweiToWei(averageGwei);
+  return projectPendingBlocks(pendingItems.map((item) => ({
+    txid: item.hash,
+    gas: number(item.gas_limit || item.gas_used),
+    fee: wei(transactionFeeParts(item).totalFeeWei),
+    rate: number(item.max_fee_per_gas) && item.max_priority_fee_per_gas != null && baseFeeWei
+      ? Math.min(number(item.max_fee_per_gas), baseFeeWei + number(item.max_priority_fee_per_gas))
+      : number(item.gas_price || item.max_fee_per_gas, fallbackRate),
+  })), gasLimit, fallbackRate);
+}
+
 function snapshotSignature(data) {
   const tip = data.blocks.at(-1)?.id || '';
   const pending = data.projectedTransactions
@@ -1186,13 +1201,14 @@ function snapshotSignature(data) {
 }
 
 function projectedBlockPayload(data, index) {
+  const txids = new Set(data['mempool-blocks'][index]?.txids || []);
   return {
     'projected-block-transactions': {
       index,
       sequence: Date.now(),
-      // Ethereum has no deterministic Bitcoin-style multi-block package
-      // projection. The current pending sample is the next-slot estimate.
-      blockTransactions: index === 0 ? data.projectedTransactions.map(compressTransaction) : [],
+      blockTransactions: data.projectedTransactions
+        .filter((transaction) => txids.has(transaction.txid))
+        .map(compressTransaction),
     },
   };
 }
@@ -1644,14 +1660,17 @@ async function ethereumTokenTransfers(address, searchParams) {
 }
 
 async function blockscoutSnapshot() {
+  const observedPool = pendingPool.snapshot();
   const [blocks, transactions, pending, stats] = await Promise.all([
     providerJson('/api/v2/blocks'),
     providerJson('/api/v2/main-page/transactions'),
-    providerJson('/api/v2/transactions?filter=pending'),
+    observedPool ? Promise.resolve(null) : providerJson('/api/v2/transactions?filter=pending'),
     providerJson('/api/v2/stats'),
   ]);
   const mappedBlocks = blocks.items.slice(0, 6).map(mapBlock).reverse();
-  const pendingItems = pending.items || [];
+  const pendingItems = observedPool
+    ? observedPool.transactions.map((transaction) => mapRpcTransaction(transaction, null, null, 0, true))
+    : pending.items || [];
   const pendingTransactions = pendingItems.map(mapTransaction);
   const gasPrices = stats.gas_prices || {};
   const slow = number(gasPrices.slow);
@@ -1659,13 +1678,16 @@ async function blockscoutSnapshot() {
   const fast = number(gasPrices.fast);
   const gasUsed = pendingItems.reduce((sum, item) => sum + number(item.gas_limit || item.gas_used), 0);
   const gasFees = pendingItems.reduce((sum, item) => sum + wei(transactionFeeParts(item).totalFeeWei), 0);
+  const blockGasLimit = number(blocks.items[0]?.gas_limit, 60_000_000);
+  const projectedBlocks = projectedPendingBlocks(pendingItems, blockGasLimit, average, number(blocks.items[0]?.base_fee_per_gas));
+  const projectedGas = projectedBlocks.reduce((sum, block) => sum + block.blockSize, 0);
   const liveMempoolSample = sampleMempool(pendingItems, gasUsed, gasFees, {
-    baseFeeGwei: gwei(blocks[0]?.base_fee_per_gas),
+    baseFeeGwei: gwei(blocks.items[0]?.base_fee_per_gas),
     networkUtilization: number(stats.network_utilization_percentage),
     slow,
     average,
     fast,
-    pendingSampleTruncated: Boolean(pending.next_page_params),
+    pendingSampleTruncated: !observedPool && Boolean(pending.next_page_params),
   });
   const tip = mappedBlocks.at(-1);
   cachedSnapshot = {
@@ -1673,11 +1695,9 @@ async function blockscoutSnapshot() {
     backendInfo: { hostname: new URL(activeProvider).hostname, version: 'eth-taxi-adapter', gitCommit: 'main', lightning: false },
     loadingIndicators: { mempool: 100 },
     blocks: mappedBlocks,
-    'mempool-blocks': pendingTransactions.length ? [{ blockSize: gasUsed, blockVSize: Math.ceil(gasUsed / 4), nTx: pendingTransactions.length, medianFee: gweiToWei(average), totalFees: gasFees, feeRange: [slow, slow, average, average, fast, fast, fast].map(gweiToWei), index: 0 }] : [],
-    // Ethereum does not have Bitcoin's configurable byte-based mempool limit.
-    // Use a stable gas reference so the pending-gas meter is informative rather
-    // than reporting every non-empty pending set as 100% full.
-    mempoolInfo: { loaded: true, size: pendingTransactions.length, bytes: gasUsed, usage: gasUsed, maxmempool: Math.max(Math.ceil(gasUsed * 1.25), 60_000_000), mempoolminfee: gweiToWei(slow), minrelaytxfee: gweiToWei(slow), total_fee: gasFees },
+    'mempool-blocks': projectedBlocks,
+    // The meter is gas assigned to projected tiles over those tiles' capacity.
+    mempoolInfo: { loaded: true, size: pendingTransactions.length, bytes: gasUsed, usage: projectedGas, maxmempool: Math.max(blockGasLimit, projectedBlocks.length * blockGasLimit), mempoolminfee: gweiToWei(slow), minrelaytxfee: gweiToWei(slow), total_fee: gasFees, source: observedPool ? 'publicnode-txpool' : 'blockscout-page', sample: true },
     vBytesPerSecond: 0,
     fees: { fastestFee: gweiToWei(fast), halfHourFee: gweiToWei(average), hourFee: gweiToWei(average), economyFee: gweiToWei(slow), minimumFee: gweiToWei(slow) },
     da: {
@@ -1713,7 +1733,8 @@ async function rpcSnapshot() {
   ]);
   const feeMetrics = await Promise.all(blocks.map((block) => rpcBlockFeeMetrics(block)));
   const mappedBlocks = blocks.map((block, index) => mapRpcBlock(block, feeMetrics[index])).reverse();
-  const pendingRaw = Array.isArray(pendingBlock?.transactions) ? pendingBlock.transactions.slice(0, 150) : [];
+  const observedPool = pendingPool.snapshot();
+  const pendingRaw = observedPool?.transactions || (Array.isArray(pendingBlock?.transactions) ? pendingBlock.transactions : []);
   const pendingItems = pendingRaw.map((transaction) => mapRpcTransaction(transaction, null, pendingBlock, tipHeight, true));
   const pendingTransactions = pendingItems.map(mapTransaction);
   const latestBlock = blocks[0];
@@ -1730,13 +1751,16 @@ async function rpcSnapshot() {
   const fast = marketPrice(2);
   const gasUsed = pendingItems.reduce((sum, item) => sum + number(item.gas_limit || item.gas_used), 0);
   const gasFees = pendingItems.reduce((sum, item) => sum + wei(transactionFeeParts(item).totalFeeWei), 0);
+  const blockGasLimit = hexNumber(latestBlock?.gasLimit) || 60_000_000;
+  const projectedBlocks = projectedPendingBlocks(pendingItems, blockGasLimit, average, Number(baseFee));
+  const projectedGas = projectedBlocks.reduce((sum, block) => sum + block.blockSize, 0);
   const liveMempoolSample = sampleMempool(pendingItems, gasUsed, gasFees, {
     baseFeeGwei: gwei(baseFee.toString()),
     networkUtilization: number(feeHistory?.gasUsedRatio?.at(-1)) * 100,
     slow,
     average,
     fast,
-    pendingSampleTruncated: pendingRaw.length === 150,
+    pendingSampleTruncated: false,
   });
   const tip = mappedBlocks.at(-1);
   cachedSnapshot = {
@@ -1744,8 +1768,8 @@ async function rpcSnapshot() {
     backendInfo: { hostname: new URL(activeRpcProvider).hostname, version: 'eth-taxi-adapter', gitCommit: 'main', lightning: false },
     loadingIndicators: { mempool: 100 },
     blocks: mappedBlocks,
-    'mempool-blocks': pendingTransactions.length ? [{ blockSize: gasUsed, blockVSize: Math.ceil(gasUsed / 4), nTx: pendingTransactions.length, medianFee: gweiToWei(average), totalFees: gasFees, feeRange: [slow, slow, average, average, fast, fast, fast].map(gweiToWei), index: 0 }] : [],
-    mempoolInfo: { loaded: true, size: pendingTransactions.length, bytes: gasUsed, usage: gasUsed, maxmempool: Math.max(Math.ceil(gasUsed * 1.25), 60_000_000), mempoolminfee: gweiToWei(slow), minrelaytxfee: gweiToWei(slow), total_fee: gasFees },
+    'mempool-blocks': projectedBlocks,
+    mempoolInfo: { loaded: true, size: pendingTransactions.length, bytes: gasUsed, usage: projectedGas, maxmempool: Math.max(blockGasLimit, projectedBlocks.length * blockGasLimit), mempoolminfee: gweiToWei(slow), minrelaytxfee: gweiToWei(slow), total_fee: gasFees, source: observedPool ? 'publicnode-txpool' : 'rpc-pending-block', sample: true },
     vBytesPerSecond: 0,
     fees: { fastestFee: gweiToWei(fast), halfHourFee: gweiToWei(average), hourFee: gweiToWei(average), economyFee: gweiToWei(slow), minimumFee: gweiToWei(slow) },
     da: {
@@ -2256,12 +2280,11 @@ wss.on('connection', async (socket) => {
         trackedTransactions.add(txid);
         const data = await snapshot();
         const transaction = data.projectedTransactions.find((item) => item.txid === txid);
-        // Ethereum's pending pool has no Bitcoin-style package position. A
-        // pending transaction is instead estimated for the next validator slot.
+        const block = data['mempool-blocks'].findIndex((projected) => projected.txids?.includes(txid));
         socket.send(JSON.stringify({
           txPosition: {
             txid,
-            position: { block: 0, vsize: transaction?.vsize || 0 },
+            position: { block: Math.max(0, block), vsize: transaction?.vsize || 0 },
             cpfp: null,
             accelerationPositions: [],
           },
@@ -2328,4 +2351,5 @@ setInterval(async () => {
   finally { pollInFlight = false; }
 }, POLL_INTERVAL_MS).unref();
 
+pendingPool.start();
 server.listen(port, host, () => console.log(`ETH adapter listening on http://${host}:${port}`));
