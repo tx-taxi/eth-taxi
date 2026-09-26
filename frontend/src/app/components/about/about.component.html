@@ -1,22 +1,27 @@
 <div class="container-xl about-page">
-  <div class="intro">
-    <h1 class="visually-hidden">About eth.tx.taxi</h1>
-    <img src="/resources/branding/eth-dark-full.svg" alt="eth.tx.taxi Ethereum explorer" class="tx-taxi-full-logo">
-    <div class="version">
-      <span>Ethereum block and pending transaction explorer</span>
-      <span class="version-sub">Built on the Mempool open-source interface</span>
-    </div>
-  </div>
-  <div class="about-text">
-    <h5>About eth.tx.taxi</h5>
+  <app-tx-taxi-docs-intro chainName="Ethereum" chainHost="eth.tx.taxi" context="explorer"></app-tx-taxi-docs-intro>
+  <div class="about-layout">
+    <aside class="about-identity">
+      <img src="/resources/branding/eth-dark-full.svg" alt="eth.tx.taxi" class="about-logo">
+      <h1>About eth.tx.taxi</h1>
+      <p>The Ethereum explorer in the tx.taxi family.</p>
+      <nav class="about-links" aria-label="Project links">
+        <a routerLink="/docs">Ethereum documentation</a>
+        <a href="https://github.com/tx-taxi/eth-taxi" target="_blank" rel="noopener noreferrer">Explorer source</a>
+        <a href="https://t.me/hiss" target="_blank" rel="noopener noreferrer">Contact the maintainer</a>
+      </nav>
+    </aside>
+    <main class="about-text">
+      <h2>About eth.tx.taxi</h2>
     <p>eth.tx.taxi adapts the familiar Mempool explorer interface for Ethereum. It presents public Ethereum blocks, transactions, account balances, gas prices, and pending transaction activity in a consistent tx.taxi experience.</p>
-    <h5>Data sources</h5>
-    <p>The explorer reads public Ethereum data through a small compatibility adapter backed by public Blockscout endpoints. Provider fallbacks keep the interface useful when one upstream endpoint is unavailable. Values shown here are observations from those providers, not independent consensus verification.</p>
-    <h5>Open-source lineage</h5>
+    <h2>Data sources</h2>
+    <p>The explorer reads public Ethereum data through a compatibility adapter backed by configured public providers. Provider fallbacks keep the interface useful when one upstream endpoint is unavailable. Values shown here are observations from those providers, not independent consensus verification.</p>
+    <h2>Open-source lineage</h2>
     <p>The interface is derived from the Mempool Open Source Project and remains available under the GNU AGPLv3. Ethereum-specific terminology, data mapping, and tx.taxi branding are maintained separately.</p>
-  </div>
-  <div class="contributors">
-    <h5>Links</h5>
-    <p><a href="https://t.me/hiss" target="_blank" rel="noopener noreferrer">Contact the operator on Telegram</a></p>
+      <div class="about-attribution">
+        <h2>Built on open source</h2>
+        <p>This explorer builds on the <a href="https://github.com/mempool/mempool" target="_blank" rel="noopener noreferrer">Mempool Open Source Project</a>. See the explorer source for its license and <a href="/3rdpartylicenses.txt">third-party attribution</a>.</p>
+      </div>
+    </main>
   </div>
 </div>

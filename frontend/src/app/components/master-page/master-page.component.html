@@ -98,8 +98,8 @@
           <div class="svg-wrapper"><app-svg-images name="nav-database" width="21.59" height="100%"></app-svg-images></div>
         </a>
       </li>
-      <li class="nav-item" id="btn-docs">
-        <a class="nav-link" href="https://ethereum.org/developers/docs/" target="_blank" rel="noopener noreferrer" (click)="collapse()" title="Ethereum documentation" aria-label="Ethereum documentation">
+      <li class="nav-item" routerLinkActive="active" id="btn-docs">
+        <a class="nav-link" [routerLink]="['/docs']" (click)="collapse()" title="Ethereum documentation" aria-label="Ethereum documentation">
           <div class="svg-wrapper"><app-svg-images name="nav-book" width="21.59" height="100%"></app-svg-images></div>
         </a>
       </li>
