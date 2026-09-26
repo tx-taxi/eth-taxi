@@ -15,6 +15,8 @@ function createPendingPool(rpcUrl) {
   let lastObservedAt = 0;
   let reconnectDelay = 1_000;
   let reconciling;
+  let bootstrapTimer;
+  let bootstrapDelay = 1_000;
   let subscriptionId;
   let headsId;
 
@@ -74,6 +76,19 @@ function createPendingPool(rpcUrl) {
     await reconcile().catch(() => {});
   }
 
+  function bootstrap() {
+    if (!connected || bootstrapped || bootstrapTimer) return;
+    reconcile().then(() => { bootstrapDelay = 1_000; }).catch(() => {
+      if (!connected) return;
+      bootstrapTimer = setTimeout(() => {
+        bootstrapTimer = null;
+        bootstrap();
+      }, bootstrapDelay);
+      bootstrapTimer.unref();
+      bootstrapDelay = Math.min(bootstrapDelay * 2, 30_000);
+    });
+  }
+
   function connect() {
     socket = new WebSocket(wsUrl);
     socket.on('open', () => {
@@ -81,7 +96,7 @@ function createPendingPool(rpcUrl) {
       reconnectDelay = 1_000;
       socket.send(JSON.stringify({jsonrpc: '2.0', id: 1, method: 'eth_subscribe', params: ['newPendingTransactions', true]}));
       socket.send(JSON.stringify({jsonrpc: '2.0', id: 2, method: 'eth_subscribe', params: ['newHeads']}));
-      reconcile().catch(() => {});
+      bootstrap();
     });
     socket.on('message', (data) => {
       let message;
@@ -105,6 +120,9 @@ function createPendingPool(rpcUrl) {
     socket.on('close', () => {
       connected = false;
       bootstrapped = false;
+      clearTimeout(bootstrapTimer);
+      bootstrapTimer = null;
+      bootstrapDelay = 1_000;
       subscriptionId = undefined;
       headsId = undefined;
       const delay = reconnectDelay;
