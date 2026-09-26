@@ -1,38 +1,45 @@
-# The Mempool Open Source Project® [![mempool](https://img.shields.io/endpoint?url=https://dashboard.cypress.io/badge/simple/ry4br7/master&style=flat-square)](https://dashboard.cypress.io/projects/ry4br7/runs)
+<p align="center">
+  <img src="frontend/src/resources/eth-favicon.svg" width="88" height="88" alt="eth.tx.taxi logo">
+</p>
 
-https://user-images.githubusercontent.com/93150691/226236121-375ea64f-b4a1-4cc0-8fad-a6fb33226840.mp4
+<h1 align="center">Ethereum Explorer · eth.tx.taxi</h1>
 
-<br>
+<p align="center">
+  A public Ethereum block explorer for following blocks, transactions, accounts, tokens, and live gas conditions.<br>
+  <a href="https://eth.tx.taxi">Open eth.tx.taxi</a>
+</p>
 
-Mempool is the fully-featured mempool visualizer, explorer, and API service running at [mempool.space](https://mempool.space/). 
+## Overview
 
-It is an open-source project developed and operated for the benefit of the Bitcoin community, with a focus on the emerging transaction fee market that is evolving Bitcoin into a multi-layer ecosystem.
+[eth.tx.taxi](https://eth.tx.taxi) is an Ethereum explorer in the [tx.taxi](https://tx.taxi) network. It presents public chain data supplied by configured infrastructure; availability and completeness depend on those sources.
 
-# Installation Methods
+## Features
 
-Mempool can be self-hosted on a wide variety of your own hardware, ranging from a simple one-click installation on a Raspberry Pi full-node distro all the way to a robust production instance on a powerful FreeBSD server. 
+- Ethereum blocks, transactions, confirmations, pending activity, and gas information.
+- Account and contract pages with ETH balances, indexed metadata when available, and token balances.
+- Token pages and transfer activity, with clear fallback states when complete indexed history is unavailable.
+- Explorer REST and WebSocket documentation in the application.
 
-Most people should use a <a href="#one-click-installation">one-click install method</a>.
+## Development
 
-Other install methods are meant for developers and others with experience managing servers. If you want support for your own production instance of Mempool, or if you'd like to have your own instance of Mempool run by the mempool.space team on their own global ISP infrastructure—check out <a href="https://mempool.space/enterprise" target="_blank">Mempool Enterprise®</a>.
+The frontend is an Angular application. Its local development server proxies explorer API requests to a compatible backend at `http://localhost:8999`. A working explorer also needs configured Ethereum chain services; use the existing [backend](./backend/), [Docker](./docker/), and [production](./production/) documentation for their prerequisites and configuration.
 
-<a id="one-click-installation"></a>
-## One-Click Installation
+```bash
+cd frontend
+npm ci
+npm run start
+```
 
-Mempool can be conveniently installed on the following full-node distros: 
-- [Umbrel](https://github.com/getumbrel/umbrel)
-- [RaspiBlitz](https://github.com/rootzoll/raspiblitz)
-- [RoninDojo](https://code.samourai.io/ronindojo/RoninDojo)
-- [myNode](https://github.com/mynodebtc/mynode)
-- [StartOS](https://github.com/Start9Labs/start-os)
-- [nix-bitcoin](https://github.com/fort-nix/nix-bitcoin/blob/a1eacce6768ca4894f365af8f79be5bbd594e1c3/examples/configuration.nix#L129)
+Open <http://localhost:4200>. `npm run start` generates the frontend configuration, synchronizes development assets, and starts the local Angular configuration. To verify a frontend production build, run `npm run build` from `frontend/`.
 
-**We highly recommend you deploy your own Mempool instance this way.** No matter which option you pick, you'll be able to get your own fully-sovereign instance of Mempool up quickly without needing to fiddle with any settings.
+## Attribution and license
 
-## Advanced Installation Methods
+This repository adapts the [Mempool Open Source Project](https://github.com/mempool/mempool) for Ethereum in the tx.taxi network. The previous upstream root documentation is archived in [UPSTREAM_README.md](./UPSTREAM_README.md) to preserve source history and superseded setup guidance.
 
-Mempool can be installed in other ways too, but we only recommend doing so if you're a developer, have experience managing servers, or otherwise know what you're doing.
+The code is distributed under the terms in [LICENSE](LICENSE) and [COPYING.md](COPYING.md), including the GNU Affero General Public License v3 text and applicable trademark notices.
 
-- See the [`docker/`](./docker/) directory for instructions on deploying Mempool with Docker.
-- See the [`backend/`](./backend/) and [`frontend/`](./frontend/) directories for manual install instructions oriented for developers.
-- See the [`production/`](./production/) directory for guidance on setting up a more serious Mempool instance designed for high performance at scale.
+## Links
+
+- [Live explorer](https://eth.tx.taxi)
+- [tx.taxi hub](https://tx.taxi)
+- [Telegram channel](https://t.me/txtaxi)
