@@ -20,6 +20,7 @@ import { ActivatedRoute } from '@angular/router';
 import { SighashFlag } from '@app/shared/transaction.utils';
 import { EthereumTokenTransfer } from '@interfaces/ethereum-api.interface';
 import { TransactionFlags } from '@app/shared/filters.utils';
+import { currentTokenTransferUsd } from '@app/shared/ethereum-token-usd.utils';
 
 @Component({
   selector: 'app-transactions-list',
@@ -29,6 +30,7 @@ import { TransactionFlags } from '@app/shared/filters.utils';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TransactionsListComponent implements OnInit, OnChanges, OnDestroy {
+  currentTokenTransferUsd = currentTokenTransferUsd;
   network = '';
   nativeAssetId = this.stateService.network === 'liquidtestnet' ? environment.nativeTestAssetId : environment.nativeAssetId;
   isLiquid = this.stateService.network === 'liquid' || this.stateService.network === 'liquidtestnet';

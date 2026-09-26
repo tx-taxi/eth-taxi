@@ -11,6 +11,7 @@ import {
   EthereumTokenTransfer,
 } from '@interfaces/ethereum-api.interface';
 import { EthereumApiService } from '@app/services/ethereum-api.service';
+import { currentTokenTransferUsd } from '@app/shared/ethereum-token-usd.utils';
 
 interface EthereumTokenTransferView {
   transfer: EthereumTokenTransfer;
@@ -26,6 +27,7 @@ interface EthereumTokenTransferView {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EthereumTokenComponent implements OnInit, OnDestroy {
+  currentTokenTransferUsd = currentTokenTransferUsd;
   token: EthereumToken | null = null;
   transfers: EthereumTokenTransferView[] = [];
   tokenAddress = '';

@@ -266,6 +266,11 @@
   white-space: nowrap;
 }
 
+.transfer-usd {
+  color: var(--transparent-fg);
+  font-size: 0.75rem;
+}
+
 .transfer-kind {
   align-self: flex-start;
   max-width: 100%;

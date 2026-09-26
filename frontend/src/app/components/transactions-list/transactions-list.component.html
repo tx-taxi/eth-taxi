@@ -416,6 +416,7 @@
                       <span class="ethereum-list-token-amount" [title]="ethereumTransferTitle(transfer)">
                         {{ ethereumTransferLabel(transfer) }}
                       </span>
+                      <span *ngIf="currentTokenTransferUsd(transfer) as usd" class="ethereum-list-token-usd" title="Approximate USD value using the current token price">~{{ usd }}</span>
                       <span *ngIf="tx.ethereum.tokenTransfers.length > 1" class="ethereum-list-token-extra">
                         +{{ tx.ethereum.tokenTransfers.length - 1 }} {{ tx.ethereum.tokenTransfers.length === 2 ? 'transfer' : 'transfers' }}
                       </span>
@@ -425,6 +426,7 @@
                         <span class="ethereum-list-token-amount" [title]="'Proposed call: ' + ethereumTransferTitle(intent)">
                           Proposed {{ ethereumTransferLabel(intent) }}
                         </span>
+                        <span *ngIf="currentTokenTransferUsd(intent) as usd" class="ethereum-list-token-usd" title="Approximate USD value of the proposed call using the current token price">~{{ usd }}</span>
                       </ng-container>
                     </ng-template>
                     <ng-template #nativeAmount>

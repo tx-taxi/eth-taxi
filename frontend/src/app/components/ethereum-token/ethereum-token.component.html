@@ -91,6 +91,7 @@
             <a class="transfer-amount" [routerLink]="['/tx', item.transfer.transactionHash]" [title]="transferExactAmount(item.transfer)">
               {{ formatTransferAmount(item.transfer) }} {{ transferSymbol(item.transfer) }}
             </a>
+            <span *ngIf="currentTokenTransferUsd(item.transfer) as usd" class="transfer-usd" title="Approximate USD value using the current token price">~{{ usd }}</span>
             <span class="transfer-kind">{{ item.transfer.method || item.transfer.type }}</span>
           </div>
 
