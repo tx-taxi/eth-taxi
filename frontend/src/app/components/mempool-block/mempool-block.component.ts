@@ -7,7 +7,6 @@ import { MempoolBlock } from '@interfaces/websocket.interface';
 import { TransactionStripped } from '@interfaces/node-api.interface';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { SeoService } from '@app/services/seo.service';
-import { seoDescriptionNetwork } from '@app/shared/common.utils';
 import { WebsocketService } from '@app/services/websocket.service';
 
 @Component({
@@ -57,8 +56,8 @@ export class MempoolBlockComponent implements OnInit, OnDestroy {
                 }
                 const ordinal = this.getOrdinal(mempoolBlocks[this.mempoolBlockIndex]);
                 this.ordinal$.next(ordinal);
-                this.seoService.setTitle(ordinal);
-                this.seoService.setDescription($localize`:@@meta.description.mempool-block:See stats for ${this.stateService.network==='liquid'||this.stateService.network==='liquidtestnet'?'Liquid':'Bitcoin'}${seoDescriptionNetwork(this.stateService.network)} transactions in the mempool: fee range, aggregate size, and more. Mempool blocks are updated in real-time as the network receives new transactions.`);
+                this.seoService.setTitle('Pending transaction sample');
+                this.seoService.setDescription('See observed Ethereum pending transactions, gas-price ranges, gas limits, and estimated execution fees for the next validator slot.');
                 mempoolBlocks[this.mempoolBlockIndex].isStack = mempoolBlocks[this.mempoolBlockIndex].blockVSize > this.stateService.blockVSize;
                 return mempoolBlocks[this.mempoolBlockIndex];
               })

@@ -75,6 +75,7 @@ export class BlocksList implements OnInit {
         filter(([blocksCountInitialized, _]) => blocksCountInitialized),
         tap(([_, params]) => {
           this.page = +params['page'] || 1;
+          this.seoService.setTitle(this.page > 1 ? `Blocks — page ${this.page}` : 'Blocks');
           this.page === 1 ? this.fromHeightSubject.next(undefined) : this.fromHeightSubject.next((this.blocksCount - 1) - (this.page - 1) * 15);
         })
       ).subscribe();

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://eth.tx.taxi/</loc></url>
+  <url><loc>https://eth.tx.taxi/blocks/1</loc></url>
+  <url><loc>https://eth.tx.taxi/txs</loc></url>
+  <url><loc>https://eth.tx.taxi/production</loc></url>
+  <url><loc>https://eth.tx.taxi/mempool-block/0</loc></url>
+  <url><loc>https://eth.tx.taxi/about</loc></url>
+  <url><loc>https://eth.tx.taxi/privacy-policy</loc></url>
+  <url><loc>https://eth.tx.taxi/terms-of-service</loc></url>
+  <url><loc>https://eth.tx.taxi/docs/faq</loc></url>
+  <url><loc>https://eth.tx.taxi/docs/api/rest</loc></url>
+  <url><loc>https://eth.tx.taxi/docs/api/websocket</loc></url>
+</urlset>

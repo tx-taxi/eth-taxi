@@ -1,0 +1,64 @@
+# eth.tx.taxi
+
+> Public Ethereum mainnet explorer in the tx.taxi family. Read-only blocks, transactions, accounts, tokens, gas estimates and provider-observed pending activity.
+
+## Canonical pages
+
+- [eth.tx.taxi](https://eth.tx.taxi/): Track Ethereum blocks, transactions, addresses, and live gas conditions on eth.tx.taxi.
+- [Blocks](https://eth.tx.taxi/blocks/1): See recent Ethereum blocks with validator, gas usage, transaction count, rewards, and fees.
+- [Recent Transactions](https://eth.tx.taxi/txs): See recent Ethereum transactions with value, gas used, and gas price, updated in real time.
+- [Ethereum Block Production](https://eth.tx.taxi/production): Follow recent Ethereum blocks, fee recipients, gas usage, transaction activity, and the live gas market.
+- [Pending transaction sample](https://eth.tx.taxi/mempool-block/0): See observed Ethereum pending transactions, gas-price ranges, gas limits, and estimated execution fees for the next validator slot.
+- [About eth.tx.taxi](https://eth.tx.taxi/about): Learn about eth.tx.taxi, its Ethereum data sources, open-source lineage, and operator contact details.
+- [Privacy Policy](https://eth.tx.taxi/privacy-policy): How eth.tx.taxi handles the limited technical data required to operate its Ethereum explorer.
+- [Terms of Service](https://eth.tx.taxi/terms-of-service): Terms for using eth.tx.taxi, an independent Ethereum block explorer operated by tx.taxi.
+- [Ethereum Guide](https://eth.tx.taxi/docs/faq): Understand Ethereum transactions, gas, account activity, confirmations, and the data shown by eth.tx.taxi.
+- [REST API](https://eth.tx.taxi/docs/api/rest): Documentation for the eth.tx.taxi REST API: blocks, transactions, accounts, tokens, gas estimates, and explorer state.
+- [WebSocket API](https://eth.tx.taxi/docs/api/websocket): Documentation for the eth.tx.taxi WebSocket API: live Ethereum blocks, pending transactions, accounts, and transaction status.
+
+## Markdown representations
+
+- [eth.tx.taxi](https://eth.tx.taxi/index.md)
+- [Blocks](https://eth.tx.taxi/blocks/1.md)
+- [Recent Transactions](https://eth.tx.taxi/txs.md)
+- [Ethereum Block Production](https://eth.tx.taxi/production.md)
+- [Pending transaction sample](https://eth.tx.taxi/mempool-block/0.md)
+- [About eth.tx.taxi](https://eth.tx.taxi/about.md)
+- [Privacy Policy](https://eth.tx.taxi/privacy-policy.md)
+- [Terms of Service](https://eth.tx.taxi/terms-of-service.md)
+- [Ethereum Guide](https://eth.tx.taxi/docs/faq.md)
+- [REST API](https://eth.tx.taxi/docs/api/rest.md)
+- [WebSocket API](https://eth.tx.taxi/docs/api/websocket.md)
+
+## Documented interfaces
+
+REST base: https://eth.tx.taxi
+WebSocket endpoint: wss://eth.tx.taxi/api/v1/ws
+
+- GET /api/v1/init-data: Explorer snapshot
+- GET /api/v1/info: Network status
+- GET /api/v1/fees/recommended: Recommended gas prices
+- GET /api/v1/mempool: Pending sample summary
+- GET /api/v1/blocks: Recent blocks
+- GET /api/v1/blocks/:height: Blocks ending at a height
+- GET /api/block-height/:height: Block hash at a height
+- GET /api/v1/block/:hash: Block by hash
+- GET /api/block/:hash/txs/:start: Block transactions
+- GET /api/tx/:hash: Transaction by hash
+- GET /api/tx/:hash/status: Transaction inclusion status
+- GET /api/v1/ethereum/transaction/:hash: Ethereum transaction metadata
+- GET /api/address/:address: Account summary
+- GET /api/address/:address/txs: Account transactions
+- GET /api/v1/ethereum/address/:address: Ethereum account metadata
+- GET /api/v1/ethereum/token/:address: Token metadata
+- GET /api/v1/ethereum/token/:address/transfers: Token transfers
+
+## Limits
+
+Documented routes are public `GET` endpoints and return JSON unless noted. Hash and address parameters are 0x-prefixed hexadecimal values. Amounts and quantities that require precision are decimal strings; do not parse them with JavaScript `Number`.
+
+This is a read API. It does not broadcast transactions, estimate gas for arbitrary call data, provide execution traces, serve raw transaction bytes, or promise complete account history while indexer fallback is active.
+
+No. eth.tx.taxi displays public Ethereum data. It cannot access wallets, undo a transaction, retrieve a private key, or recover funds. Contact the wallet, exchange, bridge, or application that submitted the transaction for account-specific support.
+
+Full documentation: https://eth.tx.taxi/llms-full.txt

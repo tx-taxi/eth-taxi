@@ -22,13 +22,11 @@ export class SeoService {
     private router: Router,
     private activatedRoute: ActivatedRoute,
   ) {
-    // save original meta tags
-    this.baseDescription = metaService.getTag('name=\'description\'')?.content || this.baseDescription;
-    this.baseTitle = titleService.getTitle()?.split(' - ')?.[0] || this.baseTitle;
+    // Route-specific server metadata must not become the base for later SPA navigation.
     try {
       const canonicalUrl = new URL(this.canonicalLink?.href || '');
       this.baseDomain = canonicalUrl?.host;
-    } catch (e) {
+    } catch {
       // leave as default
     }
 
@@ -42,7 +40,7 @@ export class SeoService {
       }),
       filter(route => route.outlet === 'primary'),
       switchMap(route => route.data),
-    ).subscribe((data) => {
+    ).subscribe(() => {
       this.clearSoft404();
       this.updateCanonical(this.router.url.split('?')[0].split('#')[0]);
     });
@@ -86,6 +84,11 @@ export class SeoService {
 
   updateCanonical(path) {
     const canonicalUrl = 'https://' + this.baseDomain + path;
+    // Metadata for the initial server-rendered page must not describe a later SPA route.
+    if (this.canonicalLink.href !== canonicalUrl) {
+      document.getElementById('jsonld-page')?.remove();
+      document.querySelector('link[rel="alternate"][type="text/markdown"]')?.remove();
+    }
     this.canonicalLink.setAttribute('href', canonicalUrl);
     this.metaService.updateTag({ property: 'og:url', content: canonicalUrl });
   }

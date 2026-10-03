@@ -1,0 +1,19 @@
+{
+  "parser": "Python ElementTree actual XML namespace",
+  "scope": "Root /sitemap.xml covers every included path",
+  "urls": [
+    "https://eth.tx.taxi/",
+    "https://eth.tx.taxi/blocks/1",
+    "https://eth.tx.taxi/txs",
+    "https://eth.tx.taxi/production",
+    "https://eth.tx.taxi/mempool-block/0",
+    "https://eth.tx.taxi/about",
+    "https://eth.tx.taxi/privacy-policy",
+    "https://eth.tx.taxi/terms-of-service",
+    "https://eth.tx.taxi/docs/faq",
+    "https://eth.tx.taxi/docs/api/rest",
+    "https://eth.tx.taxi/docs/api/websocket"
+  ],
+  "duplicates": 0,
+  "failures": 0
+}

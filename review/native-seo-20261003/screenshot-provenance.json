@@ -1,0 +1,20 @@
+{
+  "key": "eth-transaction",
+  "metadataSource": "/tmp/tx-taxi-native-seo-complete-20261003/router/public/assets/screenshots/manifest.json",
+  "assetSha256Verified": true,
+  "assetBytesVerified": true,
+  "imageViewed": false,
+  "usage": "Real historical native Ethereum product reference, not a capture of docs/policies/current entity",
+  "entry": {
+    "url": "/assets/screenshots/eth-transaction-4abe31f2a24f.jpg",
+    "width": 1440,
+    "height": 1605,
+    "alt": "A confirmed ETH transfer in eth.tx.taxi, showing status, fee, gas details, sender and destination.",
+    "source": "https://eth.tx.taxi/tx/0x82f117c1b9e9bbca003ed94bc7bf5f37ce5df5dfa512d189de6c10d66c6bee48",
+    "capturedFrom": "https://eth.tx.taxi/tx/0x82f117c1b9e9bbca003ed94bc7bf5f37ce5df5dfa512d189de6c10d66c6bee48",
+    "capturedAt": "2026-09-28T01:18:33.552Z",
+    "fullPage": true,
+    "sha256": "4abe31f2a24f83527b29dd7acb54916f8c39a3c508405f718fcc2514c62c3ed0",
+    "bytes": 199499
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-03T19:09:50.008Z",
+  "compiler": "Actual Angular CLI production --localize",
+  "exitCode": 0,
+  "bundleHash": "e38f81b7672c816f",
+  "elapsedMs": 39798,
+  "logSha256": "ada51248c1e1face31ca7518d1ea088dc49b753302d02544c30faa0b388aea04",
+  "sourceIndexScreenshotIncluded": true,
+  "standardNpmBuild": {
+    "status": "restricted environment failure",
+    "reason": "Existing generate-themes.js npx sass attempts spawnSync /bin/sh: EPERM"
+  },
+  "workaround": "Compile themes using locked Sass JS API; generate config; actual Angular production --localize; copy existing resources/themes; SKIP_SYNC asset stage; native stylesheet helper; static SEO generator",
+  "componentBudgetWarnings": [
+    "Warning: frontend/src/app/components/acceleration-timeline/acceleration-timeline.component.scss exceeded maximum budget. Budget 6.00 kB was not met by 832 bytes with a total of 6.83 kB.",
+    "Warning: frontend/src/app/components/custom-dashboard/custom-dashboard.component.scss exceeded maximum budget. Budget 6.00 kB was not met by 1.76 kB with a total of 7.76 kB.",
+    "Warning: frontend/src/app/components/ethereum-token/ethereum-token.component.scss exceeded maximum budget. Budget 6.00 kB was not met by 536 bytes with a total of 6.54 kB.",
+    "Warning: frontend/src/app/components/search-form/search-form.component.scss exceeded maximum budget. Budget 6.00 kB was not met by 1.40 kB with a total of 7.40 kB.",
+    "Warning: frontend/src/app/components/transactions-list/transactions-list.component.scss exceeded maximum budget. Budget 6.00 kB was not met by 1.83 kB with a total of 7.83 kB.",
+    "Warning: frontend/src/app/dashboard/dashboard.component.scss exceeded maximum budget. Budget 6.00 kB was not met by 90 bytes with a total of 6.09 kB."
+  ],
+  "targetedLint": {
+    "exitCode": 0,
+    "existingTypescriptWarnings": 24,
+    "newStandaloneScriptsExitCode": 0
+  },
+  "dependencyProvenance": {
+    "frontend": "Read-only /home/lukee/dev/eth-taxi/frontend/node_modules",
+    "adapter": "Read-only /home/lukee/dev/eth-eight-blocks/adapter/node_modules; matches locked parse5 6.0.1, sharp 0.34.5, ws 8.21.3"
+  },
+  "imagesViewed": false,
+  "automaticRoutingHintIncluded": true
+}

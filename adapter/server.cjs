@@ -12,6 +12,7 @@ const { WebSocketServer } = require('ws');
 const {createPendingPool} = require('./pending-pool.cjs');
 const {pendingExecutionRate, projectPendingBlocks} = require('./project-pending-blocks.cjs');
 const {ERC1155_TRANSFER_TOPICS, decodeErc1155Log, decodeTokenTransferIntent, isDirectTokenTransferCall, tokenTransferAmount} = require('./token-transfer-intent.cjs');
+const {createStaticSeo} = require('./static-seo.cjs');
 
 const host = process.env.ETH_ADAPTER_HOST || '0.0.0.0';
 const port = Number(process.env.PORT || 8080);
@@ -74,7 +75,6 @@ const OG_REQUEST_TIMEOUT_MS = 8_000;
 const OG_IMAGE_WIDTH = 1200;
 const OG_IMAGE_HEIGHT = 630;
 const OG_ORIGIN = 'https://eth.tx.taxi';
-const OG_CARD_VERSION = '4';
 const TRANSACTION_TOKEN_METADATA_LIMIT = 12;
 const ETH_PRICE_API_URL = (process.env.ETH_PRICE_API_URL || 'https://api.coingecko.com/api/v3').replace(/\/$/, '');
 const ETH_COINBASE_API_URL = (process.env.ETH_COINBASE_API_URL || 'https://api.exchange.coinbase.com').replace(/\/$/, '');
@@ -1943,22 +1943,23 @@ function ogEntityMetadata(kind, id, entity) {
   const pathname = `/${kind === 'tx' ? 'tx' : kind}/${encodeURIComponent(id)}`;
   const title = `${entity.heading} | eth.tx.taxi`;
   const url = `${OG_ORIGIN}${pathname}`;
-  const image = `${OG_ORIGIN}/og/${kind}/${encodeURIComponent(id)}.png?v=${OG_CARD_VERSION}`;
+  const image = 'https://tx.taxi/assets/screenshots/eth-transaction-4abe31f2a24f.jpg';
+  const imageAlt = 'A confirmed ETH transfer in eth.tx.taxi, showing status, fee, gas details, sender and destination.';
   const tags = [
     ['name', 'description', entity.description],
     ['property', 'og:type', 'website'], ['property', 'og:site_name', 'eth.tx.taxi'],
     ['property', 'og:locale', 'en_US'],
     ['property', 'og:title', title], ['property', 'og:description', entity.description],
     ['property', 'og:url', url], ['property', 'og:image', image],
-    ['property', 'og:image:type', 'image/png'], ['property', 'og:image:width', String(OG_IMAGE_WIDTH)],
-    ['property', 'og:image:height', String(OG_IMAGE_HEIGHT)], ['property', 'og:image:alt', `eth.tx.taxi ${entity.heading}`],
+    ['property', 'og:image:type', 'image/jpeg'], ['property', 'og:image:width', '1440'],
+    ['property', 'og:image:height', '1605'], ['property', 'og:image:alt', imageAlt],
     ['name', 'twitter:card', 'summary_large_image'], ['name', 'twitter:title', title],
     ['name', 'twitter:description', entity.description], ['name', 'twitter:image', image],
-    ['name', 'twitter:image:alt', `eth.tx.taxi ${entity.heading}`], ['name', 'twitter:domain', 'eth.tx.taxi'],
+    ['name', 'twitter:image:alt', imageAlt], ['name', 'twitter:domain', 'eth.tx.taxi'],
   ];
   return {
     title, description: entity.description, url, image,
-    html: `<title>${ogEscape(title)}</title><link rel="canonical" href="${ogEscape(url)}">` +
+    html: `<title>${ogEscape(title)}</title><link id="canonical" rel="canonical" href="${ogEscape(url)}">` +
       tags.map(([attribute, name, content]) => `<meta ${attribute}="${name}" content="${ogEscape(content)}">`).join(''),
   };
 }
@@ -2158,6 +2159,8 @@ function isSupportedApiPath(pathname) {
   ].some((pattern) => pattern.test(pathname));
 }
 
+const staticSeo = createStaticSeo(staticRoot, ogInjectDocument);
+
 async function serveStatic(pathname, res, spaFallback = true) {
   if (isApiPath(pathname)) return false;
   const entityRoute = ogEntityRoute(pathname);
@@ -2186,6 +2189,7 @@ async function serveStatic(pathname, res, spaFallback = true) {
     if (error?.code !== 'ENOENT' && error?.code !== 'EISDIR') throw error;
   }
   if (!spaFallback) return false;
+  const page = staticSeo.page(pathname);
 
   // Localized builds place an index under en-US, while the default production
   // build emits it at the static root. Either layout must serve deep links.
@@ -2195,8 +2199,8 @@ async function serveStatic(pathname, res, spaFallback = true) {
   ]) {
     try {
       const body = await fs.readFile(indexPath);
-      res.writeHead(200, { 'content-type': contentTypes['.html'], 'cache-control': 'no-store' });
-      res.end(entityMetadata ? ogInjectDocument(body.toString(), entityMetadata) : body);
+      res.writeHead(200, { 'content-type': contentTypes['.html'], 'cache-control': 'no-store', ...(!page && !entityMetadata ? { 'x-robots-tag': 'noindex, follow' } : {}) });
+      res.end(page ? staticSeo.render(body.toString(), page) : entityMetadata ? ogInjectDocument(body.toString(), entityMetadata) : body);
       return true;
     } catch (error) {
       if (error?.code !== 'ENOENT' && error?.code !== 'EISDIR') throw error;
@@ -2209,17 +2213,8 @@ const server = http.createServer(async (req, res) => {
   try {
     const requestUrl = new URL(req.url, `http://${req.headers.host}`);
     const requestPath = requestUrl.pathname;
-    // Bounded, host-specific crawl endpoints precede static/SPA fallback.
-    if (requestPath === '/sitemap.xml' || requestPath === '/robots.txt') {
-      const sitemap = requestPath === '/sitemap.xml';
-      const body = sitemap ? "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n  <url><loc>https://eth.tx.taxi/</loc></url>\n</urlset>\n" : "User-agent: *\nAllow: /\n\nSitemap: https://eth.tx.taxi/sitemap.xml\n";
-      res.writeHead(200, {
-        'Content-Type': sitemap ? 'application/xml; charset=utf-8' : 'text/plain; charset=utf-8',
-        'Cache-Control': 'public, max-age=3600',
-        'X-Content-Type-Options': 'nosniff',
-      });
-      return res.end(req.method === 'HEAD' ? undefined : body);
-    }
+    // Canonical docs, Markdown and discovery responses precede API/SPA fallback.
+    if (staticSeo.handle(req, res, requestPath)) return;
     if (requestPath.startsWith('/og/')) {
       const image = ogImageRoute(requestPath);
       if (!image || !['GET', 'HEAD'].includes(req.method)) return respond(res, 404, { error: 'Not found' });

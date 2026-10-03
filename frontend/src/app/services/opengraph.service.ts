@@ -2,7 +2,6 @@ import { Injectable, NgZone } from '@angular/core';
 import { Meta } from '@angular/platform-browser';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { filter, map, switchMap } from 'rxjs/operators';
-import { combineLatest } from 'rxjs';
 import { StateService } from '@app/services/state.service';
 
 @Injectable({
@@ -22,7 +21,7 @@ export class OpenGraphService {
     private router: Router,
     private activatedRoute: ActivatedRoute,
   ) {
-    this.defaultImageUrl = 'https://tx.taxi/assets/og/explorers/ethereum.png?v=20260925-brand';
+    this.defaultImageUrl = 'https://tx.taxi/assets/screenshots/eth-transaction-4abe31f2a24f.jpg';
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
       map(() => this.activatedRoute),
@@ -47,18 +46,20 @@ export class OpenGraphService {
   }
 
   setOgImage() {
-    // Use the native entity renderer, or the chain card for general pages.
+    // All social metadata uses a real full-page product capture.
     this.clearOgImage();
   }
 
   clearOgImage() {
-    const entity = this.router.url.split('?')[0].match(/^\/(tx|block|address|token)\/([^/]+)$/);
-    const image = entity ? `https://eth.tx.taxi/og/${entity[1]}/${entity[2]}.png?v=4` : this.defaultImageUrl;
+    const image = this.defaultImageUrl;
     this.metaService.updateTag({ property: 'og:image', content: image });
     this.metaService.updateTag({ name: 'twitter:image', content: image });
-    this.metaService.updateTag({ property: 'og:image:type', content: 'image/png' });
-    this.metaService.updateTag({ property: 'og:image:width', content: '1200' });
-    this.metaService.updateTag({ property: 'og:image:height', content: '630' });
+    this.metaService.updateTag({ property: 'og:image:type', content: 'image/jpeg' });
+    this.metaService.updateTag({ property: 'og:image:width', content: '1440' });
+    this.metaService.updateTag({ property: 'og:image:height', content: '1605' });
+    const alt = 'A confirmed ETH transfer in eth.tx.taxi, showing status, fee, gas details, sender and destination.';
+    this.metaService.updateTag({ property: 'og:image:alt', content: alt });
+    this.metaService.updateTag({ name: 'twitter:image:alt', content: alt });
   }
 
   setManualOgImage(_imageFilename) {

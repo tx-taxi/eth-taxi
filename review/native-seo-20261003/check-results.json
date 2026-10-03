@@ -1,0 +1,133 @@
+{
+  "date": "2026-10-03T19:10:18.354Z",
+  "mode": "real adapter callback, no listen; actual built Angular index; providers forbidden",
+  "canonicalPages": [
+    {
+      "route": "/",
+      "status": 200,
+      "title": "eth.tx.taxi - Ethereum Explorer",
+      "description": "Track Ethereum blocks, transactions, addresses, and live gas conditions on eth.tx.taxi.",
+      "schemaType": "WebApplication",
+      "textCharacters": 719,
+      "markdown": "/index.md",
+      "bodySha256": "5436bd1073c80ad4e28531f97078085dc9a0890ade2386a1ecb2af7fb0c47691"
+    },
+    {
+      "route": "/blocks/1",
+      "status": 200,
+      "title": "Blocks - eth.tx.taxi - Ethereum Explorer",
+      "description": "See recent Ethereum blocks with validator, gas usage, transaction count, rewards, and fees.",
+      "schemaType": "CollectionPage",
+      "textCharacters": 718,
+      "markdown": "/blocks/1.md",
+      "bodySha256": "e66bd275af219fc1b3ecc50644463b9a1fbb58f41c2223c5740937a5d12aee95"
+    },
+    {
+      "route": "/txs",
+      "status": 200,
+      "title": "Recent Transactions - eth.tx.taxi - Ethereum Explorer",
+      "description": "See recent Ethereum transactions with value, gas used, and gas price, updated in real time.",
+      "schemaType": "CollectionPage",
+      "textCharacters": 731,
+      "markdown": "/txs.md",
+      "bodySha256": "1e9b9dad55b19c699667c204007116a7d1ac2fd51ed5ed92eede57405a81f83e"
+    },
+    {
+      "route": "/production",
+      "status": 200,
+      "title": "Ethereum Block Production - eth.tx.taxi - Ethereum Explorer",
+      "description": "Follow recent Ethereum blocks, fee recipients, gas usage, transaction activity, and the live gas market.",
+      "schemaType": "WebPage",
+      "textCharacters": 750,
+      "markdown": "/production.md",
+      "bodySha256": "57bde1725347d715e1dca8d6b1478d12da25863820edfdb2910a89b0f897940b"
+    },
+    {
+      "route": "/mempool-block/0",
+      "status": 200,
+      "title": "Pending transaction sample - eth.tx.taxi - Ethereum Explorer",
+      "description": "See observed Ethereum pending transactions, gas-price ranges, gas limits, and estimated execution fees for the next validator slot.",
+      "schemaType": "WebPage",
+      "textCharacters": 778,
+      "markdown": "/mempool-block/0.md",
+      "bodySha256": "f94a584de2360da116878bb85a06d1b6576d90f577eda1feba763914f9490b40"
+    },
+    {
+      "route": "/about",
+      "status": 200,
+      "title": "About eth.tx.taxi - eth.tx.taxi - Ethereum Explorer",
+      "description": "Learn about eth.tx.taxi, its Ethereum data sources, open-source lineage, and operator contact details.",
+      "schemaType": "AboutPage",
+      "textCharacters": 2019,
+      "markdown": "/about.md",
+      "bodySha256": "911dd23ee370ba83bb743e6951a52c604b0837363e086b040115a25a3dbc1b33"
+    },
+    {
+      "route": "/privacy-policy",
+      "status": 200,
+      "title": "Privacy Policy - eth.tx.taxi - Ethereum Explorer",
+      "description": "How eth.tx.taxi handles the limited technical data required to operate its Ethereum explorer.",
+      "schemaType": "WebPage",
+      "textCharacters": 1579,
+      "markdown": "/privacy-policy.md",
+      "bodySha256": "5b2e91352ef1fbe0fd237c38dd6f8682477b0a81beb60e8e64f5b7c1589f5534"
+    },
+    {
+      "route": "/terms-of-service",
+      "status": 200,
+      "title": "Terms of Service - eth.tx.taxi - Ethereum Explorer",
+      "description": "Terms for using eth.tx.taxi, an independent Ethereum block explorer operated by tx.taxi.",
+      "schemaType": "WebPage",
+      "textCharacters": 1517,
+      "markdown": "/terms-of-service.md",
+      "bodySha256": "e3ffdc516bf961246bfcaf5f15246f174db89f52630a9072f81c15cf3883ad6f"
+    },
+    {
+      "route": "/docs/faq",
+      "status": 200,
+      "title": "Ethereum Guide - eth.tx.taxi - Ethereum Explorer",
+      "description": "Understand Ethereum transactions, gas, account activity, confirmations, and the data shown by eth.tx.taxi.",
+      "schemaType": "FAQPage",
+      "textCharacters": 8274,
+      "markdown": "/docs/faq.md",
+      "bodySha256": "4fe2d46b0a3f30ef0ad1867cf82ab8f4416f10ebbc2771e4f68e846691fb4845"
+    },
+    {
+      "route": "/docs/api/rest",
+      "status": 200,
+      "title": "REST API - eth.tx.taxi - Ethereum Explorer",
+      "description": "Documentation for the eth.tx.taxi REST API: blocks, transactions, accounts, tokens, gas estimates, and explorer state.",
+      "schemaType": "TechArticle",
+      "textCharacters": 7053,
+      "markdown": "/docs/api/rest.md",
+      "bodySha256": "c1852cd51d50fc70c9a0d8c7cc51651a6e4b4be662263c6276e34af9ec418f89"
+    },
+    {
+      "route": "/docs/api/websocket",
+      "status": 200,
+      "title": "WebSocket API - eth.tx.taxi - Ethereum Explorer",
+      "description": "Documentation for the eth.tx.taxi WebSocket API: live Ethereum blocks, pending transactions, accounts, and transaction status.",
+      "schemaType": "TechArticle",
+      "textCharacters": 3512,
+      "markdown": "/docs/api/websocket.md",
+      "bodySha256": "ecb8c8e9c4ebb27926478c7ea39ac4f211ddafd3ffa11afae7618d73ddfa3a08"
+    }
+  ],
+  "internalLinks": 169,
+  "skippedDataLinks": [],
+  "responses": 47,
+  "aliases": {
+    "/docs": "/docs/faq",
+    "/docs/api": "/docs/api/rest",
+    "/api": "/docs/faq",
+    "/api/api/rest": "/docs/api/rest",
+    "/api/api/websocket": "/docs/api/websocket",
+    "/blocks": "/blocks/1",
+    "/mining": "/production",
+    "/llm.txt": "/llms.txt",
+    "/about/": "/about"
+  },
+  "networkAttempts": 0,
+  "clientNavigation": "initial route schema retained; changed canonical clears stale schema/Markdown link; reset restores Ethereum base",
+  "failures": 0
+}
