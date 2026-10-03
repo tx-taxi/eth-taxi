@@ -2209,6 +2209,17 @@ const server = http.createServer(async (req, res) => {
   try {
     const requestUrl = new URL(req.url, `http://${req.headers.host}`);
     const requestPath = requestUrl.pathname;
+    // Bounded, host-specific crawl endpoints precede static/SPA fallback.
+    if (requestPath === '/sitemap.xml' || requestPath === '/robots.txt') {
+      const sitemap = requestPath === '/sitemap.xml';
+      const body = sitemap ? "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n  <url><loc>https://eth.tx.taxi/</loc></url>\n</urlset>\n" : "User-agent: *\nAllow: /\n\nSitemap: https://eth.tx.taxi/sitemap.xml\n";
+      res.writeHead(200, {
+        'Content-Type': sitemap ? 'application/xml; charset=utf-8' : 'text/plain; charset=utf-8',
+        'Cache-Control': 'public, max-age=3600',
+        'X-Content-Type-Options': 'nosniff',
+      });
+      return res.end(req.method === 'HEAD' ? undefined : body);
+    }
     if (requestPath.startsWith('/og/')) {
       const image = ogImageRoute(requestPath);
       if (!image || !['GET', 'HEAD'].includes(req.method)) return respond(res, 404, { error: 'Not found' });
