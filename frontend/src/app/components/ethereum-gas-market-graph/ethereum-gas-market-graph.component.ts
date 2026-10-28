@@ -23,6 +23,11 @@ const FUTURE_TOLERANCE_MS = 60 * 1000;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EthereumGasMarketGraphComponent implements OnChanges {
+  readonly ethereumGasMarketLabel = $localize`:@@eth.graph.ethereumGasMarket:Ethereum gas market`;
+  readonly baseFeeLabel = $localize`:@@eth.graph.baseFeeLabel:Base fee`;
+  readonly utilizationLabel = $localize`:@@eth.graph.utilizationLabel:Network utilization`;
+  readonly averageGasPriceLabel = $localize`:@@eth.graph.averageGasPrice:Average gas price`;
+  readonly pendingSampleLabel = $localize`:@@eth.graph.pendingSample:Pending txs sampled`;
   @Input() samples: EthereumGasMarketSample[] | null = null;
   @Input() height = 260;
 
@@ -40,10 +45,10 @@ export class EthereumGasMarketGraphComponent implements OnChanges {
 
   get emptyState(): string {
     if (this.samples === null) {
-      return 'Loading gas market history';
+      return $localize`:@@eth.graph.loadingHistory:Loading gas market history`;
     }
 
-    return 'No gas market samples are available for the last two hours';
+    return $localize`:@@eth.graph.noSamples:No gas market samples are available for the last two hours`;
   }
 
   get accessibleSummary(): string {
@@ -53,27 +58,23 @@ export class EthereumGasMarketGraphComponent implements OnChanges {
 
     const latest = this.recentSamples[this.recentSamples.length - 1];
     if (this.recentSamples.length === 1) {
-      return `Current gas market sample at ${this.formatTime(latest.timestamp)}. `
-        + `Base fee ${this.formatGwei(latest.base_fee_gwei)} gwei; `
-        + `network utilization ${this.formatPercentage(latest.network_utilization_percentage)}.`;
+      return $localize`:@@eth.graph.currentSummary:Current gas market sample at ${this.formatTime(latest.timestamp)}:TIME:. Base fee ${this.formatGwei(latest.base_fee_gwei)}:FEE: gwei; network utilization ${this.formatPercentage(latest.network_utilization_percentage)}:UTILIZATION:.`;
     }
 
-    return `Gas market history from ${this.formatTime(this.recentSamples[0].timestamp)} to ${this.formatTime(latest.timestamp)}. `
-      + `Latest base fee ${this.formatGwei(latest.base_fee_gwei)} gwei; `
-      + `network utilization ${this.formatPercentage(latest.network_utilization_percentage)}.`;
+    return $localize`:@@eth.graph.historySummary:Gas market history from ${this.formatTime(this.recentSamples[0].timestamp)}:START: to ${this.formatTime(latest.timestamp)}:END:. Latest base fee ${this.formatGwei(latest.base_fee_gwei)}:FEE: gwei; network utilization ${this.formatPercentage(latest.network_utilization_percentage)}:UTILIZATION:.`;
   }
 
   get historyLabel(): string {
     if (this.recentSamples.length === 1) {
-      return 'Current sample';
+      return $localize`:@@eth.graph.currentSample:Current sample`;
     }
 
     if (this.recentSamples.length < 2) {
-      return 'Live history';
+      return $localize`:@@eth.graph.liveHistory:Live history`;
     }
     const first = this.recentSamples[0].timestamp;
     const last = this.recentSamples[this.recentSamples.length - 1].timestamp;
-    return last - first >= TWO_HOURS_MS - 60_000 ? 'Last 2 hours' : 'Live history';
+    return last - first >= TWO_HOURS_MS - 60_000 ? $localize`:@@eth.graph.lastTwoHours:Last 2 hours` : $localize`:@@eth.graph.liveHistory:Live history`;
   }
 
   private normalizeSamples(samples: EthereumGasMarketSample[] | null): ChartSample[] {
@@ -148,14 +149,14 @@ export class EthereumGasMarketGraphComponent implements OnChanges {
           }
 
           const pendingCount = Number.isFinite(sample.pending_sample_count)
-            ? `<div>Pending txs sampled: <strong>${formatNumber(sample.pending_sample_count as number, this.locale, '1.0-0')}</strong></div>`
+            ? `<div>${this.pendingSampleLabel}: <strong>${formatNumber(sample.pending_sample_count as number, this.locale, '1.0-0')}</strong></div>`
             : '';
 
           return `<div class="ethereum-gas-tooltip">
             <div><strong>${formatDate(timestamp, 'mediumTime', this.locale)}</strong></div>
-            <div>Base fee: <strong>${this.formatGwei(sample.base_fee_gwei)} gwei</strong></div>
-            <div>Network utilization: <strong>${this.formatPercentage(sample.network_utilization_percentage)}</strong></div>
-            <div>Average gas price: <strong>${this.formatGwei(sample.gas_price_average_gwei)} gwei</strong></div>
+            <div>${this.baseFeeLabel}: <strong>${this.formatGwei(sample.base_fee_gwei)} gwei</strong></div>
+            <div>${this.utilizationLabel}: <strong>${this.formatPercentage(sample.network_utilization_percentage)}</strong></div>
+            <div>${this.averageGasPriceLabel}: <strong>${this.formatGwei(sample.gas_price_average_gwei)} gwei</strong></div>
             ${pendingCount}
           </div>`;
         },
@@ -212,7 +213,7 @@ export class EthereumGasMarketGraphComponent implements OnChanges {
       ],
       series: [
         {
-          name: 'Base fee',
+          name: this.baseFeeLabel,
           type: 'line',
           yAxisIndex: 0,
           data: this.recentSamples.map(sample => [sample.timestamp, sample.base_fee_gwei]),
@@ -228,7 +229,7 @@ export class EthereumGasMarketGraphComponent implements OnChanges {
           emphasis: { focus: 'series' },
         },
         {
-          name: 'Network utilization',
+          name: this.utilizationLabel,
           type: 'line',
           yAxisIndex: 1,
           data: this.recentSamples.map(sample => [sample.timestamp, sample.network_utilization_percentage]),

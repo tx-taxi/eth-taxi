@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ChangeDetectionStrategy, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, ChangeDetectionStrategy, Output, EventEmitter, Inject, LOCALE_ID } from '@angular/core';
 import { Transaction } from '@interfaces/electrs.interface';
 import { Acceleration, CpfpInfo } from '@interfaces/node-api.interface';
 import { Pool, TxAuditStatus } from '@components/transaction/transaction.component';
@@ -46,7 +46,7 @@ export class TransactionDetailsComponent implements OnInit {
   @Output() accelerateClicked = new EventEmitter<boolean>();
   @Output() toggleCpfp$ = new EventEmitter<void>();
 
-  constructor() {}
+  constructor(@Inject(LOCALE_ID) private locale: string) {}
 
   ngOnInit(): void {}
 
@@ -59,7 +59,7 @@ export class TransactionDetailsComponent implements OnInit {
   }
 
   formatEthereumQuantity(value: string | null | undefined, decimals: string | null | undefined = '18', maxFractionDigits = 8): string {
-    return formatEthereumQuantity(value, decimals, maxFractionDigits);
+    return formatEthereumQuantity(value, decimals, maxFractionDigits, this.locale);
   }
 
   ethereumWeiNumber(value: string | null | undefined): number {

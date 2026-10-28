@@ -11892,6 +11892,24 @@
       <trans-unit id="eth.rewards.average" datatype="html"><source>Average tx fee</source><target>Comisión media por transacción</target></trans-unit>
       <trans-unit id="eth.rewards.averageTooltip" datatype="html"><source>Average execution-layer gas fee per transaction in the recent block sample</source><target>Comisión media de gas de la capa de ejecución por transacción en la muestra reciente de bloques</target></trans-unit>
       <trans-unit id="eth.rewards.loading" datatype="html"><source>Loading recent execution rewards</source><target>Cargando recompensas de ejecución recientes</target></trans-unit>
+      <trans-unit id="eth.recent.value" datatype="html"><source>Value</source><target>Valor</target></trans-unit>
+      <trans-unit id="eth.graph.ethereumGasMarket" datatype="html"><source>Ethereum gas market</source><target>Mercado de gas de Ethereum</target></trans-unit>
+      <trans-unit id="eth.graph.historyHeading" datatype="html"><source>Gas market, <x id="INTERPOLATION"/></source><target>Mercado de gas, <x id="INTERPOLATION"/></target></trans-unit>
+      <trans-unit id="eth.graph.baseFeeLabel" datatype="html"><source>Base fee</source><target>Comisión base</target></trans-unit>
+      <trans-unit id="eth.graph.utilizationLabel" datatype="html"><source>Network utilization</source><target>Uso de la red</target></trans-unit>
+      <trans-unit id="eth.graph.averageGasPrice" datatype="html"><source>Average gas price</source><target>Precio medio del gas</target></trans-unit>
+      <trans-unit id="eth.graph.pendingSample" datatype="html"><source>Pending txs sampled</source><target>Transacciones pendientes en la muestra</target></trans-unit>
+      <trans-unit id="eth.graph.loadingHistory" datatype="html"><source>Loading gas market history</source><target>Cargando el historial del mercado de gas</target></trans-unit>
+      <trans-unit id="eth.graph.noSamples" datatype="html"><source>No gas market samples are available for the last two hours</source><target>No hay muestras del mercado de gas disponibles para las últimas dos horas</target></trans-unit>
+      <trans-unit id="eth.graph.currentSummary" datatype="html"><source>Current gas market sample at <x id="TIME"/>. Base fee <x id="FEE"/> gwei; network utilization <x id="UTILIZATION"/>.</source><target>Muestra actual del mercado de gas a las <x id="TIME"/>. Comisión base: <x id="FEE"/> gwei; uso de la red: <x id="UTILIZATION"/>.</target></trans-unit>
+      <trans-unit id="eth.graph.historySummary" datatype="html"><source>Gas market history from <x id="START"/> to <x id="END"/>. Latest base fee <x id="FEE"/> gwei; network utilization <x id="UTILIZATION"/>.</source><target>Historial del mercado de gas de <x id="START"/> a <x id="END"/>. Última comisión base: <x id="FEE"/> gwei; uso de la red: <x id="UTILIZATION"/>.</target></trans-unit>
+      <trans-unit id="eth.graph.currentSample" datatype="html"><source>Current sample</source><target>Muestra actual</target></trans-unit>
+      <trans-unit id="eth.graph.liveHistory" datatype="html"><source>Live history</source><target>Historial en directo</target></trans-unit>
+      <trans-unit id="eth.graph.lastTwoHours" datatype="html"><source>Last 2 hours</source><target>Últimas 2 horas</target></trans-unit>
+      <trans-unit id="eth.method.transfer" datatype="html"><source>Transfer</source><target>Transferencia</target></trans-unit>
+      <trans-unit id="eth.feature.transfer" datatype="html"><source>ETH transfer</source><target>Transferencia de ETH</target></trans-unit>
+      <trans-unit id="eth.feature.contractCall" datatype="html"><source>Contract call</source><target>Llamada a contrato</target></trans-unit>
+      <trans-unit id="eth.feature.tokenTransfer" datatype="html"><source>Token transfer / call</source><target>Transferencia de token / llamada</target></trans-unit>
     </body>
   </file>
 </xliff>

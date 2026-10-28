@@ -32,9 +32,9 @@
   <table class="table latest-transactions">
     <thead>
       <th class="table-cell-txid" i18n="dashboard.latest-transactions.txid">TXID</th>
-      <th class="table-cell-satoshis">Value</th>
-      <th class="table-cell-vsize" *ngIf="!widget">Gas used</th>
-      <th class="table-cell-fees">Gas price</th>
+      <th class="table-cell-satoshis" i18n="@@eth.recent.value">Value</th>
+      <th class="table-cell-vsize" *ngIf="!widget" i18n="@@eth.gasUsed">Gas used</th>
+      <th class="table-cell-fees" i18n="@@eth.gasPrice">Gas price</th>
     </thead>
     <tbody data-cy="transactions-list" *ngIf="transactions$ | async as transactions; else skeleton">
       <tr *ngFor="let transaction of transactions; trackBy: trackByTxid">

@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, HostListener, ViewChild, ElementRef, Inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, HostListener, ViewChild, ElementRef, Inject, ChangeDetectorRef, LOCALE_ID } from '@angular/core';
 import { ElectrsApiService } from '@app/services/electrs-api.service';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { TransactionsListComponent } from '@components/transactions-list/transactions-list.component';
@@ -162,11 +162,11 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
   partnerCode: string | undefined;
 
   formatEthereumQuantity(value: string | null | undefined, decimals: string | null | undefined = '18', maxFractionDigits = 8): string {
-    return formatEthereumQuantity(value, decimals, maxFractionDigits);
+    return formatEthereumQuantity(value, decimals, maxFractionDigits, this.locale);
   }
 
   formatEthereumInteger(value: string | null | undefined): string {
-    return formatEthereumInteger(value);
+    return formatEthereumInteger(value, this.locale);
   }
 
   ethereumWeiNumber(value: string | null | undefined): number {
@@ -175,7 +175,8 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ethereumMethod(): string {
-    return this.tx?.ethereum?.decodedInput?.methodCall || this.tx?.ethereum?.method || this.tx?.vin?.[0]?.scriptsig_asm || 'Transfer';
+    const method = this.tx?.ethereum?.decodedInput?.methodCall || this.tx?.ethereum?.method || this.tx?.vin?.[0]?.scriptsig_asm;
+    return !method || method === 'Transfer' ? $localize`:@@eth.method.transfer:Transfer` : method;
   }
 
   private txList: TransactionsListComponent;
@@ -203,6 +204,7 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   constructor(
+    @Inject(LOCALE_ID) private locale: string,
     private route: ActivatedRoute,
     private router: Router,
     private relativeUrlPipe: RelativeUrlPipe,

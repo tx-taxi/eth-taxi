@@ -2,6 +2,7 @@ export function formatEthereumQuantity(
   value: string | null | undefined,
   decimals: string | null | undefined = '18',
   maxFractionDigits = 8,
+  locale = 'en-US',
 ): string {
   const normalizedValue = normalizeEthereumInteger(value);
   const decimalPlaces = parseEthereumDecimals(decimals);
@@ -11,7 +12,7 @@ export function formatEthereumQuantity(
 
   const amount = BigInt(normalizedValue);
   if (decimalPlaces === 0) {
-    return formatEthereumInteger(amount.toString());
+    return formatEthereumInteger(amount.toString(), locale);
   }
 
   const divisor = 10n ** BigInt(decimalPlaces);
@@ -21,14 +22,15 @@ export function formatEthereumQuantity(
   if (fraction.length > maxFractionDigits) {
     fraction = fraction.slice(0, maxFractionDigits).replace(/0+$/, '');
   }
+  const decimalSeparator = new Intl.NumberFormat(locale).formatToParts(1.1).find(part => part.type === 'decimal')?.value || '.';
   return fraction
-    ? `${formatEthereumInteger(whole.toString())}.${fraction}`
-    : formatEthereumInteger(whole.toString());
+    ? `${formatEthereumInteger(whole.toString(), locale)}${decimalSeparator}${fraction}`
+    : formatEthereumInteger(whole.toString(), locale);
 }
 
-export function formatEthereumInteger(value: string | null | undefined): string {
+export function formatEthereumInteger(value: string | null | undefined, locale = 'en-US'): string {
   const normalized = normalizeEthereumInteger(value);
-  return normalized === null ? 'Unavailable' : normalized.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return normalized === null ? 'Unavailable' : new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(BigInt(normalized));
 }
 
 function normalizeEthereumInteger(value: string | null | undefined): string | null {

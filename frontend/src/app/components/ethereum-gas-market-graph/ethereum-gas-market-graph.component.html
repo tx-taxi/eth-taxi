@@ -1,8 +1,8 @@
-<section class="gas-market" [attr.aria-label]="'Ethereum gas market ' + historyLabel.toLowerCase()">
+<section class="gas-market" [attr.aria-label]="ethereumGasMarketLabel + ' ' + historyLabel.toLowerCase()">
   <div class="gas-market__header">
     <div>
       <h3 class="gas-market__title" i18n="@@eth.graph.gas-market">Gas market</h3>
-      <span class="sr-only">Gas market, {{ historyLabel }}</span>
+      <span class="sr-only" i18n="@@eth.graph.historyHeading">Gas market, {{ historyLabel }}</span>
     </div>
 
     <ul class="gas-market__legend" i18n-aria-label="@@eth.graph.legend" aria-label="Chart legend">
