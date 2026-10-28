@@ -11734,6 +11734,10 @@
       <trans-unit id="eth.legal.termsDescription" datatype="html"><source>Terms for using eth.tx.taxi, an independent Ethereum block explorer operated by tx.taxi.</source><target>Condiciones de uso de eth.tx.taxi, un explorador independiente de bloques de Ethereum operado por tx.taxi.</target></trans-unit>
       <trans-unit id="eth.legal.privacyDescription" datatype="html"><source>How eth.tx.taxi handles the limited technical data required to operate its Ethereum explorer.</source><target>Cómo trata eth.tx.taxi los datos técnicos limitados necesarios para operar su explorador de Ethereum.</target></trans-unit>
       <trans-unit id="eth.search.example" datatype="html"><source>tx.taxi/[your search]</source><target>tx.taxi/[tu búsqueda]</target></trans-unit>
+      <trans-unit id="eth.blockDetails.totalFees" datatype="html"><source>Total fees</source><target>Comisiones totales</target></trans-unit>
+      <trans-unit id="eth.blockDetails.medianFee" datatype="html"><source>Median fee rate</source><target>Tasa mediana de comisión</target></trans-unit>
+      <trans-unit id="eth.blockDetails.feeRange" datatype="html"><source>Fee range</source><target>Intervalo de comisiones</target></trans-unit>
+      <trans-unit id="eth.blockDetails.estimatedFees" datatype="html"><source>Estimated execution fees</source><target>Comisiones de ejecución estimadas</target></trans-unit>
     </body>
   </file>
 </xliff>

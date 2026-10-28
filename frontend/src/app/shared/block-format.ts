@@ -31,7 +31,10 @@ export function exactBlockAmount(value: number | string): string {
   } catch { return '—'; }
 }
 
-export function blockValueDetails(total: number | string, median: number, min: number, max: number, feeLabel = 'Total fees'): string {
+export function blockValueDetails(total: number | string, median: number, min: number, max: number, feeLabel?: string): string {
   const rate = (value: number) => value == null || !Number.isFinite(value) ? '—' : String(value / FEE_SCALE);
-  return `${feeLabel}: ${exactBlockAmount(total)} ${SYMBOL}. Median fee rate: ${rate(median)} ${FEE_UNIT}. Fee range: ${rate(min)}–${rate(max)} ${FEE_UNIT}.`;
+  const totalLabel = feeLabel ?? (typeof $localize === 'function' ? $localize`:@@eth.blockDetails.totalFees:Total fees` : 'Total fees');
+  const medianLabel = typeof $localize === 'function' ? $localize`:@@eth.blockDetails.medianFee:Median fee rate` : 'Median fee rate';
+  const rangeLabel = typeof $localize === 'function' ? $localize`:@@eth.blockDetails.feeRange:Fee range` : 'Fee range';
+  return `${totalLabel}: ${exactBlockAmount(total)} ${SYMBOL}. ${medianLabel}: ${rate(median)} ${FEE_UNIT}. ${rangeLabel}: ${rate(min)}–${rate(max)} ${FEE_UNIT}.`;
 }
