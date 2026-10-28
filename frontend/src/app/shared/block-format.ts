@@ -1,18 +1,28 @@
 const DECIMALS = 18, SYMBOL = 'ETH', FEE_UNIT = 'gwei', FEE_SCALE = 1000000000;
 
+// The document language follows the explicitly selected explorer or hub route.
+// Formatting is visual only; raw amounts and chain data remain unchanged.
+function usesSpanishDecimals(): boolean {
+  return typeof document !== 'undefined' && /^es(?:-|$)/i.test(document.documentElement?.lang || '');
+}
+function displayExactNumber(value: string): string {
+  return usesSpanishDecimals() ? value.replace('.', ',') : value;
+}
+
+
 // Presentation only: never round provider data or detail-page amounts.
 export function compactBlockNumber(value: number, amount = false): string {
   if (!Number.isFinite(value)) return '—';
   const abs = Math.abs(value);
-  if (abs > 0 && abs < 0.001) return value < 0 ? '>−0.001' : '<0.001';
+  if (abs > 0 && abs < 0.001) return (value < 0 ? '>−' : '<') + displayExactNumber('0.001');
   if (abs >= 1000) {
     const units = ['', 'k', 'M', 'B', 'T'];
     let group = Math.min(4, Math.floor(Math.log10(abs) / 3));
     let scaled = Number((value / 1000 ** group).toPrecision(3));
     if (Math.abs(scaled) >= 1000 && group < 4) { group++; scaled /= 1000; }
-    return scaled.toLocaleString('en-US', { maximumSignificantDigits: 3, useGrouping: false }) + units[group];
+    return scaled.toLocaleString(usesSpanishDecimals() ? 'es-ES' : 'en-US', { maximumSignificantDigits: 3, useGrouping: false }) + units[group];
   }
-  return value.toLocaleString('en-US', amount
+  return value.toLocaleString(usesSpanishDecimals() ? 'es-ES' : 'en-US', amount
     ? { minimumFractionDigits: 2, maximumFractionDigits: 3, useGrouping: false }
     : { maximumSignificantDigits: 3, useGrouping: false });
 }
@@ -32,9 +42,9 @@ export function exactBlockAmount(value: number | string): string {
 }
 
 export function blockValueDetails(total: number | string, median: number, min: number, max: number, feeLabel?: string): string {
-  const rate = (value: number) => value == null || !Number.isFinite(value) ? '—' : String(value / FEE_SCALE);
+  const rate = (value: number) => value == null || !Number.isFinite(value) ? '—' : displayExactNumber(String(value / FEE_SCALE));
   const totalLabel = feeLabel ?? (typeof $localize === 'function' ? $localize`:@@eth.blockDetails.totalFees:Total fees` : 'Total fees');
   const medianLabel = typeof $localize === 'function' ? $localize`:@@eth.blockDetails.medianFee:Median fee rate` : 'Median fee rate';
   const rangeLabel = typeof $localize === 'function' ? $localize`:@@eth.blockDetails.feeRange:Fee range` : 'Fee range';
-  return `${totalLabel}: ${exactBlockAmount(total)} ${SYMBOL}. ${medianLabel}: ${rate(median)} ${FEE_UNIT}. ${rangeLabel}: ${rate(min)}–${rate(max)} ${FEE_UNIT}.`;
+  return `${totalLabel}: ${displayExactNumber(exactBlockAmount(total))} ${SYMBOL}. ${medianLabel}: ${rate(median)} ${FEE_UNIT}. ${rangeLabel}: ${rate(min)}–${rate(max)} ${FEE_UNIT}.`;
 }
