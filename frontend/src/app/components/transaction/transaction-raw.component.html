@@ -65,16 +65,16 @@
     @if (!hasPrevouts) {
       <div class="alert alert-mempool">
         @if (offlineMode) {
-          <span><strong>Missing prevouts are not loaded. Some fields like fee rate cannot be calculated.</strong></span>
+          <span><strong i18n="@@eth.txRaw.prevoutsOffline">Missing prevouts are not loaded. Some fields like fee rate cannot be calculated.</strong></span>
         } @else {
-          <span><strong>Error loading missing prevouts</strong>. {{ errorPrevouts ? 'Reason: ' + errorPrevouts : '' }}</span>
+          <span><strong i18n="@@eth.txRaw.prevoutsError">Error loading missing prevouts</strong>. <ng-container *ngIf="errorPrevouts"><span i18n="@@eth.txRaw.reason">Reason:</span> {{ errorPrevouts }}</ng-container></span>
         }
       </div>
     }
 
     @if (errorCpfpInfo) {
       <div class="alert alert-mempool">
-        <span><strong>Error loading CPFP data</strong>. Reason: {{ errorCpfpInfo }}</span>
+        <span><strong i18n="@@eth.txRaw.cpfpError">Error loading CPFP data</strong>. <span i18n="@@eth.txRaw.reason">Reason:</span> {{ errorCpfpInfo }}</span>
       </div>
     }
 

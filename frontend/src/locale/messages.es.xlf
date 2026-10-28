@@ -11763,6 +11763,10 @@
       <trans-unit id="eth.production.recentBlocks" datatype="html"><source>Recent blocks</source><target>Bloques recientes</target></trans-unit>
       <trans-unit id="eth.production.seoTitle" datatype="html"><source>Ethereum Block Production</source><target>Producción de bloques de Ethereum</target></trans-unit>
       <trans-unit id="eth.production.seoDescription" datatype="html"><source>Follow recent Ethereum blocks, fee recipients, gas usage, transaction activity, and the live gas market.</source><target>Consulta los bloques recientes de Ethereum, los destinatarios de comisiones, el uso de gas, la actividad de transacciones y el mercado de gas en vivo.</target></trans-unit>
+      <trans-unit id="eth.txRaw.prevoutsOffline" datatype="html"><source>Missing prevouts are not loaded. Some fields like fee rate cannot be calculated.</source><target>No se han cargado las salidas anteriores que faltan. No se pueden calcular algunos campos, como la tasa de comisión.</target></trans-unit>
+      <trans-unit id="eth.txRaw.prevoutsError" datatype="html"><source>Error loading missing prevouts</source><target>Error al cargar las salidas anteriores que faltan</target></trans-unit>
+      <trans-unit id="eth.txRaw.reason" datatype="html"><source>Reason:</source><target>Motivo:</target></trans-unit>
+      <trans-unit id="eth.txRaw.cpfpError" datatype="html"><source>Error loading CPFP data</source><target>Error al cargar los datos de CPFP</target></trans-unit>
     </body>
   </file>
 </xliff>
