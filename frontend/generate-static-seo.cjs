@@ -11,7 +11,7 @@ const output = path.resolve(process.env.ETH_SEO_OUTPUT || path.join(root, 'dist/
 fs.mkdirSync(output, { recursive: true });
 
 function intro(context = 'documentation') {
-  return '<app-tx-taxi-docs-intro>' + renderTemplate(source('src/app/shared/components/tx-taxi-docs-intro/tx-taxi-docs-intro.component.html'), { chainName: 'Ethereum', chainHost: 'eth.tx.taxi', context }) + '</app-tx-taxi-docs-intro>';
+  return '<app-tx-taxi-docs-intro>' + renderTemplate(source('src/app/shared/components/tx-taxi-docs-intro/tx-taxi-docs-intro.component.html'), { chainName: 'Ethereum', chainHost: 'eth.tx.taxi', context, contextLabel: context }) + '</app-tx-taxi-docs-intro>';
 }
 function styles(filename, tag) {
   return styleBlock(path.join(root, filename), '.static-seo-content ' + tag);
