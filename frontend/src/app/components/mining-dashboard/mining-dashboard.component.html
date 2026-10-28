@@ -1,52 +1,52 @@
 <div class="container-xl dashboard-container">
-  <h1>Block production</h1>
+  <h1 i18n="@@eth.production.title">Block production</h1>
 
   <ng-container *ngIf="production$ | async as production; else loadingProduction">
-    <div *ngIf="production.error" class="alert alert-warning" role="status">Block production data is temporarily unavailable.</div>
-    <div *ngIf="!production.error && !production.blocks.length" class="alert alert-secondary" role="status">No recent blocks are available.</div>
+    <div *ngIf="production.error" class="alert alert-warning" role="status" i18n="@@eth.production.unavailable">Block production data is temporarily unavailable.</div>
+    <div *ngIf="!production.error && !production.blocks.length" class="alert alert-secondary" role="status" i18n="@@eth.production.noBlocks">No recent blocks are available.</div>
 
     <div class="row row-cols-1 row-cols-md-2" *ngIf="production.blocks.length">
       <div class="col">
-        <div class="main-title">Latest block</div>
+        <div class="main-title" i18n="@@eth.production.latest">Latest block</div>
         <div class="card"><div class="card-body">
-          <h2 class="card-title">Block <a [routerLink]="['/block' | relativeUrl, production.blocks[0].id]">{{ production.blocks[0].height | number }}</a></h2>
+          <h2 class="card-title"><span i18n="@@eth.production.block">Block</span> <a [routerLink]="['/block' | relativeUrl, production.blocks[0].id]">{{ production.blocks[0].height | number }}</a></h2>
             <div class="production-stat-grid">
-              <div><span class="stat-label">Fee recipient</span><span class="recipient" *ngIf="production.blocks[0].extras?.pool?.name as recipient" [title]="recipient"><app-truncate [text]="recipient" [lastChars]="6" [link]="['/address/' | relativeUrl, recipient]"></app-truncate></span></div>
-              <div><span class="stat-label">Transactions</span><strong>{{ production.blocks[0].tx_count | number }}</strong></div>
-              <div><span class="stat-label">Gas used</span><strong>{{ production.blocks[0].weight | number }}</strong></div>
-              <div><span class="stat-label">Produced</span><strong><app-timestamp [unixTime]="production.blocks[0].timestamp"></app-timestamp></strong></div>
-              <div *ngIf="production.blocks[0].extras?.totalFees != null"><span class="stat-label">Total fees</span><span class="production-value"><app-amount [satoshis]="production.blocks[0].extras.totalFees" [noFiat]="true"></app-amount><span class="production-fiat"><app-fiat [value]="production.blocks[0].extras.totalFees"></app-fiat></span></span></div>
-              <div *ngIf="production.blocks[0].extras?.reward != null"><span class="stat-label">Validator reward</span><span class="production-value"><app-amount [satoshis]="production.blocks[0].extras.reward" [noFiat]="true"></app-amount><span class="production-fiat"><app-fiat [value]="production.blocks[0].extras.reward"></app-fiat></span></span></div>
+              <div><span class="stat-label" i18n="@@eth.production.recipient">Fee recipient</span><span class="recipient" *ngIf="production.blocks[0].extras?.pool?.name as recipient" [title]="recipient"><app-truncate [text]="recipient" [lastChars]="6" [link]="['/address/' | relativeUrl, recipient]"></app-truncate></span></div>
+              <div><span class="stat-label" i18n="@@eth.production.transactions">Transactions</span><strong>{{ production.blocks[0].tx_count | number }}</strong></div>
+              <div><span class="stat-label" i18n="@@eth.production.gasUsed">Gas used</span><strong>{{ production.blocks[0].weight | number }}</strong></div>
+              <div><span class="stat-label" i18n="@@eth.production.produced">Produced</span><strong><app-timestamp [unixTime]="production.blocks[0].timestamp"></app-timestamp></strong></div>
+              <div *ngIf="production.blocks[0].extras?.totalFees != null"><span class="stat-label" i18n="@@eth.production.fees">Total fees</span><span class="production-value"><app-amount [satoshis]="production.blocks[0].extras.totalFees" [noFiat]="true"></app-amount><span class="production-fiat"><app-fiat [value]="production.blocks[0].extras.totalFees"></app-fiat></span></span></div>
+              <div *ngIf="production.blocks[0].extras?.reward != null"><span class="stat-label" i18n="@@eth.production.reward">Validator reward</span><span class="production-value"><app-amount [satoshis]="production.blocks[0].extras.reward" [noFiat]="true"></app-amount><span class="production-fiat"><app-fiat [value]="production.blocks[0].extras.reward"></app-fiat></span></span></div>
             </div>
         </div></div>
       </div>
 
       <div class="col">
-        <div class="main-title">Recent production <span>({{ production.blocks.length }} blocks)</span></div>
+        <div class="main-title"><span i18n="@@eth.production.recent">Recent production</span> <span>({{ production.blocks.length }} <span i18n="@@eth.production.blocks">blocks</span>)</span></div>
         <div class="card"><div class="card-body">
-          <h2 class="card-title">Execution activity</h2>
+          <h2 class="card-title" i18n="@@eth.production.execution">Execution activity</h2>
           <div class="production-stat-grid">
-            <div><span class="stat-label">Transactions</span><strong>{{ production.transactionCount | number }}</strong></div>
-            <div><span class="stat-label">Average gas used</span><strong>{{ production.averageGasUsed | number }}</strong></div>
-            <div><span class="stat-label">Observed block interval</span><strong>{{ production.averageInterval === null ? 'Unavailable' : (production.averageInterval + ' seconds') }}</strong></div>
-            <div><span class="stat-label">Consensus</span><strong>Proof of Stake</strong></div>
+            <div><span class="stat-label" i18n="@@eth.production.transactions">Transactions</span><strong>{{ production.transactionCount | number }}</strong></div>
+            <div><span class="stat-label" i18n="@@eth.production.averageGas">Average gas used</span><strong>{{ production.averageGasUsed | number }}</strong></div>
+            <div><span class="stat-label" i18n="@@eth.production.interval">Observed block interval</span><strong><ng-container *ngIf="production.averageInterval !== null; else intervalUnavailable">{{ production.averageInterval }} <span i18n="@@eth.production.seconds">seconds</span></ng-container><ng-template #intervalUnavailable><span i18n="@@eth.production.unavailableShort">Unavailable</span></ng-template></strong></div>
+            <div><span class="stat-label" i18n="@@eth.production.consensus">Consensus</span><strong i18n="@@eth.production.pos">Proof of Stake</strong></div>
           </div>
         </div></div>
       </div>
     </div>
   </ng-container>
-  <ng-template #loadingProduction><div class="alert alert-secondary" role="status">Loading block production...</div></ng-template>
+  <ng-template #loadingProduction><div class="alert alert-secondary" role="status" i18n="@@eth.production.loading">Loading block production...</div></ng-template>
 
   <div class="row row-cols-1 row-cols-md-2">
     <div class="col">
       <div class="card"><div class="card-body">
         <app-ethereum-gas-market-graph [samples]="gasMarket$ | async" [height]="260"></app-ethereum-gas-market-graph>
-        <p *ngIf="gasMarketError" class="text-warning mt-2" role="status">Gas market history is temporarily unavailable.</p>
+        <p *ngIf="gasMarketError" class="text-warning mt-2" role="status" i18n="@@eth.production.gasError">Gas market history is temporarily unavailable.</p>
       </div></div>
     </div>
     <div class="col">
       <div class="card"><div class="card-body">
-        <a class="title-link" [routerLink]="['/blocks' | relativeUrl]"><h2 class="card-title d-inline">Recent blocks</h2></a>
+        <a class="title-link" [routerLink]="['/blocks' | relativeUrl]"><h2 class="card-title d-inline" i18n="@@eth.production.recentBlocks">Recent blocks</h2></a>
         <app-blocks-list [widget]="true"></app-blocks-list>
       </div></div>
     </div>

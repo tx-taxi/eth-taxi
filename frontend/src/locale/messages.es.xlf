@@ -11738,6 +11738,31 @@
       <trans-unit id="eth.blockDetails.medianFee" datatype="html"><source>Median fee rate</source><target>Tasa mediana de comisión</target></trans-unit>
       <trans-unit id="eth.blockDetails.feeRange" datatype="html"><source>Fee range</source><target>Intervalo de comisiones</target></trans-unit>
       <trans-unit id="eth.blockDetails.estimatedFees" datatype="html"><source>Estimated execution fees</source><target>Comisiones de ejecución estimadas</target></trans-unit>
+      <trans-unit id="eth.production.title" datatype="html"><source>Block production</source><target>Producción de bloques</target></trans-unit>
+      <trans-unit id="eth.production.unavailable" datatype="html"><source>Block production data is temporarily unavailable.</source><target>Los datos de producción de bloques no están disponibles temporalmente.</target></trans-unit>
+      <trans-unit id="eth.production.noBlocks" datatype="html"><source>No recent blocks are available.</source><target>No hay bloques recientes disponibles.</target></trans-unit>
+      <trans-unit id="eth.production.latest" datatype="html"><source>Latest block</source><target>Último bloque</target></trans-unit>
+      <trans-unit id="eth.production.block" datatype="html"><source>Block</source><target>Bloque</target></trans-unit>
+      <trans-unit id="eth.production.recipient" datatype="html"><source>Fee recipient</source><target>Destinatario de comisiones</target></trans-unit>
+      <trans-unit id="eth.production.transactions" datatype="html"><source>Transactions</source><target>Transacciones</target></trans-unit>
+      <trans-unit id="eth.production.gasUsed" datatype="html"><source>Gas used</source><target>Gas utilizado</target></trans-unit>
+      <trans-unit id="eth.production.produced" datatype="html"><source>Produced</source><target>Producido</target></trans-unit>
+      <trans-unit id="eth.production.fees" datatype="html"><source>Total fees</source><target>Comisiones totales</target></trans-unit>
+      <trans-unit id="eth.production.reward" datatype="html"><source>Validator reward</source><target>Recompensa del validador</target></trans-unit>
+      <trans-unit id="eth.production.recent" datatype="html"><source>Recent production</source><target>Producción reciente</target></trans-unit>
+      <trans-unit id="eth.production.blocks" datatype="html"><source>blocks</source><target>bloques</target></trans-unit>
+      <trans-unit id="eth.production.execution" datatype="html"><source>Execution activity</source><target>Actividad de ejecución</target></trans-unit>
+      <trans-unit id="eth.production.averageGas" datatype="html"><source>Average gas used</source><target>Gas medio utilizado</target></trans-unit>
+      <trans-unit id="eth.production.interval" datatype="html"><source>Observed block interval</source><target>Intervalo de bloques observado</target></trans-unit>
+      <trans-unit id="eth.production.unavailableShort" datatype="html"><source>Unavailable</source><target>No disponible</target></trans-unit>
+      <trans-unit id="eth.production.seconds" datatype="html"><source>seconds</source><target>segundos</target></trans-unit>
+      <trans-unit id="eth.production.consensus" datatype="html"><source>Consensus</source><target>Consenso</target></trans-unit>
+      <trans-unit id="eth.production.pos" datatype="html"><source>Proof of Stake</source><target>Prueba de participación</target></trans-unit>
+      <trans-unit id="eth.production.loading" datatype="html"><source>Loading block production...</source><target>Cargando la producción de bloques...</target></trans-unit>
+      <trans-unit id="eth.production.gasError" datatype="html"><source>Gas market history is temporarily unavailable.</source><target>El historial del mercado de gas no está disponible temporalmente.</target></trans-unit>
+      <trans-unit id="eth.production.recentBlocks" datatype="html"><source>Recent blocks</source><target>Bloques recientes</target></trans-unit>
+      <trans-unit id="eth.production.seoTitle" datatype="html"><source>Ethereum Block Production</source><target>Producción de bloques de Ethereum</target></trans-unit>
+      <trans-unit id="eth.production.seoDescription" datatype="html"><source>Follow recent Ethereum blocks, fee recipients, gas usage, transaction activity, and the live gas market.</source><target>Consulta los bloques recientes de Ethereum, los destinatarios de comisiones, el uso de gas, la actividad de transacciones y el mercado de gas en vivo.</target></trans-unit>
     </body>
   </file>
 </xliff>

@@ -34,8 +34,8 @@ export class MiningDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.websocketService.want(['blocks', 'stats']);
-    this.seoService.setTitle('Ethereum Block Production');
-    this.seoService.setDescription('Follow recent Ethereum blocks, fee recipients, gas usage, transaction activity, and the live gas market.');
+    this.seoService.setTitle($localize`:@@eth.production.seoTitle:Ethereum Block Production`);
+    this.seoService.setDescription($localize`:@@eth.production.seoDescription:Follow recent Ethereum blocks, fee recipients, gas usage, transaction activity, and the live gas market.`);
 
     this.production$ = timer(0, 12_000).pipe(
       switchMap(() => this.apiService.getBlocks$(undefined).pipe(
