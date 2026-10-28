@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable, LOCALE_ID } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { filter, map, switchMap } from 'rxjs';
@@ -10,7 +10,7 @@ import { StateService } from '@app/services/state.service';
 export class SeoService {
   network = '';
   baseTitle = 'eth.tx.taxi';
-  baseDescription = 'Track Ethereum blocks, transactions, addresses, and live gas conditions on eth.tx.taxi.';
+  baseDescription = $localize`:@@eth.seo.description:Track Ethereum blocks, transactions, addresses, and live gas conditions on eth.tx.taxi.`;
   baseDomain = 'eth.tx.taxi';
 
   canonicalLink: HTMLLinkElement = document.getElementById('canonical') as HTMLLinkElement;
@@ -21,6 +21,7 @@ export class SeoService {
     private stateService: StateService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
+    @Inject(LOCALE_ID) private locale: string,
   ) {
     // Route-specific server metadata must not become the base for later SPA navigation.
     try {
@@ -83,7 +84,8 @@ export class SeoService {
   }
 
   updateCanonical(path) {
-    const canonicalUrl = 'https://' + this.baseDomain + path;
+    const localePrefix = this.locale === 'es' ? '/es' : '';
+    const canonicalUrl = 'https://' + this.baseDomain + localePrefix + path;
     // Metadata for the initial server-rendered page must not describe a later SPA route.
     if (this.canonicalLink.href !== canonicalUrl) {
       document.getElementById('jsonld-page')?.remove();
@@ -104,7 +106,7 @@ export class SeoService {
       {return this.baseTitle + ' - Liquid Network';}
     if (this.network === 'liquidtestnet')
       {return this.baseTitle + ' - Liquid Testnet';}
-    return this.baseTitle + ' - Ethereum Explorer';
+    return this.baseTitle + ' - ' + $localize`:@@eth.seo.explorer:Ethereum Explorer`;
   }
 
   getDescription(): string {

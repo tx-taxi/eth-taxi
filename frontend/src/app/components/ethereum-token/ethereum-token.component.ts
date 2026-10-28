@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { forkJoin, of, Subscription } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { combineLatest, forkJoin, of, Subscription } from 'rxjs';
+import { catchError, startWith } from 'rxjs/operators';
 
 import { EthereumIdentityEntity } from '@components/ethereum-identity/ethereum-identity.component';
 import {
@@ -11,7 +11,8 @@ import {
   EthereumTokenTransfer,
 } from '@interfaces/ethereum-api.interface';
 import { EthereumApiService } from '@app/services/ethereum-api.service';
-import { currentTokenTransferUsd } from '@app/shared/ethereum-token-usd.utils';
+import { currentTokenTransferFiat, currentUsdToFiat } from '@app/shared/ethereum-token-usd.utils';
+import { StateService } from '@app/services/state.service';
 
 interface EthereumTokenTransferView {
   transfer: EthereumTokenTransfer;
@@ -27,7 +28,13 @@ interface EthereumTokenTransferView {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EthereumTokenComponent implements OnInit, OnDestroy {
-  currentTokenTransferUsd = currentTokenTransferUsd;
+  currency = 'USD';
+  conversions: Record<string, number> | null = null;
+  private fiatSubscription?: Subscription;
+
+  currentTokenTransferFiat(transfer: EthereumTokenTransfer): string | null {
+    return currentTokenTransferFiat(transfer, this.currency, this.conversions);
+  }
   token: EthereumToken | null = null;
   transfers: EthereumTokenTransferView[] = [];
   tokenAddress = '';
@@ -47,11 +54,17 @@ export class EthereumTokenComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
+    private stateService: StateService,
     private ethereumApiService: EthereumApiService,
     private changeDetectorRef: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
+    this.fiatSubscription = combineLatest([this.stateService.fiatCurrency$, this.stateService.conversions$.pipe(startWith(null))]).subscribe(([currency, conversions]) => {
+      this.currency = currency;
+      this.conversions = conversions;
+      this.changeDetectorRef.markForCheck();
+    });
     this.routeSubscription = this.route.paramMap.subscribe((params) => {
       this.tokenAddress = params.get('id')?.trim() || '';
       this.loadToken();
@@ -59,6 +72,7 @@ export class EthereumTokenComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.fiatSubscription?.unsubscribe();
     this.routeSubscription?.unsubscribe();
     this.loadSubscription?.unsubscribe();
     this.loadMoreSubscription?.unsubscribe();
@@ -126,9 +140,22 @@ export class EthereumTokenComponent implements OnInit, OnDestroy {
     return this.groupInteger(normalized);
   }
 
-  formatUsd(value: string | null | undefined, maxFractionDigits = 2): string {
-    const formatted = this.formatDecimal(value, maxFractionDigits);
-    return formatted ? `$${formatted}` : '';
+  formatFiat(value: string | null | undefined, maxFractionDigits = 2): string {
+    if (this.currency === 'USD') {
+      const formatted = this.formatDecimal(value, maxFractionDigits);
+      return formatted ? `$${formatted}` : '';
+    }
+    if (!value || !/^\d+(?:\.\d+)?$/.test(value.trim())) return '';
+    const converted = currentUsdToFiat(Number(value), this.currency, this.conversions);
+    if (converted === null) return '';
+    try {
+      const formatter = new Intl.NumberFormat(undefined, { style: 'currency', currency: this.currency, minimumFractionDigits: 0, maximumFractionDigits: maxFractionDigits });
+      const minimum = 10 ** -maxFractionDigits;
+      if (converted > 0 && converted < minimum) return '<' + formatter.format(minimum);
+      return formatter.format(converted);
+    } catch {
+      return '';
+    }
   }
 
   formatTimestamp(value: string | null | undefined): string {
@@ -204,7 +231,7 @@ export class EthereumTokenComponent implements OnInit, OnDestroy {
 
     if (!this.tokenAddress) {
       this.isLoading = false;
-      this.errorMessage = 'No token contract address was provided.';
+      this.errorMessage = $localize`:@@eth.token.no-address:No token contract address was provided.`;
       this.changeDetectorRef.markForCheck();
       return;
     }
@@ -241,8 +268,8 @@ export class EthereumTokenComponent implements OnInit, OnDestroy {
       error: (error) => {
         this.isLoading = false;
         this.errorMessage = error?.status === 404
-          ? 'Token not found on Ethereum.'
-          : 'Token data is temporarily unavailable. Please try again.';
+          ? $localize`:@@eth.token.not-found:Token not found on Ethereum.`
+          : $localize`:@@eth.token.fetch-error:Token data is temporarily unavailable. Please try again.`;
         this.changeDetectorRef.markForCheck();
       },
     });

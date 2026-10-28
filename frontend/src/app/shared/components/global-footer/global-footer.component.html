@@ -5,7 +5,7 @@
         <div class="main-logo" [class]="{'services': isServicesPage}">
           <img src="/resources/branding/eth-dark-navbar.svg" alt="eth.tx.taxi Ethereum explorer" class="tx-taxi-footer-logo">
         </div>
-        <p class="explore-tagline-mobile">Ethereum blocks, transactions, and gas at a glance</p>
+        <p class="explore-tagline-mobile" i18n="@@eth.footer.tagline">Ethereum blocks, transactions, and gas at a glance</p>
         <div class="site-options language-selector d-flex justify-content-center align-items-center" [class]="{'services': isServicesPage}">
           <div class="selector"><app-language-selector></app-language-selector></div>
           <div class="selector"><app-fiat-selector></app-fiat-selector></div>
@@ -25,40 +25,40 @@
             <app-theme-selector class="add-margin"></app-theme-selector>
           </div>
         }
-        <p class="explore-tagline-desktop">Ethereum blocks, transactions, and gas at a glance</p>
+        <p class="explore-tagline-desktop" i18n="@@eth.footer.tagline">Ethereum blocks, transactions, and gas at a glance</p>
       </div>
     </div>
 
     <div class="row col-md-12 link-tree" [class]="{'services': isServicesPage}">
       <div class="links">
-        <p class="category">Explore</p>
-        <p><a [routerLink]="['/' | relativeUrl]">Dashboard</a></p>
-        <p><a [routerLink]="['/blocks' | relativeUrl]">Recent Blocks</a></p>
-        <p><a [routerLink]="['/txs' | relativeUrl]">Recent Transactions</a></p>
-        <p><a [routerLink]="['/mempool-block/0' | relativeUrl]">Pending Transactions</a></p>
+        <p class="category" i18n="@@eth.footer.explore">Explore</p>
+        <p><a [routerLink]="['/' | relativeUrl]" i18n="@@eth.footer.dashboard">Dashboard</a></p>
+        <p><a [routerLink]="['/blocks' | relativeUrl]" i18n="@@eth.footer.blocks">Recent Blocks</a></p>
+        <p><a [routerLink]="['/txs' | relativeUrl]" i18n="@@eth.footer.transactions">Recent Transactions</a></p>
+        <p><a [routerLink]="['/mempool-block/0' | relativeUrl]" i18n="@@eth.footer.pending">Pending Transactions</a></p>
       </div>
       <div class="links">
         <p class="category">Ethereum</p>
-        <p><a [routerLink]="['/docs' | relativeUrl]">Explorer documentation</a></p>
-        <p><a href="https://ethereum.org/what-is-ethereum/" target="_blank" rel="noopener noreferrer">What is Ethereum?</a></p>
-        <p><a href="https://ethereum.org/developers/docs/blocks/" target="_blank" rel="noopener noreferrer">Blocks</a></p>
-        <p><a href="https://ethereum.org/developers/docs/transactions/" target="_blank" rel="noopener noreferrer">Transactions</a></p>
-        <p><a href="https://ethereum.org/developers/docs/gas/" target="_blank" rel="noopener noreferrer">Gas and fees</a></p>
+        <p><a [routerLink]="['/docs' | relativeUrl]" i18n="@@eth.footer.docs">Explorer documentation</a></p>
+        <p><a href="https://ethereum.org/what-is-ethereum/" target="_blank" rel="noopener noreferrer" i18n="@@eth.footer.what">What is Ethereum?</a></p>
+        <p><a href="https://ethereum.org/developers/docs/blocks/" target="_blank" rel="noopener noreferrer" i18n="@@eth.footer.blocks-link">Blocks</a></p>
+        <p><a href="https://ethereum.org/developers/docs/transactions/" target="_blank" rel="noopener noreferrer" i18n="@@eth.footer.transactions-link">Transactions</a></p>
+        <p><a href="https://ethereum.org/developers/docs/gas/" target="_blank" rel="noopener noreferrer" i18n="@@eth.footer.gas">Gas and fees</a></p>
       </div>
       <div class="links">
         <p class="category">eth.tx.taxi</p>
-        <p><a [routerLink]="['/about']">About</a></p>
-        <p><a href="https://github.com/tx-taxi/eth-taxi" target="_blank" rel="noopener noreferrer">Source code</a></p>
-        <p><a href="https://status.tx.taxi/" target="_blank" rel="noopener noreferrer">Status</a></p>
+        <p><a [routerLink]="['/about']" i18n="@@eth.footer.about">About</a></p>
+        <p><a href="https://github.com/tx-taxi/eth-taxi" target="_blank" rel="noopener noreferrer" i18n="@@eth.footer.source">Source code</a></p>
+        <p><a href="https://status.tx.taxi/" target="_blank" rel="noopener noreferrer" i18n="@@eth.footer.status">Status</a></p>
         <p><a href="https://t.me/txtaxi" target="_blank" rel="noopener noreferrer" aria-label="Join the tx.taxi Telegram channel">Telegram</a></p>
-        <p><a href="https://t.me/hiss" target="_blank" rel="noopener noreferrer">Contact Us</a></p>
+        <p><a href="https://t.me/hiss" target="_blank" rel="noopener noreferrer" i18n="@@eth.footer.contact">Contact Us</a></p>
         <p>AGPLv3</p>
       </div>
       <div class="links">
-        <p class="category">Legal</p>
-        <p><a [routerLink]="['/terms-of-service']">Terms of Service</a></p>
-        <p><a [routerLink]="['/privacy-policy']">Privacy Policy</a></p>
-        <p><a href="/3rdpartylicenses.txt">Third-party Licenses</a></p>
+        <p class="category" i18n="@@eth.footer.legal">Legal</p>
+        <p><a [routerLink]="['/terms-of-service']" i18n="@@eth.footer.terms">Terms of Service</a></p>
+        <p><a [routerLink]="['/privacy-policy']" i18n="@@eth.footer.privacy">Privacy Policy</a></p>
+        <p><a href="/3rdpartylicenses.txt" i18n="@@eth.footer.licenses">Third-party Licenses</a></p>
       </div>
     </div>
 

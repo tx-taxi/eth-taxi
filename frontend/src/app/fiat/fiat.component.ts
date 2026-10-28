@@ -18,6 +18,7 @@ export class FiatComponent implements OnInit, OnDestroy {
   @Input() value: number;
   @Input() digitsInfo = '1.2-2';
   @Input() blockConversion: Price;
+  @Input() forceBlockConversion = false;
   @Input() colorClass = 'fiat-color';
 
   constructor(
@@ -36,6 +37,17 @@ export class FiatComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.currencySubscription.unsubscribe();
+  }
+
+  fiatAmount(conversions: Record<string, number> | null): number | null {
+    const historical = this.blockConversion?.price;
+    const rate = historical ? historical[this.currency] : this.forceBlockConversion ? undefined : conversions?.[this.currency];
+    if (typeof rate !== 'number' || !Number.isFinite(rate) || rate <= 0 ||
+        typeof this.value !== 'number' || !Number.isFinite(this.value)) {
+      return null;
+    }
+    const amount = rate * this.value / 1e18;
+    return Number.isFinite(amount) ? amount : null;
   }
 
 }

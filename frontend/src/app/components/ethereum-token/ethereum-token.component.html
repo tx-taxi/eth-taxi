@@ -1,13 +1,13 @@
 <main class="container-xl ethereum-token-page">
   <div *ngIf="isLoading" class="token-state" role="status" aria-live="polite">
     <span class="token-state__spinner" aria-hidden="true"></span>
-    <span>Loading token data...</span>
+    <span i18n="@@eth.token.loading">Loading token data...</span>
   </div>
 
   <section *ngIf="!isLoading && errorMessage" class="token-state token-state--error" role="alert">
-    <h1>Token unavailable</h1>
+    <h1 i18n="@@eth.token.unavailable">Token unavailable</h1>
     <p>{{ errorMessage }}</p>
-    <button type="button" class="btn btn-primary" (click)="retry()">Try again</button>
+    <button type="button" class="btn btn-primary" (click)="retry()" i18n="@@eth.token.try-again">Try again</button>
   </section>
 
   <ng-container *ngIf="!isLoading && token">
@@ -31,7 +31,7 @@
           <span class="token-type">{{ token.type }}</span>
         </div>
         <div class="token-contract">
-          <span class="token-contract__label">Contract</span>
+          <span class="token-contract__label" i18n="@@eth.token.contract">Contract</span>
           <a [routerLink]="['/address', token.address]" [title]="token.address">{{ token.address }}</a>
           <app-clipboard [text]="token.address"></app-clipboard>
         </div>
@@ -39,35 +39,35 @@
     </header>
 
     <section
-      *ngIf="token.holdersCount || token.totalSupply || token.circulatingSupply || token.exchangeRate || token.marketCap || token.volume24h"
+      *ngIf="token.holdersCount || token.totalSupply || token.circulatingSupply || formatFiat(token.exchangeRate, 6) || formatFiat(token.marketCap) || formatFiat(token.volume24h)"
       class="token-metrics"
-      aria-label="Token metrics"
+      aria-label="Token metrics" i18n-aria-label="@@eth.token.metrics"
     >
-      <div *ngIf="token.exchangeRate" class="token-metric">
-        <span class="token-metric__label">Price</span>
-        <strong>{{ formatUsd(token.exchangeRate, 6) }}</strong>
+      <div *ngIf="formatFiat(token.exchangeRate, 6) as price" class="token-metric">
+        <span class="token-metric__label" i18n="@@eth.token.price">Price</span>
+        <strong>{{ price }}</strong>
       </div>
-      <div *ngIf="token.marketCap" class="token-metric">
-        <span class="token-metric__label">Market cap</span>
-        <strong>{{ formatUsd(token.marketCap) }}</strong>
+      <div *ngIf="formatFiat(token.marketCap) as marketCap" class="token-metric">
+        <span class="token-metric__label" i18n="@@eth.token.market-cap">Market cap</span>
+        <strong>{{ marketCap }}</strong>
       </div>
-      <div *ngIf="token.volume24h" class="token-metric">
-        <span class="token-metric__label">24h volume</span>
-        <strong>{{ formatUsd(token.volume24h) }}</strong>
+      <div *ngIf="formatFiat(token.volume24h) as volume" class="token-metric">
+        <span class="token-metric__label" i18n="@@eth.token.volume">24h volume</span>
+        <strong>{{ volume }}</strong>
       </div>
       <div *ngIf="token.holdersCount" class="token-metric">
-        <span class="token-metric__label">Holders</span>
+        <span class="token-metric__label" i18n="@@eth.token.holders">Holders</span>
         <strong>{{ formatInteger(token.holdersCount) }}</strong>
       </div>
       <div *ngIf="token.totalSupply" class="token-metric">
-        <span class="token-metric__label">Total supply</span>
+        <span class="token-metric__label" i18n="@@eth.token.total-supply">Total supply</span>
         <strong class="token-metric__value" [title]="exactSupply(token.totalSupply) + ' ' + token.symbol">
           <span>{{ formatCompactSupply(token.totalSupply) }}</span>
           <span class="token-metric__unit">{{ token.symbol }}</span>
         </strong>
       </div>
       <div *ngIf="token.circulatingSupply" class="token-metric">
-        <span class="token-metric__label">Circulating supply</span>
+        <span class="token-metric__label" i18n="@@eth.token.circulating-supply">Circulating supply</span>
         <strong class="token-metric__value" [title]="exactSupply(token.circulatingSupply) + ' ' + token.symbol">
           <span>{{ formatCompactSupply(token.circulatingSupply) }}</span>
           <span class="token-metric__unit">{{ token.symbol }}</span>
@@ -77,11 +77,15 @@
 
     <section class="token-transfers" aria-labelledby="token-transfers-heading">
       <div class="section-heading">
-        <h2 id="token-transfers-heading">{{ transfers.length && (transfersRecentOnly || transfersUnavailable) ? 'Recent transfer sample' : nextPageParams ? 'Recent transfers' : 'Transfer history' }}</h2>
-        <span>{{ transfers.length }} shown</span>
+        <h2 id="token-transfers-heading">
+          <ng-container *ngIf="transfers.length && (transfersRecentOnly || transfersUnavailable); else fullOrRecent" i18n="@@eth.token.recent-sample">Recent transfer sample</ng-container>
+          <ng-template #fullOrRecent><ng-container *ngIf="nextPageParams; else fullHistory" i18n="@@eth.token.recent-transfers">Recent transfers</ng-container></ng-template>
+          <ng-template #fullHistory><ng-container i18n="@@eth.token.transfer-history">Transfer history</ng-container></ng-template>
+        </h2>
+        <span i18n="@@eth.token.shown">{{ transfers.length }} shown</span>
       </div>
 
-      <div *ngIf="transfers.length && (transfersRecentOnly || transfersUnavailable)" class="token-history-scope" role="status">
+      <div *ngIf="transfers.length && (transfersRecentOnly || transfersUnavailable)" class="token-history-scope" role="status" i18n="@@eth.token.bounded-history">
         This is a bounded recent sample from Ethereum RPC. Complete indexed transfer history is temporarily unavailable.
       </div>
 
@@ -91,12 +95,15 @@
             <a class="transfer-amount" [routerLink]="['/tx', item.transfer.transactionHash]" [title]="transferExactAmount(item.transfer)">
               {{ formatTransferAmount(item.transfer) }} {{ transferSymbol(item.transfer) }}
             </a>
-            <span *ngIf="currentTokenTransferUsd(item.transfer) as usd" class="transfer-usd" title="Approximate USD value using the current token price">~{{ usd }}</span>
+            <ng-container *ngIf="currentTokenTransferFiat(item.transfer) as fiat">
+              <span *ngIf="currency === 'USD'; else otherTransferFiat" class="transfer-usd" title="Approximate USD value using the current token price" i18n-title="@@eth.token.approximate-usd">~{{ fiat }}</span>
+              <ng-template #otherTransferFiat><span class="transfer-usd" title="Approximate value using the current token price" i18n-title="@@eth.current-value-title">~{{ fiat }}</span></ng-template>
+            </ng-container>
             <span class="transfer-kind">{{ item.transfer.method || item.transfer.type }}</span>
           </div>
 
           <div class="transfer-party transfer-party--from">
-            <span class="transfer-party__label">From</span>
+            <span class="transfer-party__label" i18n="@@eth.token.from">From</span>
             <app-ethereum-identity
               [entity]="item.from"
               [compact]="true"
@@ -107,7 +114,7 @@
           <span class="transfer-direction" aria-hidden="true">&rarr;</span>
 
           <div class="transfer-party transfer-party--to">
-            <span class="transfer-party__label">To</span>
+            <span class="transfer-party__label" i18n="@@eth.token.to">To</span>
             <app-ethereum-identity
               *ngIf="item.transfer.to as recipient; else contractCreation"
               [entity]="item.to"
@@ -115,7 +122,7 @@
               [link]="'/address/' + recipient.address"
             ></app-ethereum-identity>
             <ng-template #contractCreation>
-              <span class="transfer-missing">Contract creation</span>
+              <span class="transfer-missing" i18n="@@eth.token.contract-creation">Contract creation</span>
             </ng-template>
           </div>
 
@@ -134,21 +141,23 @@
           class="transfer-list__toggle"
           (click)="toggleTransfers()"
         >
-          {{ showAllTransfers ? 'Show fewer transfers' : 'Show ' + hiddenTransferCount + ' more transfers' }}
+          <ng-container *ngIf="showAllTransfers; else showMore" i18n="@@eth.token.show-fewer">Show fewer transfers</ng-container>
+          <ng-template #showMore><ng-container i18n="@@eth.token.show-more">Show {{ hiddenTransferCount }} more transfers</ng-container></ng-template>
         </button>
         <button *ngIf="nextPageParams" type="button" class="transfer-list__toggle" [disabled]="loadingMore" (click)="loadMoreTransfers()">
-          {{ loadingMore ? 'Loading older transfers...' : 'Load older transfers' }}
+          <ng-container *ngIf="loadingMore; else loadOlder" i18n="@@eth.token.loading-older">Loading older transfers...</ng-container>
+          <ng-template #loadOlder><ng-container i18n="@@eth.token.load-older">Load older transfers</ng-container></ng-template>
         </button>
-        <span *ngIf="loadMoreError" role="alert">Older transfers could not be loaded. Try again.</span>
+        <span *ngIf="loadMoreError" role="alert" i18n="@@eth.token.older-error">Older transfers could not be loaded. Try again.</span>
       </div>
 
       <ng-template #noTransfers>
         <div *ngIf="transfersUnavailable; else emptyTransferHistory" class="token-empty token-empty--degraded" role="status">
-          <strong>Transfer history is temporarily unavailable</strong>
-          <span>Token metadata is current, but the indexed transfer feed could not be loaded.</span>
+          <strong i18n="@@eth.token.history-unavailable">Transfer history is temporarily unavailable</strong>
+          <span i18n="@@eth.token.history-unavailable-detail">Token metadata is current, but the indexed transfer feed could not be loaded.</span>
         </div>
         <ng-template #emptyTransferHistory>
-          <div class="token-empty">No transfers were found for this token.</div>
+          <div class="token-empty" i18n="@@eth.token.no-transfers">No transfers were found for this token.</div>
         </ng-template>
       </ng-template>
     </section>

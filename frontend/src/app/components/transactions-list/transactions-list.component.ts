@@ -20,7 +20,7 @@ import { ActivatedRoute } from '@angular/router';
 import { SighashFlag } from '@app/shared/transaction.utils';
 import { EthereumTokenTransfer } from '@interfaces/ethereum-api.interface';
 import { TransactionFlags } from '@app/shared/filters.utils';
-import { currentTokenTransferUsd } from '@app/shared/ethereum-token-usd.utils';
+import { currentTokenTransferFiat } from '@app/shared/ethereum-token-usd.utils';
 
 @Component({
   selector: 'app-transactions-list',
@@ -30,7 +30,12 @@ import { currentTokenTransferUsd } from '@app/shared/ethereum-token-usd.utils';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TransactionsListComponent implements OnInit, OnChanges, OnDestroy {
-  currentTokenTransferUsd = currentTokenTransferUsd;
+  conversions: Record<string, number> | null = null;
+  conversionsSubscription?: Subscription;
+
+  currentTokenTransferFiat(transfer: EthereumTokenTransfer): string | null {
+    return currentTokenTransferFiat(transfer, this.currency || 'USD', this.conversions);
+  }
   network = '';
   nativeAssetId = this.stateService.network === 'liquidtestnet' ? environment.nativeTestAssetId : environment.nativeAssetId;
   isLiquid = this.stateService.network === 'liquid' || this.stateService.network === 'liquidtestnet';
@@ -189,10 +194,15 @@ export class TransactionsListComponent implements OnInit, OnChanges, OnDestroy {
         ,
     ).subscribe(() => this.ref.markForCheck());
 
+    this.conversionsSubscription = this.stateService.conversions$.subscribe(conversions => {
+      this.conversions = conversions;
+      this.ref.markForCheck();
+    });
     this.currencyChangeSubscription = this.stateService.fiatCurrency$
     .subscribe(currency => {
       this.currency = currency;
       this.refreshPrice();
+      this.ref.markForCheck();
     });
 
     this.updateAddressSimilarities();
@@ -799,6 +809,7 @@ export class TransactionsListComponent implements OnInit, OnChanges, OnDestroy {
   ngOnDestroy(): void {
     this.outspendsSubscription.unsubscribe();
     this.currencyChangeSubscription?.unsubscribe();
+    this.conversionsSubscription?.unsubscribe();
     this.networkSubscription.unsubscribe();
     this.signaturesSubscription.unsubscribe();
   }

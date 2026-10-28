@@ -89,7 +89,7 @@
         </a>
       </li>
       <li class="nav-item" routerLinkActive="active" id="btn-production">
-        <a class="nav-link" [routerLink]="['/production' | relativeUrl]" (click)="collapse()" title="Block production" aria-label="Block production">
+        <a class="nav-link" [routerLink]="['/production' | relativeUrl]" (click)="collapse()" title="Block production" i18n-title="@@eth.nav.production" aria-label="Block production" i18n-aria-label="@@eth.nav.production">
           <div class="svg-wrapper"><app-svg-images name="nav-enterprise" width="21.59" height="100%"></app-svg-images></div>
         </a>
       </li>
@@ -99,7 +99,7 @@
         </a>
       </li>
       <li class="nav-item" routerLinkActive="active" id="btn-docs">
-        <a class="nav-link" [routerLink]="['/docs']" (click)="collapse()" title="Ethereum documentation" aria-label="Ethereum documentation">
+        <a class="nav-link" [routerLink]="['/docs']" (click)="collapse()" title="Ethereum documentation" i18n-title="@@eth.about.docs" aria-label="Ethereum documentation" i18n-aria-label="@@eth.about.docs">
           <div class="svg-wrapper"><app-svg-images name="nav-book" width="21.59" height="100%"></app-svg-images></div>
         </a>
       </li>

@@ -24,8 +24,8 @@ export class TermsOfServiceComponent {
   ) { }
 
   ngOnInit(): void {
-    this.seoService.setTitle('Terms of Service');
-    this.seoService.setDescription('Terms for using eth.tx.taxi, an independent Ethereum block explorer operated by tx.taxi.');
+    this.seoService.setTitle($localize`:@@eth.footer.terms:Terms of Service`);
+    this.seoService.setDescription($localize`:@@eth.legal.termsDescription:Terms for using eth.tx.taxi, an independent Ethereum block explorer operated by tx.taxi.`);
     this.ogService.setManualOgImage('tos.jpg');
 
     this.themeStateSubscription = this.themeService.themeState$.subscribe((state) => {

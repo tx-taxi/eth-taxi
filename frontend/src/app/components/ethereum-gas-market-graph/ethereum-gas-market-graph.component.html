@@ -1,13 +1,13 @@
 <section class="gas-market" [attr.aria-label]="'Ethereum gas market ' + historyLabel.toLowerCase()">
   <div class="gas-market__header">
     <div>
-      <h3 class="gas-market__title">Gas market</h3>
+      <h3 class="gas-market__title" i18n="@@eth.graph.gas-market">Gas market</h3>
       <span class="sr-only">Gas market, {{ historyLabel }}</span>
     </div>
 
-    <ul class="gas-market__legend" aria-label="Chart legend">
-      <li><span class="gas-market__swatch gas-market__swatch--fee" aria-hidden="true"></span>Base fee (gwei)</li>
-      <li><span class="gas-market__swatch gas-market__swatch--utilization" aria-hidden="true"></span>Network utilization (%)</li>
+    <ul class="gas-market__legend" i18n-aria-label="@@eth.graph.legend" aria-label="Chart legend">
+      <li><span class="gas-market__swatch gas-market__swatch--fee" aria-hidden="true"></span><ng-container i18n="@@eth.graph.base-fee">Base fee (gwei)</ng-container></li>
+      <li><span class="gas-market__swatch gas-market__swatch--utilization" aria-hidden="true"></span><ng-container i18n="@@eth.graph.utilization">Network utilization (%)</ng-container></li>
     </ul>
   </div>
 

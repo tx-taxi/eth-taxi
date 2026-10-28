@@ -48,7 +48,7 @@
 <ng-template #blockRow>
   @if (!isLoadingTx && tx?.status?.confirmed && tx?.status?.block_height != null) {
     <tr>
-      <td>Block</td>
+      <td i18n="@@eth.transaction.block">Block</td>
       <td><a [routerLink]="['/block/' | relativeUrl, tx.status.block_hash || tx.status.block_height]">{{ tx.status.block_height | number }}</a></td>
     </tr>
   }
@@ -210,13 +210,13 @@
 <ng-template #feeRow>
   @if (!isLoadingTx) {
     <tr>
-      <td class="td-width">{{ tx?.ethereum?.maximumFeeWei ? 'Maximum fee' : 'Fee' }}</td>
+      <td class="td-width"><ng-container *ngIf="tx?.ethereum?.maximumFeeWei; else basicFee" i18n="@@eth.maximumFee">Maximum fee</ng-container><ng-template #basicFee i18n="@@eth.fee">Fee</ng-template></td>
       @if (tx?.ethereum; as ethereum) {
-        <td class="text-wrap">&lrm;{{ formatEthereumQuantity(ethereum.maximumFeeWei || ethereum.feeWei, '18') }} ETH <span class="fiat"><app-fiat [blockConversion]="tx.price" [value]="ethereumWeiNumber(ethereum.maximumFeeWei || ethereum.feeWei)"></app-fiat></span></td>
+        <td class="text-wrap">&lrm;{{ formatEthereumQuantity(ethereum.maximumFeeWei || ethereum.feeWei, '18') }} ETH <span class="fiat"><app-fiat [blockConversion]="tx.price" [forceBlockConversion]="!!tx.status?.confirmed" [value]="ethereumWeiNumber(ethereum.maximumFeeWei || ethereum.feeWei)"></app-fiat></span></td>
       } @else {
-      <td class="text-wrap"><app-amount [satoshis]="tx.fee" [blockConversion]="tx.price"></app-amount>
+      <td class="text-wrap"><app-amount [satoshis]="tx.fee" [blockConversion]="tx.price" [forceBlockConversion]="!!tx.status?.confirmed"></app-amount>
         @if (isAcceleration && (accelerationInfo?.bidBoost ?? tx.feeDelta > 0)) {
-          <span class="oobFees" i18n-ngbTooltip="Acceleration Fees" ngbTooltip="Acceleration fees paid out-of-band"><app-amount [satoshis]="accelerationInfo?.bidBoost ?? tx.feeDelta" [blockConversion]="tx.price" [addPlus]="true"></app-amount></span>
+          <span class="oobFees" i18n-ngbTooltip="Acceleration Fees" ngbTooltip="Acceleration fees paid out-of-band"><app-amount [satoshis]="accelerationInfo?.bidBoost ?? tx.feeDelta" [blockConversion]="tx.price" [forceBlockConversion]="!!tx.status?.confirmed" [addPlus]="true"></app-amount></span>
         }
       </td>
       }
@@ -229,7 +229,7 @@
 <ng-template #feeRateRow>
   @if (!isLoadingTx) {
     <tr>
-      <td>{{ tx?.ethereum?.maximumFeeWei ? 'Maximum fee per gas' : 'Fee rate' }}</td>
+      <td><ng-container *ngIf="tx?.ethereum?.maximumFeeWei; else basicFeeRate" i18n="@@eth.maximumFeePerGas">Maximum fee per gas</ng-container><ng-template #basicFeeRate i18n="@@eth.feeRate">Fee rate</ng-template></td>
       @if (tx?.ethereum; as ethereum) {
         <td>&lrm;{{ formatEthereumQuantity(ethereum.maximumFeeWei ? (ethereum.maxFeePerGasWei || ethereum.gasPriceWei) : ethereum.gasPriceWei, '9', 4) }} gwei</td>
       } @else {

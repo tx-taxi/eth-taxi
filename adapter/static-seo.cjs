@@ -86,7 +86,7 @@ function createStaticSeo(staticRoot, injectDocument) {
     }
     return false;
   }
-  return { page, render, handle };
+  return { page, render, handle, alias: pathname => data().aliases[pathname] || null };
 }
 
 module.exports = { createStaticSeo };

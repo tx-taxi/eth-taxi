@@ -30,7 +30,7 @@ export class AmountComponent implements OnInit, OnDestroy {
   @Input() blockConversion: Price;
   @Input() forceBtc: boolean = false;
   @Input() ignoreViewMode: boolean = false;
-  @Input() forceBlockConversion: boolean = false; // true = displays fiat price as 0 if blockConversion is undefined instead of falling back to conversions
+  @Input() forceBlockConversion: boolean = false; // Do not substitute a current quote for a missing historical one.
   @Input() unitStyle: any;
 
   constructor(
@@ -54,6 +54,17 @@ export class AmountComponent implements OnInit, OnDestroy {
       this.stateSubscription.unsubscribe();
     }
     this.currencySubscription.unsubscribe();
+  }
+
+  fiatAmount(conversions: Record<string, number> | null): number | null {
+    const historical = this.blockConversion?.price;
+    const rate = historical ? historical[this.currency] : this.forceBlockConversion ? undefined : conversions?.[this.currency];
+    if (typeof rate !== 'number' || !Number.isFinite(rate) || rate <= 0 ||
+        typeof this.satoshis !== 'number' || !Number.isFinite(this.satoshis)) {
+      return null;
+    }
+    const amount = rate * this.satoshis / 1e18;
+    return Number.isFinite(amount) ? amount : null;
   }
 
 }

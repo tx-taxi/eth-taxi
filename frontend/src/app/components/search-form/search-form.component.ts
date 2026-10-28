@@ -1,5 +1,8 @@
+import { LanguageService } from '@app/services/language.service';
+import { readSharedPreference } from '@app/services/shared-preferences';
+import { localizedNativeUrl, refreshLocalizedCapabilities } from '@app/services/localized-native-url';
 import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap';
-import { Component, OnInit, ChangeDetectionStrategy, EventEmitter, Output, ViewChild, HostListener, ElementRef, Input } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, EventEmitter, Output, ViewChild, HostListener, ElementRef, Input } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { EventType, NavigationStart, Router } from '@angular/router';
 import { AssetsService } from '@app/services/assets.service';
@@ -116,6 +119,22 @@ export class SearchFormComponent implements OnInit {
   click$ = new Subject<string>();
 
   @Output() searchTriggered = new EventEmitter();
+  readonly registryUnavailableLabel = $localize`:@@eth.search.registryUnavailable:Explorer registry unavailable`;
+  readonly loadingExplorersLabel = $localize`:@@eth.search.loading:Loading explorers`;
+  readonly foundLabel = $localize`:@@eth.search.found:Found`;
+  readonly possibleLabel = $localize`:@@eth.search.possible:Possible`;
+
+  openExplorerLabel(name: string): string { return $localize`:@@eth.search.openExplorer:Open ${name}:name:`; }
+  openNewTabLabel(name: string): string { return $localize`:@@eth.search.openNewTab:Open ${name}:name: in a new tab`; }
+  switchExplorerLabel(name: string): string { return $localize`:@@eth.search.switchExplorer:Switch to ${name}:name:`; }
+  additionalExplorersLabel(name: string): string { return $localize`:@@eth.search.additionalExplorers:${name}:name: additional explorers`; }
+  additionalOptionsLabel(name: string, count: number, expanded: boolean): string {
+    if (expanded) {
+      return count === 1 ? $localize`:@@eth.search.hideOne:Hide ${count}:count: additional ${name}:name: option` : $localize`:@@eth.search.hideMany:Hide ${count}:count: additional ${name}:name: options`;
+    }
+    return count === 1 ? $localize`:@@eth.search.showOne:Show ${count}:count: additional ${name}:name: option` : $localize`:@@eth.search.showMany:Show ${count}:count: additional ${name}:name: options`;
+  }
+
   @ViewChild('searchResults') searchResults: SearchResultsComponent;
   @HostListener('keydown', ['$event']) keydown($event): void {
     this.handleKeyDown($event);
@@ -133,11 +152,25 @@ export class SearchFormComponent implements OnInit {
     private relativeUrlPipe: RelativeUrlPipe,
     private elementRef: ElementRef,
     private explorerRegistry: TxTaxiExplorerRegistryService,
+    private cdr: ChangeDetectorRef,
+    private languageService: LanguageService,
   ) {
     this.explorers$ = this.explorerRegistry.explorers$;
   }
 
+  private refreshLocales = (): void => {
+    void refreshLocalizedCapabilities(this.explorerRegistry.hubUrl).then(() => this.cdr.markForCheck());
+  };
+
+  ngOnDestroy(): void {
+    if (typeof window !== 'undefined') window.removeEventListener('focus', this.refreshLocales);
+  }
+
   ngOnInit(): void {
+    if (typeof window !== 'undefined') {
+      this.refreshLocales();
+      window.addEventListener('focus', this.refreshLocales);
+    }
     this.env = this.stateService.env;
     this.thirdPartyExplorers$ = this.explorerRegistry.thirdPartyExplorers$;
     this.stateService.networkChanged$.subscribe((network) => {
@@ -583,7 +616,7 @@ export class SearchFormComponent implements OnInit {
       if (parseInt(searchText) <= this.stateService.latestBlockHeight) {
         this.navigate('/block/', searchText);
       } else {
-        this.showSearchError('That block has not been produced yet.');
+        this.showSearchError($localize`:@@eth.search.futureBlock:That block has not been produced yet.`);
       }
     } else if (this.regexTransaction.test(searchText)) {
       const matches = this.regexTransaction.exec(searchText);
@@ -609,19 +642,28 @@ export class SearchFormComponent implements OnInit {
       this.regexDate.test(searchText) ? timestamp = Math.floor(new Date(searchText).getTime() / 1000) : timestamp = Number(searchText);
       // Check if timestamp is too far in the future or before the genesis block
       if (timestamp > Math.floor(Date.now() / 1000)) {
-        this.showSearchError('Enter a date or timestamp that is not in the future.');
+        this.showSearchError($localize`:@@eth.search.futureDate:Enter a date or timestamp that is not in the future.`);
         return;
       }
       this.apiService.getBlockDataFromTimestamp$(timestamp).subscribe(
         (data) => { this.navigate('/block/', data.hash); },
-        () => { this.showSearchError('No Ethereum block was found for that time.'); }
+        () => { this.showSearchError($localize`:@@eth.search.dateNotFound:No Ethereum block was found for that time.`); }
       );
     } else {
-      this.showSearchError('Enter an Ethereum address, transaction hash, or block number.');
+      this.showSearchError($localize`:@@eth.search.invalidInput:Enter an Ethereum address, transaction hash, or block number.`);
     }
   }
 
+  localizedExplorerUrl(value: string): string {
+    if (typeof document === 'undefined') return value;
+    const preference = readSharedPreference(document, 'txtaxi_language');
+    const explicit = document.location.pathname.match(/^\/(ar|ca|cs|da|de|en(?:-US)?|es|fa|fi|fr|he|hi|hr|hu|it|ja|ka|ko|lt|mk|nb|ne|nl|pl|pt|ro|ru|sl|sv|th|tr|uk|vi|zh)(?:\/|$)/i)?.[1].toLowerCase();
+    const language = explicit ? (explicit.startsWith('en') ? 'en' : explicit) : preference || this.languageService.getLanguage();
+    return localizedNativeUrl(value, language);
+  }
+
   private assignDestination(value: string, destinationHint?: Pick<SearchTarget, 'chainId' | 'destinationId'>): void {
+    value = this.localizedExplorerUrl(value);
     let lightning = false;
     try {
       const url = new URL(value);

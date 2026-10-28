@@ -194,6 +194,7 @@
           },
           "configurations": {
             "production": {
+              "localize": ["en-US", "es"],
               "assets": [
                 "src/favicon.ico",
                 "src/robots.txt",

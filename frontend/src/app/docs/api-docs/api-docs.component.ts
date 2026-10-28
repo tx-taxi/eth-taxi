@@ -1,4 +1,5 @@
-import { AfterViewInit, Component, HostListener, Input, OnInit } from '@angular/core';
+import { localizeEthereumDocs } from '@app/docs/api-docs/ethereum-docs-es';
+import { AfterViewInit, Component, Inject, LOCALE_ID, HostListener, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import {
   EthereumDocEntry,
@@ -16,20 +17,22 @@ import {
 })
 export class ApiDocsComponent implements OnInit, AfterViewInit {
   @Input() whichTab: 'faq' | 'rest' | 'websocket';
+  documentPath = document.location.pathname + document.location.search;
 
+  clientMessageLabel = $localize`:@@eth.docs.clientMessage:Client message`;
   hostname = `${document.location.protocol}//${document.location.host}`;
   mobileViewport = window.innerWidth <= 992;
   expandedFragments = new Set<string>();
   docs: EthereumDocItem[] = [];
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(private route: ActivatedRoute, @Inject(LOCALE_ID) private locale: string) {}
 
   ngOnInit(): void {
-    this.docs = this.whichTab === 'rest'
+    this.docs = localizeEthereumDocs(this.whichTab === 'rest'
       ? ethereumRestData
       : this.whichTab === 'websocket'
         ? ethereumWebsocketData
-        : ethereumGuideData;
+        : ethereumGuideData, this.locale);
   }
 
   ngAfterViewInit(): void {

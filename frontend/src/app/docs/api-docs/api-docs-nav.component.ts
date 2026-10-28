@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { localizeEthereumDocs } from '@app/docs/api-docs/ethereum-docs-es';
+import { Component, Inject, LOCALE_ID, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import {
   EthereumDocItem,
   ethereumGuideData,
@@ -14,16 +15,19 @@ import {
 })
 export class ApiDocsNavComponent implements OnInit {
   @Input() whichTab: 'faq' | 'rest' | 'websocket';
+  documentPath = document.location.pathname + document.location.search;
   @Output() navLinkClickEvent = new EventEmitter<{ event: Event; fragment: string }>();
 
   tabData: EthereumDocItem[] = [];
 
+  constructor(@Inject(LOCALE_ID) private locale: string) {}
+
   ngOnInit(): void {
-    this.tabData = this.whichTab === 'rest'
+    this.tabData = localizeEthereumDocs(this.whichTab === 'rest'
       ? ethereumRestData
       : this.whichTab === 'websocket'
         ? ethereumWebsocketData
-        : ethereumGuideData;
+        : ethereumGuideData, this.locale);
   }
 
   navLinkClick(event: Event, fragment: string): void {

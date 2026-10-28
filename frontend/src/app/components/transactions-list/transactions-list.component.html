@@ -140,9 +140,9 @@
                   <ng-template #defaultOutput>
                     <span *ngIf="vin.lazy" class="skeleton-loader"></span>
                     @if (vin.prevout?.scriptpubkey_type === 'ethereum-address') {
-                      <span class="grey-info-text">From</span>
+                      <span class="grey-info-text" i18n="@@eth.from">From</span>
                     } @else {
-                      <app-amount [blockConversion]="tx.price" *ngIf="vin.prevout" [satoshis]="vin.prevout.value"></app-amount>
+                      <app-amount [blockConversion]="tx.price" [forceBlockConversion]="!!tx.status?.confirmed" *ngIf="vin.prevout" [satoshis]="vin.prevout.value"></app-amount>
                     }
                   </ng-template>
                 </td>
@@ -416,17 +416,23 @@
                       <span class="ethereum-list-token-amount" [title]="ethereumTransferTitle(transfer)">
                         {{ ethereumTransferLabel(transfer) }}
                       </span>
-                      <span *ngIf="currentTokenTransferUsd(transfer) as usd" class="ethereum-list-token-usd" title="Approximate USD value using the current token price">~{{ usd }}</span>
+                      <ng-container *ngIf="currentTokenTransferFiat(transfer) as fiat">
+                        <span *ngIf="currency === 'USD'; else otherTransferFiat" class="ethereum-list-token-usd" i18n-title="@@eth.tokenUsdTitle" title="Approximate USD value using the current token price">~{{ fiat }}</span>
+                        <ng-template #otherTransferFiat><span class="ethereum-list-token-usd" title="Approximate value using the current token price" i18n-title="@@eth.current-value-title">~{{ fiat }}</span></ng-template>
+                      </ng-container>
                       <span *ngIf="tx.ethereum.tokenTransfers.length > 1" class="ethereum-list-token-extra">
-                        +{{ tx.ethereum.tokenTransfers.length - 1 }} {{ tx.ethereum.tokenTransfers.length === 2 ? 'transfer' : 'transfers' }}
+                        +{{ tx.ethereum.tokenTransfers.length - 1 }} <ng-container *ngIf="tx.ethereum.tokenTransfers.length === 2; else ethPluralTransfers" i18n="@@eth.transfer">transfer</ng-container><ng-template #ethPluralTransfers i18n="@@eth.transfers">transfers</ng-template>
                       </span>
                     </ng-container>
                     <ng-template #pendingTokenIntentAmount>
                       <ng-container *ngIf="tx.ethereum?.pendingTokenIntents?.[0] as intent; else nativeAmount">
                         <span class="ethereum-list-token-amount" [title]="'Proposed call: ' + ethereumTransferTitle(intent)">
-                          Proposed {{ ethereumTransferLabel(intent) }}
+                          <ng-container i18n="@@eth.proposed">Proposed</ng-container> {{ ethereumTransferLabel(intent) }}
                         </span>
-                        <span *ngIf="currentTokenTransferUsd(intent) as usd" class="ethereum-list-token-usd" title="Approximate USD value of the proposed call using the current token price">~{{ usd }}</span>
+                        <ng-container *ngIf="currentTokenTransferFiat(intent) as fiat">
+                        <span *ngIf="currency === 'USD'; else otherIntentFiat" class="ethereum-list-token-usd" i18n-title="@@eth.intentUsdTitle" title="Approximate USD value of the proposed call using the current token price">~{{ fiat }}</span>
+                        <ng-template #otherIntentFiat><span class="ethereum-list-token-usd" title="Approximate value of the proposed call using the current token price" i18n-title="@@eth.current-intent-title">~{{ fiat }}</span></ng-template>
+                      </ng-container>
                       </ng-container>
                     </ng-template>
                     <ng-template #nativeAmount>
@@ -434,7 +440,7 @@
                         <span class="ethereum-list-activity">{{ activity }}</span>
                       </ng-container>
                       <ng-template #nativeEthAmount>
-                        <app-amount [blockConversion]="tx.price" [satoshis]="vout.value"></app-amount>
+                        <app-amount [blockConversion]="tx.price" [forceBlockConversion]="!!tx.status?.confirmed" [satoshis]="vout.value"></app-amount>
                       </ng-template>
                     </ng-template>
                   </ng-template>
@@ -558,7 +564,7 @@
     <div class="summary">
       <div class="float-start mt-2-5" *ngIf="!transactionPage && !tx.vin[0].is_coinbase && tx.fee !== -1">
         <app-fee-rate [fee]="tx.fee" [weight]="tx.weight"></app-fee-rate>
-        <span class="d-none d-sm-inline-block">&nbsp;&ndash; <app-amount [blockConversion]="tx.price" [satoshis]="tx.fee" [noFiat]="true"></app-amount> <span class="fiat"><app-fiat [blockConversion]="tx.price" [value]="tx.fee"></app-fiat></span></span>
+        <span class="d-none d-sm-inline-block">&nbsp;&ndash; <app-amount [blockConversion]="tx.price" [forceBlockConversion]="!!tx.status?.confirmed" [satoshis]="tx.fee" [noFiat]="true"></app-amount> <span class="fiat"><app-fiat [blockConversion]="tx.price" [forceBlockConversion]="!!tx.status?.confirmed" [value]="tx.fee"></app-fiat></span></span>
       </div>
       <div class="float-start mt-2-5 grey-info-text" *ngIf="tx.fee === -1" i18n="transactions-list.load-to-reveal-fee-info">Show more inputs to reveal fee data</div>
 
@@ -579,12 +585,12 @@
         <button *ngIf="addresses.length === 0; else viewingAddress" type="button" class="btn btn-sm btn-primary mt-2 ms-2" (click)="switchCurrency()">
           <ng-template [ngIf]="(network === 'liquid' || network === 'liquidtestnet') && haveBlindedOutputValues(tx)" [ngIfElse]="defaultAmount" i18n="shared.confidential">Confidential</ng-template>
           <ng-template #defaultAmount>
-            <app-amount [blockConversion]="tx.price" [satoshis]="getTotalTxOutput(tx)"></app-amount>
+            <app-amount [blockConversion]="tx.price" [forceBlockConversion]="!!tx.status?.confirmed" [satoshis]="getTotalTxOutput(tx)"></app-amount>
           </ng-template>
         </button>
         <ng-template #viewingAddress>
           <button *ngIf="!tx.ethereum" type="button" class="btn btn-sm mt-2 ms-2" (click)="switchCurrency()" [ngClass]="{'btn-success': tx['addressValue'] >= 0, 'btn-danger': tx['addressValue'] < 0}">
-            <app-amount [blockConversion]="tx.price" [satoshis]="tx['addressValue']" [addPlus]="true" [unitStyle]="{color: '#ffffffbb'}"></app-amount>
+            <app-amount [blockConversion]="tx.price" [forceBlockConversion]="!!tx.status?.confirmed" [satoshis]="tx['addressValue']" [addPlus]="true" [unitStyle]="{color: '#ffffffbb'}"></app-amount>
           </button>
         </ng-template>
       </div>

@@ -59,7 +59,7 @@
                 <td [innerHTML]="'&lrm;' + (block.size | bytes: 2)"></td>
               </tr>
               <tr>
-                <td>Gas used</td>
+                <td i18n="@@eth.block.gas-used">Gas used</td>
                 <td>&lrm;{{ block.weight | number }} gas</td>
               </tr>
               <tr *ngIf="auditAvailable">
@@ -147,7 +147,7 @@
           </td>
         </tr>
         <tr>
-          <td>Validator reward</td>
+          <td i18n="@@eth.block.validator-reward">Validator reward</td>
           <td>
             &lrm;{{ formatEthereumWei(block.extras.reward) }} ETH
             <span class="fiat"><app-fiat [blockConversion]="blockConversion" [value]="block.extras.reward" digitsInfo="1.0-0"></app-fiat></span>
@@ -160,12 +160,12 @@
           <td style="width: 75%;"><span class="skeleton-loader"></span></td>
         </tr>
         <tr>
-          <td>Validator reward</td>
+          <td i18n="@@eth.block.validator-reward">Validator reward</td>
           <td><span class="skeleton-loader"></span></td>
         </tr>
       </ng-template>
       <tr>
-        <td>Fee recipient</td>
+        <td i18n="@@eth.block.fee-recipient">Fee recipient</td>
         <td><app-truncate [text]="block.extras.pool.name" [lastChars]="8" [link]="['/address/' | relativeUrl, block.extras.pool.name]"></app-truncate></td>
       </tr>
     </ng-container>
@@ -287,15 +287,15 @@
             <table class="table table-borderless table-striped">
               <tbody>
                 <tr>
-                  <td class="td-width">Parent hash</td>
+                  <td class="td-width" i18n="@@eth.block.parent-hash">Parent hash</td>
                   <td><app-truncate [text]="block.previousblockhash" [lastChars]="8" [link]="['/block/' | relativeUrl, block.previousblockhash]"></app-truncate></td>
                 </tr>
                 <tr>
-                  <td>Transactions</td>
+                  <td i18n="@@eth.block.transactions">Transactions</td>
                   <td>{{ block.tx_count | number }}</td>
                 </tr>
                 <tr>
-                  <td>Data size</td>
+                  <td i18n="@@eth.block.data-size">Data size</td>
                   <td [innerHTML]="'&lrm;' + (block.size | bytes: 2)"></td>
                 </tr>
               </tbody>
@@ -310,11 +310,11 @@
                   <td>{{ block.weight | number }} gas</td>
                 </tr>
                 <tr>
-                  <td>Base fee</td>
+                  <td i18n="@@eth.block.base-fee">Base fee</td>
                   <td><app-fee-rate [fee]="block.extras?.medianFee" [dp]="2"></app-fee-rate></td>
                 </tr>
                 <tr>
-                  <td>Fee recipient</td>
+                  <td i18n="@@eth.block.fee-recipient">Fee recipient</td>
                   <td><app-truncate [text]="block.extras?.pool?.name" [lastChars]="8" [link]="['/address/' | relativeUrl, block.extras?.pool?.name]"></app-truncate></td>
                 </tr>
               </tbody>

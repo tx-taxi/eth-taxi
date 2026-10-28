@@ -127,7 +127,7 @@
 
       <div class="subtitle-block">
         <div class="title">
-          <h2 id="state" class="anchor">State</h2>
+          <h2 id="state" class="anchor" i18n="@@eth.state">State</h2>
         </div>
       </div>
 
@@ -139,7 +139,7 @@
 
       <div class="subtitle-block">
         <div class="title">
-          <h2>From &amp; To</h2>
+          <h2 i18n="@@eth.fromTo">From &amp; To</h2>
         </div>
       </div>
 
@@ -157,40 +157,40 @@
           <table class="table table-borderless table-striped">
             <tbody>
               <tr>
-                <td>Input data</td>
+                <td i18n="@@eth.inputData">Input data</td>
                 <td [innerHTML]="'&lrm;' + (tx.size | bytes: 2)"></td>
               </tr>
               <tr>
-                <td>Gas used</td>
+                <td i18n="@@eth.gasUsed">Gas used</td>
                 <td>
                   <ng-container *ngIf="tx?.ethereum; else legacyGasUsed">
-                    {{ tx.ethereum.gasUsed ? formatEthereumInteger(tx.ethereum.gasUsed) + ' gas' : 'Not executed' }}
+                    <ng-container *ngIf="tx.ethereum.gasUsed; else ethNotExecuted">{{ formatEthereumInteger(tx.ethereum.gasUsed) }} gas</ng-container><ng-template #ethNotExecuted i18n="@@eth.notExecuted">Not executed</ng-template>
                   </ng-container>
                   <ng-template #legacyGasUsed>&lrm;{{ tx.weight / 4 | number }} gas</ng-template>
                 </td>
               </tr>
               <tr *ngIf="tx?.ethereum?.gasLimit">
-                <td>Gas limit</td>
+                <td i18n="@@eth.gasLimit">Gas limit</td>
                 <td>&lrm;{{ formatEthereumInteger(tx.ethereum.gasLimit) }} gas</td>
               </tr>
               <tr *ngIf="tx?.ethereum?.feeWei || tx?.ethereum?.maximumFeeWei">
-                <td>{{ tx.ethereum.maximumFeeWei ? 'Maximum fee' : 'Transaction fee' }}</td>
-                <td>&lrm;{{ formatEthereumQuantity(tx.ethereum.maximumFeeWei || tx.ethereum.feeWei, '18') }} ETH <span class="fiat"><app-fiat [blockConversion]="tx.price" [value]="ethereumWeiNumber(tx.ethereum.maximumFeeWei || tx.ethereum.feeWei)"></app-fiat></span></td>
+                <td><ng-container *ngIf="tx.ethereum.maximumFeeWei; else transactionFeeLabel" i18n="@@eth.maximumFee">Maximum fee</ng-container><ng-template #transactionFeeLabel i18n="@@eth.transactionFee">Transaction fee</ng-template></td>
+                <td>&lrm;{{ formatEthereumQuantity(tx.ethereum.maximumFeeWei || tx.ethereum.feeWei, '18') }} ETH <span class="fiat"><app-fiat [blockConversion]="tx.price" [forceBlockConversion]="!!tx.status?.confirmed" [value]="ethereumWeiNumber(tx.ethereum.maximumFeeWei || tx.ethereum.feeWei)"></app-fiat></span></td>
               </tr>
               <tr *ngIf="tx?.ethereum?.blobFeeWei">
-                <td>Execution fee</td>
-                <td>&lrm;{{ formatEthereumQuantity(tx.ethereum.executionFeeWei, '18') }} ETH <span class="fiat"><app-fiat [blockConversion]="tx.price" [value]="ethereumWeiNumber(tx.ethereum.executionFeeWei)"></app-fiat></span></td>
+                <td i18n="@@eth.executionFee">Execution fee</td>
+                <td>&lrm;{{ formatEthereumQuantity(tx.ethereum.executionFeeWei, '18') }} ETH <span class="fiat"><app-fiat [blockConversion]="tx.price" [forceBlockConversion]="!!tx.status?.confirmed" [value]="ethereumWeiNumber(tx.ethereum.executionFeeWei)"></app-fiat></span></td>
               </tr>
               <tr *ngIf="tx?.ethereum?.blobFeeWei">
-                <td>Blob fee</td>
-                <td>&lrm;{{ formatEthereumQuantity(tx.ethereum.blobFeeWei, '18') }} ETH <span class="fiat"><app-fiat [blockConversion]="tx.price" [value]="ethereumWeiNumber(tx.ethereum.blobFeeWei)"></app-fiat></span></td>
+                <td i18n="@@eth.blobFee">Blob fee</td>
+                <td>&lrm;{{ formatEthereumQuantity(tx.ethereum.blobFeeWei, '18') }} ETH <span class="fiat"><app-fiat [blockConversion]="tx.price" [forceBlockConversion]="!!tx.status?.confirmed" [value]="ethereumWeiNumber(tx.ethereum.blobFeeWei)"></app-fiat></span></td>
               </tr>
               <tr *ngIf="tx?.ethereum?.maximumBlobFeeWei">
-                <td>Maximum blob fee</td>
-                <td>&lrm;{{ formatEthereumQuantity(tx.ethereum.maximumBlobFeeWei, '18') }} ETH <span class="fiat"><app-fiat [blockConversion]="tx.price" [value]="ethereumWeiNumber(tx.ethereum.maximumBlobFeeWei)"></app-fiat></span></td>
+                <td i18n="@@eth.maximumBlobFee">Maximum blob fee</td>
+                <td>&lrm;{{ formatEthereumQuantity(tx.ethereum.maximumBlobFeeWei, '18') }} ETH <span class="fiat"><app-fiat [blockConversion]="tx.price" [forceBlockConversion]="!!tx.status?.confirmed" [value]="ethereumWeiNumber(tx.ethereum.maximumBlobFeeWei)"></app-fiat></span></td>
               </tr>
               <tr *ngIf="tx?.ethereum?.blobGasUsed">
-                <td>Blob gas used</td>
+                <td i18n="@@eth.blobGasUsed">Blob gas used</td>
                 <td>&lrm;{{ formatEthereumInteger(tx.ethereum.blobGasUsed) }} blob gas</td>
               </tr>
             </tbody>
@@ -200,7 +200,7 @@
           <table class="table table-borderless table-striped">
             <tbody>
               <tr>
-                <td>Transaction type</td>
+                <td i18n="@@eth.transactionType">Transaction type</td>
                 <td>&lrm;Type {{ tx?.ethereum?.type || tx.version }}</td>
               </tr>
               <tr>
@@ -208,23 +208,23 @@
                 <td>&lrm;{{ tx?.ethereum?.nonce ? formatEthereumInteger(tx.ethereum.nonce) : (tx.vin[0]?.sequence | number) }}</td>
               </tr>
               <tr>
-                <td>Method</td>
+                <td i18n="@@eth.method">Method</td>
                 <td class="ethereum-detail-method">{{ ethereumMethod() }}</td>
               </tr>
               <tr *ngIf="tx?.ethereum?.gasPriceWei">
-                <td>{{ tx.ethereum.maximumFeeWei ? 'Maximum fee per gas' : 'Gas price' }}</td>
+                <td><ng-container *ngIf="tx.ethereum.maximumFeeWei; else gasPriceLabel" i18n="@@eth.maximumFeePerGas">Maximum fee per gas</ng-container><ng-template #gasPriceLabel i18n="@@eth.gasPrice">Gas price</ng-template></td>
                 <td>&lrm;{{ formatEthereumQuantity(tx.ethereum.maximumFeeWei ? (tx.ethereum.maxFeePerGasWei || tx.ethereum.gasPriceWei) : tx.ethereum.gasPriceWei, '9', 4) }} gwei</td>
               </tr>
               <tr *ngIf="tx?.ethereum?.blobGasPriceWei">
-                <td>Blob gas price</td>
+                <td i18n="@@eth.blobGasPrice">Blob gas price</td>
                 <td>&lrm;{{ formatEthereumQuantity(tx.ethereum.blobGasPriceWei, '9', 4) }} gwei</td>
               </tr>
               <tr *ngIf="tx?.ethereum?.maxFeePerBlobGasWei">
-                <td>Maximum blob fee per gas</td>
+                <td i18n="@@eth.maximumBlobFeePerGas">Maximum blob fee per gas</td>
                 <td>&lrm;{{ formatEthereumQuantity(tx.ethereum.maxFeePerBlobGasWei, '9', 4) }} gwei</td>
               </tr>
               <tr *ngIf="tx?.ethereum?.revertReason">
-                <td>Revert reason</td>
+                <td i18n="@@eth.revertReason">Revert reason</td>
                 <td class="ethereum-detail-error">{{ tx.ethereum.revertReason }}</td>
               </tr>
             </tbody>
@@ -239,7 +239,7 @@
     <br>
 
     <div class="title">
-      <h2>From &amp; To</h2>
+      <h2 i18n="@@eth.fromTo">From &amp; To</h2>
     </div>
 
     <div class="box">

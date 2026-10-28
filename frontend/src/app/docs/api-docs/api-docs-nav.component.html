@@ -1,9 +1,9 @@
-<nav aria-label="Documentation sections">
+<nav aria-label="Documentation sections" i18n-aria-label="@@eth.docs.sections">
   <ng-container *ngFor="let item of tabData">
     <p *ngIf="item.type === 'category'">{{ item.title }}</p>
     <a
       *ngIf="item.type === 'entry'"
-      [href]="'#' + item.fragment"
+      [href]="documentPath + '#' + item.fragment"
       (click)="navLinkClick($event, item.fragment)"
     >{{ item.title }}</a>
   </ng-container>

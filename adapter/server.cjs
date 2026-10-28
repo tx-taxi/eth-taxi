@@ -2226,11 +2226,21 @@ function presentationRoute(pathname) {
 
 async function serveStatic(pathname, res, spaFallback = true, search = '') {
   if (isApiPath(pathname)) return false;
+  const spanish = pathname === '/es' || pathname.startsWith('/es/');
+  if (pathname === '/es' || pathname === '/es/index.html') {
+    res.writeHead(308, {location: '/es/' + search, 'cache-control': 'no-store'}); res.end(); return true;
+  }
+  const routePath = spanish ? pathname.slice(3) || '/' : pathname;
+  const localizedAlias = spanish && staticSeo.alias(routePath.replace(/\/$/, '') || '/');
+  if (localizedAlias) {
+    res.writeHead(301, {location: '/es' + localizedAlias + search, 'cache-control': 'no-store'}); res.end(); return true;
+  }
   const slashless = pathname.length > 1 ? pathname.replace(/\/$/, '') : pathname;
-  if (slashless !== pathname && (ogEntityRoute(slashless) || staticSeo.page(slashless))) {
+  const slashlessRoute = spanish ? slashless.slice(3) || '/' : slashless;
+  if (routePath !== '/' && slashless !== pathname && (ogEntityRoute(slashlessRoute) || staticSeo.page(slashlessRoute))) {
     res.writeHead(308, {location: slashless + search, 'cache-control': 'no-store'}); res.end(); return true;
   }
-  const entityRoute = ogEntityRoute(pathname);
+  const entityRoute = ogEntityRoute(routePath);
   let entityMetadata, entity, entityStatus = 200;
   if (entityRoute) {
     try { entity = ogEntity(entityRoute.kind, entityRoute.id, await documentEntity(entityRoute.kind, entityRoute.id)); }
@@ -2264,19 +2274,37 @@ async function serveStatic(pathname, res, spaFallback = true, search = '') {
     if (error?.code !== 'ENOENT' && error?.code !== 'EISDIR') throw error;
   }
   if (!spaFallback) return false;
-  const page = staticSeo.page(pathname);
+  const page = staticSeo.page(routePath);
 
   // Localized builds place an index under en-US, while the default production
   // build emits it at the static root. Either layout must serve deep links.
-  for (const indexPath of [
-    path.join(staticRoot, 'en-US', 'index.html'),
-    path.join(staticRoot, 'index.html'),
-  ]) {
+  const indexPaths = spanish ? [path.join(staticRoot, 'es', 'index.html')] : [
+    path.join(staticRoot, 'en-US', 'index.html'), path.join(staticRoot, 'index.html'),
+  ];
+  for (const indexPath of indexPaths) {
     try {
       const body = await fs.readFile(indexPath);
-      const noindex = page?.noindex || entityStatus === 404 || (!page && !entityMetadata);
-      const status = entityMetadata ? entityStatus : !page && !presentationRoute(pathname) ? 404 : 200;
+      const noindex = spanish || page?.noindex || entityStatus === 404 || (!page && !entityMetadata);
+      const status = entityMetadata ? entityStatus : !page && !presentationRoute(routePath) ? 404 : 200;
       res.writeHead(status, { 'content-type': contentTypes['.html'], 'cache-control': 'no-store', ...(noindex ? {'x-robots-tag': 'noindex, follow'} : {}), ...(status === 503 ? {'retry-after': '60'} : {}) });
+      if (spanish) {
+        // The Ethereum-specific Spanish pages are being completed. Keep them out
+        // of search until the page content and localized metadata are reviewed.
+        const canonical = `${OG_ORIGIN}${pathname}`;
+        const title = 'eth.tx.taxi - Explorador de Ethereum';
+        const description = 'Consulta bloques, transacciones, direcciones y comisiones de Ethereum.';
+        const image = 'https://tx.taxi/assets/screenshots/eth-transaction-4abe31f2a24f.jpg';
+        const html = `<title>${title}</title><link id="canonical" rel="canonical" href="${ogEscape(canonical)}">` +
+          `<meta name="robots" content="noindex, follow"><meta name="description" content="${description}">` +
+          `<meta property="og:locale" content="es_ES"><meta property="og:title" content="${title}">` +
+          `<meta property="og:description" content="${description}"><meta property="og:url" content="${ogEscape(canonical)}">` +
+          `<meta property="og:type" content="website"><meta property="og:site_name" content="eth.tx.taxi">` +
+          `<meta property="og:image" content="${image}"><meta name="twitter:card" content="summary_large_image">` +
+          `<meta name="twitter:title" content="${title}"><meta name="twitter:description" content="${description}">` +
+          `<meta name="twitter:image" content="${image}">`;
+        res.end(ogInjectDocument(body.toString(), {html}));
+        return true;
+      }
       res.end(page ? staticSeo.render(body.toString(), page) : entityMetadata ? documentBody(ogInjectDocument(body.toString(), entityMetadata), entity, entityStatus) : body.toString().replace(/<meta\b[^>]*name=["']robots["'][^>]*>/gi, '').replace('</head>', '<meta name="robots" content="noindex, follow"></head>'));
       return true;
     } catch (error) {

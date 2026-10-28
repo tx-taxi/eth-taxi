@@ -187,7 +187,7 @@ export interface Language {
   name: string;
 }
 
-export const languages: Language[] = [
+const inheritedLanguages: Language[] = [
    { code: 'ar', name: 'العربية' },         // Arabic
 // { code: 'bg', name: 'Български' },       // Bulgarian
 // { code: 'bs', name: 'Bosanski' },        // Bosnian
@@ -238,6 +238,9 @@ export const languages: Language[] = [
    { code: 'vi', name: 'Tiếng Việt' },      // Vietnamese
    { code: 'zh', name: '中文' },            // Chinese
 ];
+
+// Only languages verified for the Ethereum explorer are offered.
+export const languages: Language[] = inheritedLanguages.filter(({ code }) => code === 'en' || code === 'es');
 
 export const specialBlocks = {
   '0': {
