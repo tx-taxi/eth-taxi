@@ -11501,6 +11501,18 @@
         <source>Recent Transactions</source>
         <target>Transactions récentes</target>
       </trans-unit>
+      <trans-unit id="eth.about.docs" datatype="html"><source>Ethereum documentation</source><target>Documentation Ethereum</target></trans-unit>
+      <trans-unit id="eth.nav.production" datatype="html"><source>Block production</source><target>Production de blocs</target></trans-unit>
+      <trans-unit id="eth.blockDetails.estimatedFees" datatype="html"><source>Estimated execution fees</source><target>Frais d’exécution estimés</target></trans-unit>
+      <trans-unit id="eth.blockDetails.totalFees" datatype="html"><source>Total fees</source><target>Frais totaux</target></trans-unit>
+      <trans-unit id="eth.blockDetails.medianFee" datatype="html"><source>Median fee rate</source><target>Taux médian des frais</target></trans-unit>
+      <trans-unit id="eth.blockDetails.feeRange" datatype="html"><source>Fee range</source><target>Fourchette des frais</target></trans-unit>
+      <trans-unit id="eth.divider.dashboard" datatype="html"><source>Ethereum explorer dashboard</source><target>Tableau de bord de l’explorateur Ethereum</target></trans-unit>
+      <trans-unit id="eth.divider.displayFees" datatype="html"><source>Switch to displaying total fees per block</source><target>Afficher les frais totaux par bloc</target></trans-unit>
+      <trans-unit id="eth.divider.displaySizes" datatype="html"><source>Switch to displaying block sizes</source><target>Afficher la taille des blocs</target></trans-unit>
+      <trans-unit id="eth.divider.newestLeft" datatype="html"><source>Switch to displaying newest blocks on the left</source><target>Afficher les blocs les plus récents à gauche</target></trans-unit>
+      <trans-unit id="eth.divider.newestRight" datatype="html"><source>Switch to displaying newest blocks on the right</source><target>Afficher les blocs les plus récents à droite</target></trans-unit>
+      <trans-unit id="eth.pending.executionFeesTooltip" datatype="html"><source>Estimated execution fees at the current base fee, assuming each transaction uses its full gas limit</source><target>Frais d’exécution estimés au tarif de base actuel, en supposant que chaque transaction utilise toute sa limite de gaz</target></trans-unit>
     </body>
   </file>
 </xliff>
