@@ -2220,7 +2220,8 @@ function documentBody(html, entity, status) {
   return html.replace(/(<app-root\b[^>]*>)[\s\S]*?(<\/app-root>)/i, (_, open, close) => `${open}<main class="container-xl"><h1>${ogEscape(entity.heading)}</h1><p style="overflow-wrap:anywhere">${ogEscape(entity.subtitle)}</p><p>${ogEscape(entity.description)}</p>${table}</main>${close}`);
 }
 function presentationRoute(pathname) {
-  return /^\/(?:clock(?:\/[^/]+){0,2}|view\/(?:blocks|block\/[^/]+|mempool-block\/\d+)|preview(?:\/[^/]+){0,4}|widget\/wallet|wallet(?:\/[^/]+)?|tx\/(?:push|test|preview)|blocks\/stale|mempool-block\/\d+|mining\/pool\/[^/]+)$/.test(pathname);
+  const registered = new Set(['/status', '/tools/calculator', '/rbf', '/txs', '/stratum', '/monitoring', '/nodes', '/faucet', '/production', '/mining', '/acceleration', '/acceleration/list', '/treasuries', '/graphs/mempool', '/graphs/mining/hashrate-difficulty', '/graphs/mining/pools-dominance', '/graphs/mining/pools', '/graphs/mining/block-fees', '/graphs/mining/block-fees-subsidy', '/graphs/mining/block-rewards', '/graphs/mining/block-fee-rates', '/graphs/mining/block-sizes-weights', '/graphs/mining/block-health', '/graphs/acceleration/fees', '/graphs/price']);
+  return registered.has(pathname) || /^\/acceleration\/list\/\d+$/.test(pathname) || /^\/(?:clock(?:\/[^/]+){0,2}|view\/(?:blocks|block\/[^/]+|mempool-block\/\d+)|preview(?:\/[^/]+){0,4}|widget\/wallet|wallet(?:\/[^/]+)?|tx\/(?:push|test|preview)|blocks\/stale|mempool-block\/\d+|mining\/pool\/[^/]+)$/.test(pathname);
 }
 
 async function serveStatic(pathname, res, spaFallback = true, search = '') {
