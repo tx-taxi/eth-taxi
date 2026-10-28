@@ -1,3 +1,15 @@
+const localizedDigits = new Map<string, string[]>();
+
+export function localizeEthereumFraction(fraction: string, locale = 'en-US'): string {
+  let digits = localizedDigits.get(locale);
+  if (!digits) {
+    const formatter = new Intl.NumberFormat(locale, { useGrouping: false });
+    digits = Array.from({ length: 10 }, (_, digit) => formatter.format(digit));
+    localizedDigits.set(locale, digits);
+  }
+  return fraction.replace(/[0-9]/g, digit => digits[Number(digit)]);
+}
+
 export function formatEthereumQuantity(
   value: string | null | undefined,
   decimals: string | null | undefined = '18',
@@ -24,7 +36,7 @@ export function formatEthereumQuantity(
   }
   const decimalSeparator = new Intl.NumberFormat(locale).formatToParts(1.1).find(part => part.type === 'decimal')?.value || '.';
   return fraction
-    ? `${formatEthereumInteger(whole.toString(), locale)}${decimalSeparator}${fraction}`
+    ? `${formatEthereumInteger(whole.toString(), locale)}${decimalSeparator}${localizeEthereumFraction(fraction, locale)}`
     : formatEthereumInteger(whole.toString(), locale);
 }
 

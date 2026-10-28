@@ -11912,6 +11912,11 @@
       <trans-unit id="eth.feature.tokenTransfer" datatype="html"><source>Token transfer / call</source><target>Transferencia de token / llamada</target></trans-unit>
       <trans-unit id="eth.list.tokenTransferCall" datatype="html"><source>Token transfer call</source><target>Llamada de transferencia de token</target></trans-unit>
       <trans-unit id="eth.list.contractDeployment" datatype="html"><source>Contract deployment</source><target>Despliegue de contrato</target></trans-unit>
+      <trans-unit id="eth.value.unavailable" datatype="html"><source>Unavailable</source><target>No disponible</target></trans-unit>
+      <trans-unit id="eth.list.proposedCall" datatype="html"><source>Proposed call: </source><target>Llamada propuesta: </target></trans-unit>
+      <trans-unit id="eth.list.rawUnits" datatype="html"><source><x id="AMOUNT"/> raw units</source><target><x id="AMOUNT"/> unidades sin procesar</target></trans-unit>
+      <trans-unit id="eth.token.tokens" datatype="html"><source>tokens</source><target>tokens</target></trans-unit>
+      <trans-unit id="eth.token.generic" datatype="html"><source>Ethereum token</source><target>Token de Ethereum</target></trans-unit>
     </body>
   </file>
 </xliff>

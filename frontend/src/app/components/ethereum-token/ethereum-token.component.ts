@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, Inject, LOCALE_ID } from '@angular/core';
-import { formatEthereumInteger } from '@app/shared/ethereum-quantity.utils';
+import { formatEthereumInteger, localizeEthereumFraction } from '@app/shared/ethereum-quantity.utils';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, forkJoin, of, Subscription } from 'rxjs';
 import { catchError, startWith } from 'rxjs/operators';
@@ -94,7 +94,7 @@ export class EthereumTokenComponent implements OnInit, OnDestroy {
   }
 
   tokenTitle(): string {
-    return this.token?.name?.trim() || this.token?.symbol?.trim() || 'Ethereum token';
+    return this.token?.name?.trim() || this.token?.symbol?.trim() || $localize`:@@eth.token.generic:Ethereum token`;
   }
 
   formatTransferAmount(transfer: EthereumTokenTransfer): string {
@@ -103,12 +103,12 @@ export class EthereumTokenComponent implements OnInit, OnDestroy {
 
   transferExactAmount(transfer: EthereumTokenTransfer): string {
     const amount = this.formatUnits(transfer.value, this.transferDecimals(transfer));
-    const symbol = transfer.token.symbol?.trim() || this.token?.symbol?.trim() || 'tokens';
+    const symbol = transfer.token.symbol?.trim() || this.token?.symbol?.trim() || $localize`:@@eth.token.tokens:tokens`;
     return transfer.tokenId ? `${amount} ${symbol} #${transfer.tokenId}` : `${amount} ${symbol}`;
   }
 
   transferSymbol(transfer: EthereumTokenTransfer): string {
-    const symbol = transfer.token.symbol?.trim() || this.token?.symbol?.trim() || 'tokens';
+    const symbol = transfer.token.symbol?.trim() || this.token?.symbol?.trim() || $localize`:@@eth.token.tokens:tokens`;
     const id = transfer.tokenId;
     if (!id) return symbol;
     return `${symbol} #${id.length > 16 ? `${id.slice(0, 6)}…${id.slice(-6)}` : id}`;
@@ -322,7 +322,7 @@ export class EthereumTokenComponent implements OnInit, OnDestroy {
 
     const decimal = new Intl.NumberFormat(locale).formatToParts(1.1).find(part => part.type === 'decimal')?.value || '.';
     return fraction
-      ? `${this.groupInteger(integer.toString(), locale)}${decimal}${fraction}`
+      ? `${this.groupInteger(integer.toString(), locale)}${decimal}${localizeEthereumFraction(fraction, locale)}`
       : this.groupInteger(integer.toString(), locale);
   }
 
@@ -335,7 +335,7 @@ export class EthereumTokenComponent implements OnInit, OnDestroy {
     const fraction = rawFraction.slice(0, maxFractionDigits).replace(/0+$/, '');
     const decimal = new Intl.NumberFormat(this.locale).formatToParts(1.1).find(part => part.type === 'decimal')?.value || '.';
     return fraction
-      ? `${this.groupInteger(BigInt(integer).toString())}${decimal}${fraction}`
+      ? `${this.groupInteger(BigInt(integer).toString())}${decimal}${localizeEthereumFraction(fraction, this.locale)}`
       : this.groupInteger(BigInt(integer).toString());
   }
 

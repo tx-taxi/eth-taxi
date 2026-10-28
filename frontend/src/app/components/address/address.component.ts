@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, HostListener, Inject, LOCALE_ID } from '@angular/core';
-import { formatEthereumInteger } from '@app/shared/ethereum-quantity.utils';
+import { formatEthereumInteger, localizeEthereumFraction } from '@app/shared/ethereum-quantity.utils';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { ElectrsApiService } from '@app/services/electrs-api.service';
@@ -193,7 +193,7 @@ export class AddressComponent implements OnInit, OnDestroy {
     const normalizedValue = this.normalizeEthereumInteger(value);
     const decimalPlaces = this.parseEthereumDecimals(decimals);
     if (normalizedValue === null || decimalPlaces === null) {
-      return 'Unavailable';
+      return $localize`:@@eth.value.unavailable:Unavailable`;
     }
 
     const amount = BigInt(normalizedValue);
@@ -209,7 +209,7 @@ export class AddressComponent implements OnInit, OnDestroy {
       fraction = fraction.slice(0, maxFractionDigits).replace(/0+$/, '');
     }
     const decimal = new Intl.NumberFormat(this.locale).formatToParts(1.1).find(part => part.type === 'decimal')?.value || '.';
-    return fraction ? `${this.groupEthereumInteger(whole.toString())}${decimal}${fraction}` : this.groupEthereumInteger(whole.toString());
+    return fraction ? `${this.groupEthereumInteger(whole.toString())}${decimal}${localizeEthereumFraction(fraction, this.locale)}` : this.groupEthereumInteger(whole.toString());
   }
 
   private normalizeEthereumInteger(value: string | null | undefined): string | null {

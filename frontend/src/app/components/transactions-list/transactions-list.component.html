@@ -426,7 +426,7 @@
                     </ng-container>
                     <ng-template #pendingTokenIntentAmount>
                       <ng-container *ngIf="tx.ethereum?.pendingTokenIntents?.[0] as intent; else nativeAmount">
-                        <span class="ethereum-list-token-amount" [title]="'Proposed call: ' + ethereumTransferTitle(intent)">
+                        <span class="ethereum-list-token-amount" [title]="proposedCallLabel + ethereumTransferTitle(intent)">
                           <ng-container i18n="@@eth.proposed">Proposed</ng-container> {{ ethereumTransferLabel(intent) }}
                         </span>
                         <ng-container *ngIf="currentTokenTransferFiat(intent) as fiat">
