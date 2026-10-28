@@ -11917,6 +11917,8 @@
       <trans-unit id="eth.list.rawUnits" datatype="html"><source><x id="AMOUNT"/> raw units</source><target><x id="AMOUNT"/> unidades sin procesar</target></trans-unit>
       <trans-unit id="eth.token.tokens" datatype="html"><source>tokens</source><target>tokens</target></trans-unit>
       <trans-unit id="eth.token.generic" datatype="html"><source>Ethereum token</source><target>Token de Ethereum</target></trans-unit>
+      <trans-unit id="eth.footer.madeWith" datatype="html"><source>Made with</source><target>Hecho con</target></trans-unit>
+      <trans-unit id="eth.footer.by" datatype="html"><source>by</source><target>por</target></trans-unit>
     </body>
   </file>
 </xliff>

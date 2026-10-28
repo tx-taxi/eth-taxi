@@ -64,7 +64,7 @@
 
     <div class="row footer-credit" [style]="{'background-color': isServicesPage ? 'var(--bg)' : ''}">
       <div class="col-sm-12">
-        <p>Made with <span class="footer-credit-emoji" aria-hidden="true">🚕</span> by <a class="footer-credit-link" href="https://u.software" target="_blank" rel="noopener noreferrer">u.software</a></p>
+        <p><ng-container i18n="@@eth.footer.madeWith">Made with</ng-container>&nbsp;<span class="footer-credit-emoji" aria-hidden="true">🚕</span>&nbsp;<ng-container i18n="@@eth.footer.by">by</ng-container>&nbsp;<a class="footer-credit-link" href="https://u.software" target="_blank" rel="noopener noreferrer">u.software</a></p>
       </div>
     </div>
   </div>
