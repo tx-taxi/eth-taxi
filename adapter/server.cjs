@@ -885,9 +885,11 @@ function explorerRateLimitCooldown(response) {
 
 async function providerJson(requestPath, { bypassCooldown = false } = {}) {
   let lastError;
+  const failureStatuses = [];
   for (const provider of providers) {
     const cooldownUntil = providerCooldowns.get(provider) || 0;
     if (!bypassCooldown && cooldownUntil > Date.now()) {
+      failureStatuses.push(503);
       lastError = new Error(`${provider} is rate limited until ${new Date(cooldownUntil).toISOString()}`);
       continue;
     }
@@ -898,16 +900,17 @@ async function providerJson(requestPath, { bypassCooldown = false } = {}) {
       });
       if (!response.ok) {
         if (response.status === 429) providerCooldowns.set(provider, Date.now() + explorerRateLimitCooldown(response));
-        throw new Error(`${provider}${requestPath} returned ${response.status}`);
+        throw Object.assign(new Error(`${provider}${requestPath} returned ${response.status}`), {status: response.status});
       }
       activeProvider = provider;
       providerCooldowns.delete(provider);
       return response.json();
     } catch (error) {
+      failureStatuses.push(error.status || 503);
       lastError = error;
     }
   }
-  throw lastError || new Error('No Ethereum providers configured');
+  throw Object.assign(lastError || new Error('No Ethereum providers configured'), {status: failureStatuses.length && failureStatuses.every(status => status === 404) ? 404 : 503});
 }
 
 function setAddressCacheEntry(cache, key, entry) {
@@ -1999,7 +2002,7 @@ function ogInjectDocument(html, metadata) {
     if (node.tagName === 'title') return true;
     if (node.tagName === 'link') return attribute(node, 'rel')?.split(/\s+/).includes('canonical');
     if (node.tagName !== 'meta') return false;
-    return attribute(node, 'name') === 'description' || attribute(node, 'name')?.startsWith('twitter:') || attribute(node, 'property')?.startsWith('og:');
+    return attribute(node, 'name') === 'description' || attribute(node, 'name') === 'robots' || attribute(node, 'name')?.startsWith('twitter:') || attribute(node, 'property')?.startsWith('og:');
   }).map((node) => node.sourceCodeLocation).filter(Boolean).sort((a, b) => a.startOffset - b.startOffset);
   const insertAt = head.sourceCodeLocation.endTag.startOffset;
   let cursor = 0;
@@ -2161,12 +2164,83 @@ function isSupportedApiPath(pathname) {
 
 const staticSeo = createStaticSeo(staticRoot, ogInjectDocument);
 
+const entityDocuments = new Map(), entityDocumentPending = new Map();
+async function loadDocumentEntity(kind, id) {
+  try {
+    if (kind === 'tx') {
+      const value = await providerJson(`/api/v2/transactions/${encodeURIComponent(id)}`);
+      if (value.hash?.toLowerCase() !== id.toLowerCase()) throw new Error('Transaction mismatch');
+      return mapTransactionDetail(value, value.block_hash);
+    }
+    if (kind === 'block') return mapBlock(await providerJson(`/api/v2/blocks/${encodeURIComponent(id)}`));
+    if (kind === 'address') return mapEthereumAddressMetadata(await providerJson(`/api/v2/addresses/${encodeURIComponent(id)}`), {}, id);
+    return await ethereumToken(id);
+  } catch (error) {
+    if (kind === 'tx') {
+      const tx = await rpcJson('eth_getTransactionByHash', [id]);
+      if (tx === null) throw Object.assign(new Error('Transaction not found'), {status: 404});
+      if (!tx || tx.hash?.toLowerCase() !== id.toLowerCase()) throw new Error('Transaction unavailable');
+      const receipt = await rpcJson('eth_getTransactionReceipt', [id]).catch(() => null);
+      const mapped = mapTransactionDetail(mapRpcTransaction(tx, receipt, null, null), tx.blockHash);
+      if (!receipt) mapped.ethereum.feeWei = null;
+      return mapped;
+    }
+    if (kind === 'block') {
+      const hash = /^0x[a-f0-9]{64}$/i.test(id);
+      const block = await rpcJson(hash ? 'eth_getBlockByHash' : 'eth_getBlockByNumber', [hash ? id : '0x' + Number(id).toString(16), false]);
+      if (block === null) throw Object.assign(new Error('Block not found'), {status: 404});
+      if (!block) throw new Error('Block unavailable');
+      return mapRpcBlock(block);
+    }
+    if (kind === 'address') return rpcAddressMetadata(id);
+    throw error;
+  }
+}
+async function documentEntity(kind, id) {
+  const key = kind + ':' + id.toLowerCase();
+  let work = entityDocumentPending.get(key);
+  const cached = entityDocuments.get(key);
+  if (cached && cached.until > Date.now()) return cached.value;
+  if (!work) {
+    if (entityDocumentPending.size >= 16) throw new Error('Metadata busy');
+    work = loadDocumentEntity(kind, id).then(value => {
+      entityDocuments.delete(key); entityDocuments.set(key, {value, until: Date.now() + 30000});
+      while (entityDocuments.size > 256) entityDocuments.delete(entityDocuments.keys().next().value);
+      return value;
+    }).finally(() => entityDocumentPending.delete(key));
+    entityDocumentPending.set(key, work);
+  }
+  let timer;
+  try { return await Promise.race([work, new Promise((_, reject) => {timer = setTimeout(() => reject(new Error('Metadata deadline')), 4000);})]); }
+  finally { clearTimeout(timer); }
+}
+function documentBody(html, entity, status) {
+  const rows = status === 200 ? entity.rows.filter(([, value]) => value !== null && value !== undefined && value !== '') : [];
+  const table = rows.length ? `<table class="table table-striped"><tbody>${rows.map(([label, value]) => `<tr><th scope="row">${ogEscape(label)}</th><td style="overflow-wrap:anywhere">${ogEscape(value)}</td></tr>`).join('')}</tbody></table>` : '';
+  return html.replace(/(<app-root\b[^>]*>)[\s\S]*?(<\/app-root>)/i, (_, open, close) => `${open}<main class="container-xl"><h1>${ogEscape(entity.heading)}</h1><p style="overflow-wrap:anywhere">${ogEscape(entity.subtitle)}</p><p>${ogEscape(entity.description)}</p>${table}</main>${close}`);
+}
+function presentationRoute(pathname) {
+  return /^\/(?:clock(?:\/[^/]+){0,2}|view\/(?:blocks|block\/[^/]+|mempool-block\/\d+)|preview(?:\/[^/]+){0,4}|widget\/wallet|wallet(?:\/[^/]+)?|tx\/(?:push|test|preview)|blocks\/stale|mempool-block\/\d+|mining\/pool\/[^/]+)$/.test(pathname);
+}
+
 async function serveStatic(pathname, res, spaFallback = true) {
   if (isApiPath(pathname)) return false;
+  const slashless = pathname.length > 1 ? pathname.replace(/\/$/, '') : pathname;
+  if (slashless !== pathname && (ogEntityRoute(slashless) || staticSeo.page(slashless))) {
+    res.writeHead(308, {location: slashless, 'cache-control': 'no-store'}); res.end(); return true;
+  }
   const entityRoute = ogEntityRoute(pathname);
-  const entityMetadata = entityRoute
-    ? ogEntityMetadata(entityRoute.kind, entityRoute.id, ogRouteEntity(entityRoute.kind, entityRoute.id))
-    : null;
+  let entityMetadata, entity, entityStatus = 200;
+  if (entityRoute) {
+    try { entity = ogEntity(entityRoute.kind, entityRoute.id, await documentEntity(entityRoute.kind, entityRoute.id)); }
+    catch (error) {
+      entityStatus = error.status === 404 ? 404 : 503;
+      entity = ogRouteEntity(entityRoute.kind, entityRoute.id);
+      entity.description = entityStatus === 404 ? 'Ethereum entity not found.' : 'Ethereum data temporarily unavailable. Please retry.';
+    }
+    entityMetadata = ogEntityMetadata(entityRoute.kind, entityRoute.id, entity);
+    entityMetadata.html += `<meta name="robots" content="${entityStatus === 404 ? 'noindex, follow' : 'index, follow, max-image-preview:large'}">`;
+  }
   const requested = pathname;
   const relative = path.posix.normalize(requested).replace(/^\/+/, '');
   let filePath = path.join(staticRoot, relative);
@@ -2199,8 +2273,10 @@ async function serveStatic(pathname, res, spaFallback = true) {
   ]) {
     try {
       const body = await fs.readFile(indexPath);
-      res.writeHead(200, { 'content-type': contentTypes['.html'], 'cache-control': 'no-store', ...(!page && !entityMetadata ? { 'x-robots-tag': 'noindex, follow' } : {}) });
-      res.end(page ? staticSeo.render(body.toString(), page) : entityMetadata ? ogInjectDocument(body.toString(), entityMetadata) : body);
+      const noindex = page?.noindex || entityStatus === 404 || (!page && !entityMetadata);
+      const status = entityMetadata ? entityStatus : !page && !presentationRoute(pathname) ? 404 : 200;
+      res.writeHead(status, { 'content-type': contentTypes['.html'], 'cache-control': 'no-store', ...(noindex ? {'x-robots-tag': 'noindex, follow'} : {}), ...(status === 503 ? {'retry-after': '60'} : {}) });
+      res.end(page ? staticSeo.render(body.toString(), page) : entityMetadata ? documentBody(ogInjectDocument(body.toString(), entityMetadata), entity, entityStatus) : body.toString().replace(/<meta\b[^>]*name=["']robots["'][^>]*>/gi, '').replace('</head>', '<meta name="robots" content="noindex, follow"></head>'));
       return true;
     } catch (error) {
       if (error?.code !== 'ENOENT' && error?.code !== 'EISDIR') throw error;

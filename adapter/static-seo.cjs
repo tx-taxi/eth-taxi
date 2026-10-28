@@ -22,12 +22,13 @@ function createStaticSeo(staticRoot, injectDocument) {
     const first = data().pages.find(item => item.path === '/blocks/1');
     const heading = `Blocks — page ${pagination[1]}`;
     const canonical = ORIGIN + pathname;
-    return { ...first, path: pathname, title: `${heading} - eth.tx.taxi - Ethereum Explorer`, canonical,
+    return { ...first, path: pathname, noindex: true, title: `${heading} - eth.tx.taxi - Ethereum Explorer`, canonical,
       markdownPath: null, html: first.html.replace('<h1>Blocks</h1>', `<h1>${heading}</h1>`),
       schema: { ...first.schema, '@id': canonical + '#page', url: canonical, name: heading } };
   }
   function render(html, item) {
     const tags = [
+      ['name', 'robots', item.noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large'],
       ['name', 'description', item.description], ['property', 'og:type', 'website'],
       ['property', 'og:site_name', 'eth.tx.taxi'], ['property', 'og:locale', 'en_US'],
       ['property', 'og:title', item.title], ['property', 'og:description', item.description],
