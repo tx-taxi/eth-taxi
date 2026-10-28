@@ -1,7 +1,7 @@
 <div class="fee-estimation-wrapper" *ngIf="$rewardStats | async as rewardStats; else loadingReward">
   <div class="fee-estimation-container">
     <div class="item">
-      <h5 class="card-title" ngbTooltip="Priority fees paid to block proposers in the recent block sample" placement="bottom">Proposer rewards</h5>
+      <h5 class="card-title" i18n-ngbTooltip="@@eth.rewards.proposerTooltip" ngbTooltip="Priority fees paid to block proposers in the recent block sample" placement="bottom" i18n="@@eth.rewards.proposer">Proposer rewards</h5>
       <div class="card-text">
         <div class="fee-text">
           <app-amount [satoshis]="rewardStats.proposerRewards" digitsInfo="1.2-6" [noFiat]="true" [ignoreViewMode]="true"></app-amount>
@@ -10,17 +10,17 @@
       </div>
     </div>
     <div class="item">
-      <h5 class="card-title" ngbTooltip="All execution-layer gas fees in the recent block sample" placement="bottom">Execution fees</h5>
+      <h5 class="card-title" i18n-ngbTooltip="@@eth.rewards.executionTooltip" ngbTooltip="All execution-layer gas fees in the recent block sample" placement="bottom" i18n="@@eth.rewards.execution">Execution fees</h5>
       <div class="card-text">
         <div class="fee-text">
           <app-amount [satoshis]="rewardStats.feePerBlock" digitsInfo="1.2-4" [noFiat]="true" [ignoreViewMode]="true"></app-amount>
-          <span>/block</span>
+          <span i18n="@@eth.rewards.perBlock">/block</span>
         </div>
         <span class="fiat"><app-fiat [value]="rewardStats.feePerBlock" digitsInfo="1.0-0"></app-fiat></span>
       </div>
     </div>
     <div class="item">
-      <h5 class="card-title" ngbTooltip="Average execution-layer gas fee per transaction in the recent block sample" placement="bottom">Average tx fee</h5>
+      <h5 class="card-title" i18n-ngbTooltip="@@eth.rewards.averageTooltip" ngbTooltip="Average execution-layer gas fee per transaction in the recent block sample" placement="bottom" i18n="@@eth.rewards.average">Average tx fee</h5>
       <div class="card-text">
         <div class="fee-text">
           <app-amount [satoshis]="rewardStats.feePerTx" digitsInfo="1.4-6" [noFiat]="true" [ignoreViewMode]="true"></app-amount>
@@ -33,9 +33,9 @@
 </div>
 
 <ng-template #loadingReward>
-  <div class="fee-estimation-container loading-container" aria-label="Loading recent execution rewards">
-    <div class="item"><h5 class="card-title">Proposer rewards</h5><div class="card-text"><div class="skeleton-loader"></div><div class="skeleton-loader"></div></div></div>
-    <div class="item"><h5 class="card-title">Execution fees</h5><div class="card-text"><div class="skeleton-loader"></div><div class="skeleton-loader"></div></div></div>
-    <div class="item"><h5 class="card-title">Average tx fee</h5><div class="card-text"><div class="skeleton-loader"></div><div class="skeleton-loader"></div></div></div>
+  <div class="fee-estimation-container loading-container" i18n-aria-label="@@eth.rewards.loading" aria-label="Loading recent execution rewards">
+    <div class="item"><h5 class="card-title" i18n="@@eth.rewards.proposer">Proposer rewards</h5><div class="card-text"><div class="skeleton-loader"></div><div class="skeleton-loader"></div></div></div>
+    <div class="item"><h5 class="card-title" i18n="@@eth.rewards.execution">Execution fees</h5><div class="card-text"><div class="skeleton-loader"></div><div class="skeleton-loader"></div></div></div>
+    <div class="item"><h5 class="card-title" i18n="@@eth.rewards.average">Average tx fee</h5><div class="card-text"><div class="skeleton-loader"></div><div class="skeleton-loader"></div></div></div>
   </div>
 </ng-template>

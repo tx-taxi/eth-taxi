@@ -29,11 +29,11 @@
             </td>
           </tr>
           <tr>
-            <td>Gas used</td>
+            <td i18n="@@eth.gasUsed">Gas used</td>
             <td>&lrm;{{ block?.weight | number }} gas</td>
           </tr>
           <tr *ngIf="block?.extras?.medianFee != undefined">
-            <td class="td-width">Base fee</td>
+            <td class="td-width" i18n="@@eth.preview.baseFee">Base fee</td>
             <td><app-fee-rate [fee]="block?.extras?.medianFee" [dp]="2"></app-fee-rate></td>
           </tr>
           <ng-template [ngIf]="fees !== undefined">
@@ -50,7 +50,7 @@
             </tr>
           </ng-template>
           <tr *ngIf="block?.extras?.pool">
-            <td>Fee recipient</td>
+            <td i18n="@@eth.block.fee-recipient">Fee recipient</td>
             <td><app-truncate [text]="block.extras.pool.name" [lastChars]="8"></app-truncate></td>
           </tr>
         </tbody>

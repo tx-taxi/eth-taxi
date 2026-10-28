@@ -13,11 +13,11 @@
 </ng-container>
 
 <div *ngIf="transactionsError" class="block-transactions-unavailable" role="status">
-  <strong>Transactions are temporarily unavailable</strong>
-  <span>The block summary is current, but its transaction rows could not be loaded.</span>
+  <strong i18n="@@eth.block.transactionsUnavailable">Transactions are temporarily unavailable</strong>
+  <span i18n="@@eth.block.transactionsUnavailableDetail">The block summary is current, but its transaction rows could not be loaded.</span>
   <button type="button" (click)="retryTransactions()">
     <fa-icon [icon]="['fas', 'redo-alt']" [fixedWidth]="true"></fa-icon>
-    Retry transactions
+    <span i18n="@@eth.block.retryTransactions">Retry transactions</span>
   </button>
 </div>
 

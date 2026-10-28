@@ -1,18 +1,18 @@
-<div *ngIf="showTitle && mode === 'network'" class="main-title">Ethereum Network</div>
-<div *ngIf="showTitle && mode === 'rewards'" class="main-title">Recent execution rewards</div>
+<div *ngIf="showTitle && mode === 'network'" class="main-title" i18n="@@eth.network.title">Ethereum Network</div>
+<div *ngIf="showTitle && mode === 'rewards'" class="main-title" i18n="@@eth.network.recentRewards">Recent execution rewards</div>
 <div class="card-wrapper">
   <div class="card">
-    <div class="widget-toggler" role="group" aria-label="Ethereum network dashboard panel">
+    <div class="widget-toggler" role="group" i18n-aria-label="@@eth.network.panel" aria-label="Ethereum network dashboard panel">
       <a href="" (click)="setMode('network')" class="toggler-option"
-        [ngClass]="{'inactive': mode === 'network'}" [attr.aria-pressed]="mode === 'network'"><small>network</small></a>
+        [ngClass]="{'inactive': mode === 'network'}" [attr.aria-pressed]="mode === 'network'"><small i18n="@@eth.network.network">network</small></a>
       <span aria-hidden="true"> | </span>
       <a href="" (click)="setMode('rewards')" class="toggler-option"
-        [ngClass]="{'inactive': mode === 'rewards'}" [attr.aria-pressed]="mode === 'rewards'"><small>rewards</small></a>
+        [ngClass]="{'inactive': mode === 'rewards'}" [attr.aria-pressed]="mode === 'rewards'"><small i18n="@@eth.network.rewards">rewards</small></a>
     </div>
     <div *ngIf="mode === 'network'; else rewards" class="card-body more-padding">
       <div class="difficulty-adjustment-container" *ngIf="networkStats$ | async as network; else loadingNetwork">
         <div class="epoch-progress">
-          <svg class="epoch-blocks" height="22px" width="100%" viewBox="0 0 224 9" shape-rendering="crispEdges" preserveAspectRatio="none" role="img" aria-label="Latest block gas utilization">
+          <svg class="epoch-blocks" height="22px" width="100%" viewBox="0 0 224 9" shape-rendering="crispEdges" preserveAspectRatio="none" role="img" i18n-aria-label="@@eth.network.gasUtilization" aria-label="Latest block gas utilization">
             <defs>
               <linearGradient id="diff-gradient" x1="0%" y1="0%" x2="100%" y2="0%" gradientUnits="userSpaceOnUse">
                 <stop offset="0%" stop-color="var(--primary)" />
@@ -32,17 +32,17 @@
             <div class="card-text">
               ~<app-time [time]="network.observedBlockTime" [fractionDigits]="1"></app-time>
             </div>
-            <div class="symbol">Observed block time</div>
+            <div class="symbol" i18n="@@eth.network.observedTime">Observed block time</div>
           </div>
           <div class="item">
             <div class="card-text bigger">
               {{ network.gasUtilization | number: '1.0-1' }}<span class="symbol">%</span>
             </div>
-            <div class="symbol">Block gas used</div>
+            <div class="symbol" i18n="@@eth.network.blockGasUsed">Block gas used</div>
           </div>
           <div class="item">
             <div class="card-text">#{{ network.latestBlockHeight | number }}</div>
-            <div class="symbol">Latest block</div>
+            <div class="symbol" i18n="@@eth.network.latestBlock">Latest block</div>
           </div>
         </div>
       </div>

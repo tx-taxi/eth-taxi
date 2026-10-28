@@ -25,15 +25,15 @@
               </span></td>
             </tr>
             <tr>
-              <td>Estimated execution fees</td>
-              <td>~<app-amount [satoshis]="mempoolBlock.totalFees" [digitsInfo]="'1.2-6'" [noFiat]="true" ngbTooltip="Estimated execution fees at the current base fee, assuming each transaction uses its full gas limit"></app-amount> <span class="fiat"><app-fiat [value]="mempoolBlock.totalFees" digitsInfo="1.0-0"></app-fiat></span></td>
+              <td i18n="@@eth.dashboard.execution-fees">Estimated execution fees</td>
+              <td>~<app-amount [satoshis]="mempoolBlock.totalFees" [digitsInfo]="'1.2-6'" [noFiat]="true" i18n-ngbTooltip="@@eth.pending.executionFeesTooltip" ngbTooltip="Estimated execution fees at the current base fee, assuming each transaction uses its full gas limit"></app-amount> <span class="fiat"><app-fiat [value]="mempoolBlock.totalFees" digitsInfo="1.0-0"></app-fiat></span></td>
             </tr>
             <tr>
               <td i18n="mempool-block.transactions">Transactions</td>
               <td>{{ mempoolBlock.nTx }}</td>
             </tr>
             <tr>
-              <td>Gas limit</td>
+              <td i18n="@@eth.gasLimit">Gas limit</td>
               <td>
                 <div class="progress">
                   <div class="progress-bar progress-mempool {{ (network$ | async) }}" role="progressbar" [ngStyle]="{'width': (mempoolBlock.blockVSize / stateService.blockVSize) * 100 + '%' }"></div>

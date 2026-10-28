@@ -10,17 +10,17 @@
         </ng-container>
       </div>
       <div id="divider" [hidden]="pageIndex > 0">
-        <a class="chain-divider-mark" [routerLink]="['/' | relativeUrl]" aria-label="Ethereum explorer dashboard"><img src="/resources/branding/ethereum-divider.png" alt=""></a>
+        <a class="chain-divider-mark" [routerLink]="['/' | relativeUrl]" i18n-aria-label="@@eth.divider.dashboard" aria-label="Ethereum explorer dashboard"><img src="/resources/branding/ethereum-divider.png" alt=""></a>
         <button
           type="button"
           class="block-display-toggle"
           (click)="toggleBlockDisplayMode()"
           [attr.aria-label]="blockDisplayMode === 'fees'
-            ? 'Switch to displaying block sizes'
-            : 'Switch to displaying total fees per block'"
+            ? displayBlockSizesLabel
+            : displayTotalFeesLabel"
           [attr.title]="blockDisplayMode === 'fees'
-            ? 'Switch to displaying block sizes'
-            : 'Switch to displaying total fees per block'">
+            ? displayBlockSizesLabel
+            : displayTotalFeesLabel">
           <fa-icon [icon]="['fas', 'exchange-alt']" [fixedWidth]="true"></fa-icon>
         </button>
 
@@ -29,11 +29,11 @@
           class="time-toggle"
           (click)="toggleTimeDirection()"
           [attr.aria-label]="timeLtr
-            ? 'Switch to displaying newest blocks on the right'
-            : 'Switch to displaying newest blocks on the left'"
+            ? newestBlocksRightLabel
+            : newestBlocksLeftLabel"
           [attr.title]="timeLtr
-            ? 'Switch to displaying newest blocks on the right'
-            : 'Switch to displaying newest blocks on the left'">
+            ? newestBlocksRightLabel
+            : newestBlocksLeftLabel">
           <fa-icon [icon]="['fas', 'exchange-alt']" [fixedWidth]="true"></fa-icon>
         </button>
       </div>

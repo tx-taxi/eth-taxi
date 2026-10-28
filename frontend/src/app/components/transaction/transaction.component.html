@@ -201,7 +201,7 @@
             <tbody>
               <tr>
                 <td i18n="@@eth.transactionType">Transaction type</td>
-                <td>&lrm;Type {{ tx?.ethereum?.type || tx.version }}</td>
+                <td>&lrm;<ng-container i18n="@@eth.typeLabel">Type</ng-container> {{ tx?.ethereum?.type || tx.version }}</td>
               </tr>
               <tr>
                 <td>Nonce</td>
