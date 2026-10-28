@@ -162,11 +162,13 @@ export class TransactionComponent implements OnInit, AfterViewInit, OnDestroy {
   partnerCode: string | undefined;
 
   formatEthereumQuantity(value: string | null | undefined, decimals: string | null | undefined = '18', maxFractionDigits = 8): string {
-    return formatEthereumQuantity(value, decimals, maxFractionDigits, this.locale);
+    const result = formatEthereumQuantity(value, decimals, maxFractionDigits, this.locale);
+    return result === 'Unavailable' ? $localize`:@@eth.value.unavailable:Unavailable` : result;
   }
 
   formatEthereumInteger(value: string | null | undefined): string {
-    return formatEthereumInteger(value, this.locale);
+    const result = formatEthereumInteger(value, this.locale);
+    return result === 'Unavailable' ? $localize`:@@eth.value.unavailable:Unavailable` : result;
   }
 
   ethereumWeiNumber(value: string | null | undefined): number {

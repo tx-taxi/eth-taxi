@@ -59,7 +59,8 @@ export class TransactionDetailsComponent implements OnInit {
   }
 
   formatEthereumQuantity(value: string | null | undefined, decimals: string | null | undefined = '18', maxFractionDigits = 8): string {
-    return formatEthereumQuantity(value, decimals, maxFractionDigits, this.locale);
+    const result = formatEthereumQuantity(value, decimals, maxFractionDigits, this.locale);
+    return result === 'Unavailable' ? $localize`:@@eth.value.unavailable:Unavailable` : result;
   }
 
   ethereumWeiNumber(value: string | null | undefined): number {
