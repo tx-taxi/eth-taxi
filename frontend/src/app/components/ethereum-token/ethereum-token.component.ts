@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, Inject, LOCALE_ID } from '@angular/core';
+import { formatEthereumInteger } from '@app/shared/ethereum-quantity.utils';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, forkJoin, of, Subscription } from 'rxjs';
 import { catchError, startWith } from 'rxjs/operators';
@@ -33,7 +34,7 @@ export class EthereumTokenComponent implements OnInit, OnDestroy {
   private fiatSubscription?: Subscription;
 
   currentTokenTransferFiat(transfer: EthereumTokenTransfer): string | null {
-    return currentTokenTransferFiat(transfer, this.currency, this.conversions);
+    return currentTokenTransferFiat(transfer, this.currency, this.conversions, this.locale);
   }
   token: EthereumToken | null = null;
   transfers: EthereumTokenTransferView[] = [];
@@ -53,6 +54,7 @@ export class EthereumTokenComponent implements OnInit, OnDestroy {
   private loadMoreSubscription?: Subscription;
 
   constructor(
+    @Inject(LOCALE_ID) private locale: string,
     private route: ActivatedRoute,
     private stateService: StateService,
     private ethereumApiService: EthereumApiService,
@@ -117,12 +119,12 @@ export class EthereumTokenComponent implements OnInit, OnDestroy {
   }
 
   formatCompactSupply(value: string | null | undefined): string {
-    const fullValue = this.formatUnits(value, this.token?.decimals, 4).replace(/,/g, '');
+    const fullValue = this.formatUnits(value, this.token?.decimals, 4, 'en-US').replace(/,/g, '');
     const numericValue = Number(fullValue);
     if (!Number.isFinite(numericValue)) {
       return this.formatSupply(value);
     }
-    return new Intl.NumberFormat(undefined, {
+    return new Intl.NumberFormat(this.locale, {
       notation: 'compact',
       maximumFractionDigits: 2,
     }).format(numericValue);
@@ -149,7 +151,7 @@ export class EthereumTokenComponent implements OnInit, OnDestroy {
     const converted = currentUsdToFiat(Number(value), this.currency, this.conversions);
     if (converted === null) return '';
     try {
-      const formatter = new Intl.NumberFormat(undefined, { style: 'currency', currency: this.currency, minimumFractionDigits: 0, maximumFractionDigits: maxFractionDigits });
+      const formatter = new Intl.NumberFormat(this.locale, { style: 'currency', currency: this.currency, minimumFractionDigits: 0, maximumFractionDigits: maxFractionDigits });
       const minimum = 10 ** -maxFractionDigits;
       if (converted > 0 && converted < minimum) return '<' + formatter.format(minimum);
       return formatter.format(converted);
@@ -166,7 +168,7 @@ export class EthereumTokenComponent implements OnInit, OnDestroy {
     if (!Number.isFinite(timestamp)) {
       return value;
     }
-    return new Intl.DateTimeFormat(undefined, {
+    return new Intl.DateTimeFormat(this.locale, {
       dateStyle: 'medium',
       timeStyle: 'short',
     }).format(new Date(timestamp));
@@ -297,6 +299,7 @@ export class EthereumTokenComponent implements OnInit, OnDestroy {
     value: string | null | undefined,
     decimals: string | null | undefined,
     maxFractionDigits?: number,
+    locale = this.locale,
   ): string {
     const normalized = this.normalizeInteger(value);
     if (normalized === null) {
@@ -306,7 +309,7 @@ export class EthereumTokenComponent implements OnInit, OnDestroy {
     const decimalPlaces = this.parseDecimals(decimals);
     const amount = BigInt(normalized);
     if (decimalPlaces === 0) {
-      return this.groupInteger(amount.toString());
+      return this.groupInteger(amount.toString(), locale);
     }
 
     const divisor = 10n ** BigInt(decimalPlaces);
@@ -317,9 +320,10 @@ export class EthereumTokenComponent implements OnInit, OnDestroy {
       fraction = fraction.slice(0, maxFractionDigits).replace(/0+$/, '');
     }
 
+    const decimal = new Intl.NumberFormat(locale).formatToParts(1.1).find(part => part.type === 'decimal')?.value || '.';
     return fraction
-      ? `${this.groupInteger(integer.toString())}.${fraction}`
-      : this.groupInteger(integer.toString());
+      ? `${this.groupInteger(integer.toString(), locale)}${decimal}${fraction}`
+      : this.groupInteger(integer.toString(), locale);
   }
 
   private formatDecimal(value: string | null | undefined, maxFractionDigits: number): string {
@@ -329,8 +333,9 @@ export class EthereumTokenComponent implements OnInit, OnDestroy {
     }
     const [integer, rawFraction = ''] = normalized.split('.');
     const fraction = rawFraction.slice(0, maxFractionDigits).replace(/0+$/, '');
+    const decimal = new Intl.NumberFormat(this.locale).formatToParts(1.1).find(part => part.type === 'decimal')?.value || '.';
     return fraction
-      ? `${this.groupInteger(BigInt(integer).toString())}.${fraction}`
+      ? `${this.groupInteger(BigInt(integer).toString())}${decimal}${fraction}`
       : this.groupInteger(BigInt(integer).toString());
   }
 
@@ -348,7 +353,7 @@ export class EthereumTokenComponent implements OnInit, OnDestroy {
     return decimals <= 255n ? parseInt(normalized, 10) : 0;
   }
 
-  private groupInteger(value: string): string {
-    return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  private groupInteger(value: string, locale = this.locale): string {
+    return formatEthereumInteger(value, locale);
   }
 }

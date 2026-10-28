@@ -11910,6 +11910,8 @@
       <trans-unit id="eth.feature.transfer" datatype="html"><source>ETH transfer</source><target>Transferencia de ETH</target></trans-unit>
       <trans-unit id="eth.feature.contractCall" datatype="html"><source>Contract call</source><target>Llamada a contrato</target></trans-unit>
       <trans-unit id="eth.feature.tokenTransfer" datatype="html"><source>Token transfer / call</source><target>Transferencia de token / llamada</target></trans-unit>
+      <trans-unit id="eth.list.tokenTransferCall" datatype="html"><source>Token transfer call</source><target>Llamada de transferencia de token</target></trans-unit>
+      <trans-unit id="eth.list.contractDeployment" datatype="html"><source>Contract deployment</source><target>Despliegue de contrato</target></trans-unit>
     </body>
   </file>
 </xliff>

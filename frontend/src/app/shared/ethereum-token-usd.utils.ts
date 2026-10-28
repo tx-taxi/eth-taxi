@@ -1,7 +1,7 @@
 import { EthereumTokenTransfer } from '@interfaces/ethereum-api.interface';
 
 /** An estimate using the token's current USD quote, not its price at transfer time. */
-export function currentTokenTransferUsd(transfer: EthereumTokenTransfer): string | null {
+export function currentTokenTransferUsd(transfer: EthereumTokenTransfer, locale = 'en-US'): string | null {
   if (transfer.token?.type !== 'ERC-20') return null;
   const value = transfer.value?.trim();
   const decimals = transfer.token.decimals?.trim();
@@ -15,9 +15,10 @@ export function currentTokenTransferUsd(transfer: EthereumTokenTransfer): string
   const divisor = 10n ** BigInt(places + fraction.length);
   const numerator = BigInt(value) * rateUnits * 100n;
   const cents = (numerator + divisor / 2n) / divisor;
-  if (cents === 0n && numerator > 0n) return '<$0.01';
+  const formatter = new Intl.NumberFormat(locale, { style: 'currency', currency: 'USD' });
+  if (cents === 0n && numerator > 0n) return '<' + formatter.format(0.01);
   if (cents > BigInt(Number.MAX_SAFE_INTEGER)) return null;
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(cents) / 100);
+  return formatter.format(Number(cents) / 100);
 }
 
 /** Use the same current ETH quote snapshot for both sides of a USD conversion. */
@@ -32,8 +33,8 @@ export function currentUsdToFiat(value: number, currency: string, conversions: R
 }
 
 /** Token quotes are current estimates, even when the transfer itself is historical. */
-export function currentTokenTransferFiat(transfer: EthereumTokenTransfer, currency: string, conversions: Record<string, number> | null): string | null {
-  if (currency === 'USD') return currentTokenTransferUsd(transfer);
+export function currentTokenTransferFiat(transfer: EthereumTokenTransfer, currency: string, conversions: Record<string, number> | null, locale?: string): string | null {
+  if (currency === 'USD') return currentTokenTransferUsd(transfer, locale);
   if (transfer.token?.type !== 'ERC-20') return null;
   const value = transfer.value?.trim();
   const decimals = transfer.token.decimals?.trim();
@@ -46,7 +47,7 @@ export function currentTokenTransferFiat(transfer: EthereumTokenTransfer, curren
   const converted = currentUsdToFiat(amount * Number(rate), currency, conversions);
   if (converted === null) return null;
   try {
-    const formatter = new Intl.NumberFormat(undefined, { style: 'currency', currency });
+    const formatter = new Intl.NumberFormat(locale, { style: 'currency', currency });
     const minimum = 10 ** -(formatter.resolvedOptions().maximumFractionDigits ?? 2);
     if (converted > 0 && converted < minimum) return '<' + formatter.format(minimum);
     return formatter.format(converted);

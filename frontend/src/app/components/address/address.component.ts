@@ -1,4 +1,5 @@
-import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, Inject, LOCALE_ID } from '@angular/core';
+import { formatEthereumInteger } from '@app/shared/ethereum-quantity.utils';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { ElectrsApiService } from '@app/services/electrs-api.service';
@@ -143,6 +144,7 @@ export class AddressComponent implements OnInit, OnDestroy {
   private lastTransactionTxId: string;
 
   constructor(
+    @Inject(LOCALE_ID) private locale: string,
     private route: ActivatedRoute,
     private electrsApiService: ElectrsApiService,
     private websocketService: WebsocketService,
@@ -206,7 +208,8 @@ export class AddressComponent implements OnInit, OnDestroy {
     if (fraction.length > maxFractionDigits) {
       fraction = fraction.slice(0, maxFractionDigits).replace(/0+$/, '');
     }
-    return fraction ? `${this.groupEthereumInteger(whole.toString())}.${fraction}` : this.groupEthereumInteger(whole.toString());
+    const decimal = new Intl.NumberFormat(this.locale).formatToParts(1.1).find(part => part.type === 'decimal')?.value || '.';
+    return fraction ? `${this.groupEthereumInteger(whole.toString())}${decimal}${fraction}` : this.groupEthereumInteger(whole.toString());
   }
 
   private normalizeEthereumInteger(value: string | null | undefined): string | null {
@@ -224,7 +227,7 @@ export class AddressComponent implements OnInit, OnDestroy {
   }
 
   private groupEthereumInteger(value: string): string {
-    return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return formatEthereumInteger(value, this.locale);
   }
 
   ngOnInit(): void {

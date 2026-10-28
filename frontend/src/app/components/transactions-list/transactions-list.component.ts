@@ -1,4 +1,5 @@
-import { Component, OnInit, Input, ChangeDetectionStrategy, OnChanges, Output, EventEmitter, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input, ChangeDetectionStrategy, OnChanges, Output, EventEmitter, ChangeDetectorRef, OnDestroy, Inject, LOCALE_ID } from '@angular/core';
+import { formatEthereumInteger } from '@app/shared/ethereum-quantity.utils';
 import { StateService, SignaturesMode } from '@app/services/state.service';
 import { CacheService } from '@app/services/cache.service';
 import { Observable, ReplaySubject, BehaviorSubject, merge, Subscription, of, forkJoin } from 'rxjs';
@@ -34,7 +35,7 @@ export class TransactionsListComponent implements OnInit, OnChanges, OnDestroy {
   conversionsSubscription?: Subscription;
 
   currentTokenTransferFiat(transfer: EthereumTokenTransfer): string | null {
-    return currentTokenTransferFiat(transfer, this.currency || 'USD', this.conversions);
+    return currentTokenTransferFiat(transfer, this.currency || 'USD', this.conversions, this.locale);
   }
   network = '';
   nativeAssetId = this.stateService.network === 'liquidtestnet' ? environment.nativeTestAssetId : environment.nativeAssetId;
@@ -91,6 +92,7 @@ export class TransactionsListComponent implements OnInit, OnChanges, OnDestroy {
   signaturesMode: SignaturesMode = 'interesting';
 
   constructor(
+    @Inject(LOCALE_ID) private locale: string,
     public stateService: StateService,
     private cacheService: CacheService,
     private electrsApiService: ElectrsApiService,
@@ -230,7 +232,8 @@ export class TransactionsListComponent implements OnInit, OnChanges, OnDestroy {
     if (fraction.length > maxFractionDigits) {
       fraction = fraction.slice(0, maxFractionDigits).replace(/0+$/, '');
     }
-    return fraction ? `${this.groupEthereumInteger(whole.toString())}.${fraction}` : this.groupEthereumInteger(whole.toString());
+    const decimal = new Intl.NumberFormat(this.locale).formatToParts(1.1).find(part => part.type === 'decimal')?.value || '.';
+    return fraction ? `${this.groupEthereumInteger(whole.toString())}${decimal}${fraction}` : this.groupEthereumInteger(whole.toString());
   }
 
   ethereumTransferLabel(transfer: EthereumTokenTransfer): string {
@@ -262,12 +265,16 @@ export class TransactionsListComponent implements OnInit, OnChanges, OnDestroy {
   ethereumListSummary(tx: Transaction): string | null {
     const ethereum = tx.ethereum;
     if (!ethereum && !tx.status?.confirmed && tx.flags && (BigInt(tx.flags) & TransactionFlags.eth_token_transfer)) {
-      return 'Token transfer call';
+      return $localize`:@@eth.list.tokenTransferCall:Token transfer call`;
     }
     if (!ethereum || ethereum.valueWei !== '0') {
       return null;
     }
-    return ethereum.decodedInput?.methodCall || ethereum.method || (ethereum.createdContract && !ethereum.to ? 'Contract deployment' : 'Contract call');
+    const method = ethereum.decodedInput?.methodCall || ethereum.method;
+    if (method && method !== 'Contract call' && method !== 'Contract deployment') return method;
+    return (method === 'Contract deployment' || (!method && ethereum.createdContract && !ethereum.to))
+      ? $localize`:@@eth.list.contractDeployment:Contract deployment`
+      : $localize`:@@eth.feature.contractCall:Contract call`;
   }
 
   private normalizeEthereumInteger(value: string | null | undefined): string | null {
@@ -285,7 +292,7 @@ export class TransactionsListComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private groupEthereumInteger(value: string): string {
-    return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return formatEthereumInteger(value, this.locale);
   }
 
   private formatEthereumRawUnits(value: string): string {
@@ -293,7 +300,8 @@ export class TransactionsListComponent implements OnInit, OnChanges, OnDestroy {
       return this.groupEthereumInteger(value);
     }
     const fraction = value.slice(1, 4).replace(/0+$/, '');
-    return `${value[0]}${fraction ? `.${fraction}` : ''}e${value.length - 1}`;
+    const decimal = new Intl.NumberFormat(this.locale).formatToParts(1.1).find(part => part.type === 'decimal')?.value || '.';
+    return `${value[0]}${fraction ? `${decimal}${fraction}` : ''}e${value.length - 1}`;
   }
 
   refreshPrice(): void {
