@@ -85,7 +85,8 @@ export class SeoService {
 
   updateCanonical(path) {
     const localePrefix = this.locale === 'es' ? '/es' : '';
-    const canonicalUrl = 'https://' + this.baseDomain + localePrefix + path;
+    // Location.path() is empty on a locale root; retain its canonical slash.
+    const canonicalUrl = 'https://' + this.baseDomain + localePrefix + (path || '/');
     // Metadata for the initial server-rendered page must not describe a later SPA route.
     if (this.canonicalLink.href !== canonicalUrl) {
       document.getElementById('jsonld-page')?.remove();
