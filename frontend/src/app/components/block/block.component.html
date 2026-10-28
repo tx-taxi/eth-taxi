@@ -135,7 +135,7 @@
   <ng-template #restOfTable>
     <ng-container *ngIf="block && !isLoadingBlock; else loadingRest">
       <tr *ngIf="block.extras?.medianFee != undefined">
-        <td class="td-width">Base fee</td>
+        <td class="td-width" i18n="@@eth.block.base-fee">Base fee</td>
         <td><app-fee-rate [fee]="block.extras?.medianFee" [dp]="2"></app-fee-rate></td>
       </tr>
       <ng-template [ngIf]="block.extras?.totalFees !== undefined" [ngIfElse]="loadingFees">
