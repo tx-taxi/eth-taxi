@@ -2223,11 +2223,11 @@ function presentationRoute(pathname) {
   return /^\/(?:clock(?:\/[^/]+){0,2}|view\/(?:blocks|block\/[^/]+|mempool-block\/\d+)|preview(?:\/[^/]+){0,4}|widget\/wallet|wallet(?:\/[^/]+)?|tx\/(?:push|test|preview)|blocks\/stale|mempool-block\/\d+|mining\/pool\/[^/]+)$/.test(pathname);
 }
 
-async function serveStatic(pathname, res, spaFallback = true) {
+async function serveStatic(pathname, res, spaFallback = true, search = '') {
   if (isApiPath(pathname)) return false;
   const slashless = pathname.length > 1 ? pathname.replace(/\/$/, '') : pathname;
   if (slashless !== pathname && (ogEntityRoute(slashless) || staticSeo.page(slashless))) {
-    res.writeHead(308, {location: slashless, 'cache-control': 'no-store'}); res.end(); return true;
+    res.writeHead(308, {location: slashless + search, 'cache-control': 'no-store'}); res.end(); return true;
   }
   const entityRoute = ogEntityRoute(pathname);
   let entityMetadata, entity, entityStatus = 200;
@@ -2305,7 +2305,7 @@ const server = http.createServer(async (req, res) => {
       if (await serveStatic(requestPath, res, false)) return;
       return respondJavaScript(res, requestPath.endsWith('/config.js') ? 'window.__env = window.__env || {};\n' : '');
     }
-    if (await serveStatic(requestPath, res)) return;
+    if (await serveStatic(requestPath, res, true, requestUrl.search)) return;
     if (ogEntityRoute(requestPath)) return respond(res, 503, { error: 'SPA index unavailable' });
     const ethereumAddressMatch = requestPath.match(/^\/api\/v1\/ethereum\/address\/(0x[a-fA-F0-9]{40})$/);
     if (ethereumAddressMatch) return respond(res, 200, await ethereumAddressMetadata(ethereumAddressMatch[1]));
