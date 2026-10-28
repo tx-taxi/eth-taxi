@@ -11513,6 +11513,10 @@
       <trans-unit id="eth.divider.newestLeft" datatype="html"><source>Switch to displaying newest blocks on the left</source><target>Afficher les blocs les plus récents à gauche</target></trans-unit>
       <trans-unit id="eth.divider.newestRight" datatype="html"><source>Switch to displaying newest blocks on the right</source><target>Afficher les blocs les plus récents à droite</target></trans-unit>
       <trans-unit id="eth.pending.executionFeesTooltip" datatype="html"><source>Estimated execution fees at the current base fee, assuming each transaction uses its full gas limit</source><target>Frais d’exécution estimés au tarif de base actuel, en supposant que chaque transaction utilise toute sa limite de gaz</target></trans-unit>
+      <trans-unit id="taxi.clipboard.copy" datatype="html"><source>Copy</source><target>Copier</target></trans-unit>
+      <trans-unit id="taxi.clipboard.copied" datatype="html"><source>Copied</source><target>Copié</target></trans-unit>
+      <trans-unit id="taxi.clipboard.copyAria" datatype="html"><source>Copy to clipboard</source><target>Copier dans le presse-papiers</target></trans-unit>
+      <trans-unit id="taxi.clipboard.copiedAria" datatype="html"><source>Copied to clipboard</source><target>Copié dans le presse-papiers</target></trans-unit>
     </body>
   </file>
 </xliff>
