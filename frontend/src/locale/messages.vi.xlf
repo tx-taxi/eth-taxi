@@ -11401,6 +11401,18 @@
           <context context-type="linenumber">173</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="32fba724df729afb840693b40e3f8869356f4e33" datatype="html">
+        <source>Size</source>
+        <target>Kích thước</target>
+      </trans-unit>
+      <trans-unit id="graphs.blockFeesSubsidy.fees" datatype="html">
+        <source>Fees</source>
+        <target>Phí</target>
+      </trans-unit>
+      <trans-unit id="recent-transactions-title" datatype="html">
+        <source>Recent Transactions</source>
+        <target>Các giao dịch gần đây</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
