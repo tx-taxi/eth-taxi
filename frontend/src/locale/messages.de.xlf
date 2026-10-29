@@ -13273,6 +13273,10 @@
           <context context-type="linenumber">125</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="eth.search.chooseSelected" datatype="html">
+        <source>Choose search chain. Selected: <x id="name" equiv-text="name" /></source>
+        <target>Such-Blockchain auswählen. Ausgewählt: <x id="name" equiv-text="name" /></target>
+      </trans-unit>
       <trans-unit id="eth.search.openExplorer" datatype="html">
         <source>Open <x id="name" equiv-text="name" />
         </source>

@@ -11701,6 +11701,10 @@
       <trans-unit id="eth.search.futureDate" datatype="html"><source>Enter a date or timestamp that is not in the future.</source><target>Introduce una fecha o marca de tiempo que no sea futura.</target></trans-unit>
       <trans-unit id="eth.search.dateNotFound" datatype="html"><source>No Ethereum block was found for that time.</source><target>No se encontró ningún bloque de Ethereum para ese momento.</target></trans-unit>
       <trans-unit id="eth.search.invalidInput" datatype="html"><source>Enter an Ethereum address, transaction hash, or block number.</source><target>Introduce una dirección de Ethereum, un hash de transacción o un número de bloque.</target></trans-unit>
+      <trans-unit id="eth.search.chooseSelected" datatype="html">
+        <source>Choose search chain. Selected: <x id="name" equiv-text="name" /></source>
+        <target>Elegir cadena de búsqueda. Seleccionada: <x id="name" equiv-text="name" /></target>
+      </trans-unit>
       <trans-unit id="eth.search.openExplorer" datatype="html"><source>Open <x id="name"/></source><target>Abrir <x id="name"/></target></trans-unit>
       <trans-unit id="eth.search.openNewTab" datatype="html"><source>Open <x id="name"/> in a new tab</source><target>Abrir <x id="name"/> en una pestaña nueva</target></trans-unit>
       <trans-unit id="eth.search.switchExplorer" datatype="html"><source>Switch to <x id="name"/></source><target>Cambiar a <x id="name"/></target></trans-unit>

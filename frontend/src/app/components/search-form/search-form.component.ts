@@ -124,6 +124,8 @@ export class SearchFormComponent implements OnInit {
   readonly foundLabel = $localize`:@@eth.search.found:Found`;
   readonly possibleLabel = $localize`:@@eth.search.possible:Possible`;
 
+  searchChainLabel(name: string): string { return $localize`:@@eth.search.chooseSelected:Choose search chain. Selected: ${name}:name:`; }
+
   openExplorerLabel(name: string): string { return $localize`:@@eth.search.openExplorer:Open ${name}:name:`; }
   openNewTabLabel(name: string): string { return $localize`:@@eth.search.openNewTab:Open ${name}:name: in a new tab`; }
   switchExplorerLabel(name: string): string { return $localize`:@@eth.search.switchExplorer:Switch to ${name}:name:`; }
