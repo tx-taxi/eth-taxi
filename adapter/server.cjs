@@ -2226,7 +2226,7 @@ function presentationRoute(pathname) {
 
 async function serveStatic(pathname, res, spaFallback = true, search = '') {
   if (isApiPath(pathname)) return false;
-  const locale = pathname.match(/^\/(es|fr|de|it|pt|nl|ru|ja|zh|ko|uk|vi|pl|cs|sv)(?:\/|$)/)?.[1];
+  const locale = pathname.match(/^\/(es|fr|de|it|pt|nl|ru|ja|zh|ko|uk|vi|pl|cs|sv|nb)(?:\/|$)/)?.[1];
   if (locale && (pathname === `/${locale}` || pathname === `/${locale}/index.html`)) {
     res.writeHead(308, {location: `/${locale}/` + search, 'cache-control': 'no-store'}); res.end(); return true;
   }
@@ -2307,6 +2307,7 @@ async function serveStatic(pathname, res, spaFallback = true, search = '') {
           pl: ['eth.tx.taxi — eksplorator Ethereum', 'Przeglądaj bloki, transakcje, adresy i opłaty Ethereum.', 'pl_PL'],
           cs: ['eth.tx.taxi — průzkumník Ethereum', 'Prohlížejte bloky, transakce, adresy a poplatky Ethereum.', 'cs_CZ'],
           sv: ['eth.tx.taxi — Ethereum-utforskare', 'Utforska Ethereum-block, transaktioner, adresser och avgifter.', 'sv_SE'],
+          nb: ['eth.tx.taxi — Ethereum-utforsker', 'Utforsk Ethereum-blokker, transaksjoner, adresser og gebyrer.', 'nb_NO'],
         };
         const [title, description, ogLocale] = labels[locale];
         const image = 'https://tx.taxi/assets/screenshots/eth-transaction-4abe31f2a24f.jpg';

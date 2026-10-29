@@ -68,6 +68,27 @@ const czechUnits: Record<string, [string, string, string, string, string, string
   second: ['sekunda', 'sekundy', 'sekund', 'sekundy', 'sekundu', 'sekundou', 'sekundami'],
 };
 
+const norwegianUnits: Record<string, [string, string]> = {
+  year: ['år', 'år'], month: ['måned', 'måneder'], week: ['uke', 'uker'],
+  day: ['dag', 'dager'], hour: ['time', 'timer'], minute: ['minutt', 'minutter'],
+  second: ['sekund', 'sekunder'],
+};
+
+function norwegianDuration(kind: string, unit: string, amount: number): string | null {
+  const forms = norwegianUnits[unit];
+  if (!forms || !Number.isFinite(amount)) return null;
+  const noun = new Intl.PluralRules('nb').select(amount) === 'one' ? forms[0] : forms[1];
+  const duration = `${amount.toLocaleString('nb')} ${noun}`;
+  switch (kind) {
+    case 'since': return `For ${duration} siden`;
+    case 'until': return `Om ~${duration}`;
+    case 'within': return `Innen ~${duration}`;
+    case 'span': return `Etter ${duration}`;
+    case 'before': return `${duration} tidligere`;
+    default: return duration;
+  }
+}
+
 const swedishUnits: Record<string, [string, string]> = {
   year: ['år', 'år'], month: ['månad', 'månader'], week: ['vecka', 'veckor'],
   day: ['dag', 'dagar'], hour: ['timme', 'timmar'], minute: ['minut', 'minuter'],
@@ -261,6 +282,10 @@ export class TimeService {
   }
 
   private formatTime(kind, unit, number): string {
+    if (/^nb(?:-|$)/i.test(this.locale)) {
+      const localized = norwegianDuration(kind, unit, number);
+      if (localized) return localized;
+    }
     if (/^sv(?:-|$)/i.test(this.locale)) {
       const localized = swedishDuration(kind, unit, number);
       if (localized) return localized;

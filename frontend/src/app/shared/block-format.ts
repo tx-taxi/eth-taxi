@@ -4,7 +4,7 @@ const DECIMALS = 18, SYMBOL = 'ETH', FEE_UNIT = 'gwei', FEE_SCALE = 1000000000;
 // Formatting is visual only; raw amounts and chain data remain unchanged.
 function displayLocale(): string {
   const lang = typeof document !== 'undefined' ? document.documentElement?.lang || '' : '';
-  const match = /^(es|fr|de|it|pt|nl|ru|ja|zh|ko|uk|vi|pl|cs|sv)(?:-|$)/i.exec(lang);
+  const match = /^(es|fr|de|it|pt|nl|ru|ja|zh|ko|uk|vi|pl|cs|sv|nb)(?:-|$)/i.exec(lang);
   return match ? match[1].toLowerCase() : 'en-US';
 }
 function displayExactNumber(value: string): string {
@@ -26,6 +26,10 @@ export function localizedSlavicTransactionCount(count: number): string | null {
 
 /** Preserve singular Swedish counts while keeping existing Slavic inflection. */
 export function localizedTransactionCount(count: number): string | null {
+  if (displayLocale() === 'nb' && Number.isFinite(count)) {
+    const noun = new Intl.PluralRules('nb').select(count) === 'one' ? 'transaksjon' : 'transaksjoner';
+    return `${count.toLocaleString('nb')} ${noun}`;
+  }
   if (displayLocale() === 'sv' && Number.isFinite(count)) {
     const noun = new Intl.PluralRules('sv').select(count) === 'one' ? 'transaktion' : 'transaktioner';
     return `${count.toLocaleString('sv')} ${noun}`;
