@@ -69,13 +69,13 @@ export class BlocksList implements OnInit {
 
       this.seoService.setTitle($localize`:@@8a7b4bd44c0ac71b2e72de0398b303257f7d2f54:Blocks`);
       this.ogService.setManualOgImage('recent-blocks.jpg');
-      this.seoService.setDescription('See recent Ethereum blocks with validator, gas usage, transaction count, rewards, and fees.');
+      this.seoService.setDescription($localize`:@@eth.meta.recentBlocks:See recent Ethereum blocks with validator, gas usage, transaction count, rewards, and fees.`);
 
       this.blocksCountInitializedSubscription = combineLatest([this.blocksCountInitialized$, this.route.params]).pipe(
         filter(([blocksCountInitialized, _]) => blocksCountInitialized),
         tap(([_, params]) => {
           this.page = +params['page'] || 1;
-          this.seoService.setTitle(this.page > 1 ? `Blocks — page ${this.page}` : 'Blocks');
+          this.seoService.setTitle(this.page > 1 ? $localize`:@@eth.meta.blockPage:Blocks — page ${this.page}:PAGE:` : $localize`:@@8a7b4bd44c0ac71b2e72de0398b303257f7d2f54:Blocks`);
           this.page === 1 ? this.fromHeightSubject.next(undefined) : this.fromHeightSubject.next((this.blocksCount - 1) - (this.page - 1) * 15);
         })
       ).subscribe();

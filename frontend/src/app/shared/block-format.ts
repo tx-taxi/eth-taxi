@@ -4,7 +4,7 @@ const DECIMALS = 18, SYMBOL = 'ETH', FEE_UNIT = 'gwei', FEE_SCALE = 1000000000;
 // Formatting is visual only; raw amounts and chain data remain unchanged.
 function displayLocale(): string {
   const lang = typeof document !== 'undefined' ? document.documentElement?.lang || '' : '';
-  const match = /^(es|fr|de)(?:-|$)/i.exec(lang);
+  const match = /^(es|fr|de|it|pt)(?:-|$)/i.exec(lang);
   return match ? match[1].toLowerCase() : 'en-US';
 }
 function displayExactNumber(value: string): string {

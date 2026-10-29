@@ -71,7 +71,7 @@ export class AddressPreviewComponent implements OnInit, OnDestroy {
             this.addressString = this.addressString.toLowerCase();
           }
           this.seoService.setTitle($localize`:@@address.component.browser-title:Address: ${this.addressString}:INTERPOLATION:`);
-          this.seoService.setDescription(`See the balance and recent transactions for Ethereum address ${this.addressString}.`);
+          this.seoService.setDescription($localize`:@@eth.meta.addressDetails:See the balance and recent transactions for Ethereum address ${this.addressString}:ADDRESS:.`);
 
           return (this.addressString.match(/04[a-fA-F0-9]{128}|(02|03)[a-fA-F0-9]{64}/)
               ? this.electrsApiService.getPubKeyAddress$(this.addressString)

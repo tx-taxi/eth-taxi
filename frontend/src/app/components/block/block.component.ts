@@ -294,7 +294,7 @@ export class BlockComponent implements OnInit, OnDestroy {
         if( this.stateService.network === 'liquid' || this.stateService.network === 'liquidtestnet' ) {
           this.seoService.setDescription($localize`:@@meta.description.liquid.block:See size, weight, fee range, included transactions, and more for Liquid${seoDescriptionNetwork(this.stateService.network)} block ${block.height}:BLOCK_HEIGHT: (${block.id}:BLOCK_ID:).`);
         } else {
-          this.seoService.setDescription(`See gas usage, fees, validator details, and transactions for Ethereum block ${block.height} (${block.id}).`);
+          this.seoService.setDescription($localize`:@@eth.meta.blockDetails:See gas usage, fees, validator details, and transactions for Ethereum block ${block.height}:HEIGHT: (${block.id}:HASH:).`);
         }
         this.isLoadingBlock = false;
         this.setBlockSubsidy();

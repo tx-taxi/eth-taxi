@@ -92,7 +92,7 @@ export class RecentTransactionsList implements OnInit, OnDestroy {
 
     if (!this.widget) {
       this.seoService.setTitle($localize`:@@recent-transactions-title:Recent Transactions`);
-      this.seoService.setDescription('See recent Ethereum transactions with value, gas used, and gas price, updated in real time.');
+      this.seoService.setDescription($localize`:@@eth.meta.recentTransactions:See recent Ethereum transactions with value, gas used, and gas price, updated in real time.`);
     }
   }
 

@@ -446,8 +446,7 @@ export class TrackerComponent implements OnInit, OnDestroy {
           this.seoService.setTitle(
             $localize`:@@bisq.transaction.browser-title:Transaction: ${this.txId}:INTERPOLATION:`
           );
-          const seoDescription = this.tx?.status?.confirmed ? '' : ' unconfirmed';
-          this.seoService.setDescription(`Track the real-time status, gas, fee, and confirmation details for Ethereum${seoDescription} transaction ${this.txId}.`);
+          this.seoService.setDescription($localize`:@@eth.meta.trackTransaction:Track the real-time status, gas, fee, and confirmation details for Ethereum transaction ${this.txId}:HASH:.`);
           this.resetTransaction();
           return merge(
             of(true),

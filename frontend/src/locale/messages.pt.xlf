@@ -11501,6 +11501,539 @@
         <source>Recent Transactions</source>
         <target>Transações Recentes</target>
       </trans-unit>
+      <trans-unit id="6693ca41dea3f8a2b1747ba08e3f780c52d074bf" datatype="html"><source>Using partner code</source>
+        <target>A usar código de parceiro</target></trans-unit>
+      <trans-unit id="graphs.accelerationFees.totalBidBoost" datatype="html"><source>Total bid boost</source>
+        <target>Aumento total da oferta</target></trans-unit>
+      <trans-unit id="graphs.accelerationFees.accelerated" datatype="html"><source>Accelerated</source>
+        <target>Aceleradas</target></trans-unit>
+      <trans-unit id="eth.createdBy" datatype="html"><source>Created by</source>
+        <target>Criado por</target></trans-unit>
+      <trans-unit id="eth.transactions" datatype="html"><source>Transactions</source>
+        <target>Transações</target></trans-unit>
+      <trans-unit id="eth.tokenTransfers" datatype="html"><source>Token transfers</source>
+        <target>Transferências de tokens</target></trans-unit>
+      <trans-unit id="eth.internalCalls" datatype="html"><source>Internal calls</source>
+        <target>Chamadas internas</target></trans-unit>
+      <trans-unit id="eth.gasUsed" datatype="html"><source>Gas used</source>
+        <target>Gas utilizado</target></trans-unit>
+      <trans-unit id="eth.tokenBalances" datatype="html"><source>Token balances</source>
+        <target>Saldos de tokens</target></trans-unit>
+      <trans-unit id="eth.shown" datatype="html"><source>shown</source>
+        <target>apresentadas</target></trans-unit>
+      <trans-unit id="eth.transactionHistory" datatype="html"><source>Transaction history</source>
+        <target>Histórico de transações</target></trans-unit>
+      <trans-unit id="eth.noTransactions" datatype="html"><source>No transactions</source>
+        <target>Sem transações</target></trans-unit>
+      <trans-unit id="eth.recentTransactions" datatype="html"><source>recent transactions</source>
+        <target>transações recentes</target></trans-unit>
+      <trans-unit id="eth.historyUnavailable" datatype="html"><source>Transaction history is temporarily unavailable</source>
+        <target>O histórico de transações está temporariamente indisponível</target></trans-unit>
+      <trans-unit id="eth.historyUnavailableDetail" datatype="html"><source>The balance and account type are current, but indexed transaction history is temporarily unavailable.</source>
+        <target>O saldo e o tipo de conta estão atualizados, mas o histórico indexado está temporariamente indisponível.</target></trans-unit>
+      <trans-unit id="eth.retryHistory" datatype="html"><source>Retry indexed history</source>
+        <target>Tentar novamente o histórico indexado</target></trans-unit>
+      <trans-unit id="1c4e5bd4e8f20285e3dfcdb58c3b87cced25bffa" datatype="html"><source><x id="LINE_BREAK" ctype="lb" /><x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;i&gt;" />There are too many transactions on this address, more than your backend can handle. See more on <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;/docs/faq#address-lookup-issues&quot;&gt;" />setting up a stronger backend<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;" />.<x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;/i&gt;" /><x id="LINE_BREAK" ctype="lb" /><x id="LINE_BREAK" ctype="lb" /> Consider viewing this address on another Ethereum explorer instead: </source>
+        <target><x id="LINE_BREAK" ctype="lb" /><x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;i&gt;" />Este endereço tem mais transações do que o backend consegue processar. Saiba como <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;/docs/faq#address-lookup-issues&quot;&gt;" />configurar um backend mais potente<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;" />.<x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;/i&gt;" /><x id="LINE_BREAK" ctype="lb" /><x id="LINE_BREAK" ctype="lb" /> Também pode consultar este endereço noutro explorador de Ethereum: </target></trans-unit>
+      <trans-unit id="eth.balance" datatype="html"><source>Balance</source>
+        <target>Saldo</target></trans-unit>
+      <trans-unit id="eth.confirmedBalance" datatype="html"><source>Confirmed balance</source>
+        <target>Saldo confirmado</target></trans-unit>
+      <trans-unit id="eth.pendingBalance" datatype="html"><source>Pending balance</source>
+        <target>Saldo pendente</target></trans-unit>
+      <trans-unit id="eth.pending" datatype="html"><source>Pending</source>
+        <target>Pendente</target></trans-unit>
+      <trans-unit id="eth.ethereumAccount" datatype="html"><source>Ethereum account</source>
+        <target>Conta Ethereum</target></trans-unit>
+      <trans-unit id="graphs.blockFees.feesBtc" datatype="html"><source>Fees BTC</source>
+        <target>Taxas BTC</target></trans-unit>
+      <trans-unit id="graphs.blockFees.feesFiat" datatype="html"><source>Fees <x id="currency" equiv-text="this.currency" /></source>
+        <target>Taxas <x id="currency" equiv-text="this.currency" /></target></trans-unit>
+      <trans-unit id="graphs.blockFees.avgBlock" datatype="html"><source>* On average around block <x id="block" equiv-text="data[0].data[2]" /></source>
+        <target>* Em média por volta do bloco <x id="block" equiv-text="data[0].data[2]" /></target></trans-unit>
+      <trans-unit id="graphs.blockFeesSubsidy.subsidy" datatype="html"><source>Subsidy</source>
+        <target>Subsídio</target></trans-unit>
+      <trans-unit id="graphs.blockFeesSubsidy.subsidyUsd" datatype="html"><source>Subsidy (USD)</source>
+        <target>Subsídio (USD)</target></trans-unit>
+      <trans-unit id="graphs.blockFeesSubsidy.feesUsd" datatype="html"><source>Fees (USD)</source>
+        <target>Taxas (USD)</target></trans-unit>
+      <trans-unit id="graphs.blockFeesSubsidy.subsidyPercent" datatype="html"><source>Subsidy (%)</source>
+        <target>Subsídio (%)</target></trans-unit>
+      <trans-unit id="graphs.blockFeesSubsidy.feesPercent" datatype="html"><source>Fees (%)</source>
+        <target>Taxas (%)</target></trans-unit>
+      <trans-unit id="eth.block.gas-used" datatype="html"><source>Gas used</source>
+        <target>Gas utilizado</target></trans-unit>
+      <trans-unit id="eth.block.validator-reward" datatype="html"><source>Validator reward</source>
+        <target>Recompensa do validador</target></trans-unit>
+      <trans-unit id="eth.block.fee-recipient" datatype="html"><source>Fee recipient</source>
+        <target>Beneficiário das taxas</target></trans-unit>
+      <trans-unit id="eth.block.parent-hash" datatype="html"><source>Parent hash</source>
+        <target>Hash do bloco anterior</target></trans-unit>
+      <trans-unit id="eth.block.transactions" datatype="html"><source>Transactions</source>
+        <target>Transações</target></trans-unit>
+      <trans-unit id="eth.block.data-size" datatype="html"><source>Data size</source>
+        <target>Tamanho dos dados</target></trans-unit>
+      <trans-unit id="eth.block.base-fee" datatype="html"><source>Base fee</source>
+        <target>Taxa base</target></trans-unit>
+      <trans-unit id="c4221ec405e432a0dac150a4c48c9100eac712bd" datatype="html"><source> Values were capped at the max supply of 21M BTC </source>
+        <target> Os valores foram limitados à oferta máxima de 21 milhões de BTC </target></trans-unit>
+      <trans-unit id="1cdb643999eb6d66bcd839aeaa381b62b8be8cd4" datatype="html"><source>mempool chunk</source>
+        <target>parte da mempool</target></trans-unit>
+      <trans-unit id="36028650a60cba9aa7f034ae34643c72f5364f1d" datatype="html"><source>this transaction</source>
+        <target>esta transação</target></trans-unit>
+      <trans-unit id="1eb8a98f68c1c98884c6436650f5ad80f4b3d5bf" datatype="html"><source>parents</source>
+        <target>ascendentes</target></trans-unit>
+      <trans-unit id="94c4e242e055d9521e1a0bfc7f1d165bbb37b94a" datatype="html"><source>children</source>
+        <target>descendentes</target></trans-unit>
+      <trans-unit id="d1ca10f0337c02e631f15b7da5d57dddc1954704" datatype="html"><source>parent</source>
+        <target>ascendente</target></trans-unit>
+      <trans-unit id="016d2ff8ad4b04f08717b98b5bc61eb122fb1ac8" datatype="html"><source>child</source>
+        <target>descendente</target></trans-unit>
+      <trans-unit id="954513036043312440" datatype="html"><source>ETH transfers</source>
+        <target>Transferências de ETH</target></trans-unit>
+      <trans-unit id="2971012579912877161" datatype="html"><source>Contract calls</source>
+        <target>Chamadas de contratos</target></trans-unit>
+      <trans-unit id="5240110572385374583" datatype="html"><source>Token transfers</source>
+        <target>Transferências de tokens</target></trans-unit>
+      <trans-unit id="eth.token.loading" datatype="html"><source>Loading token data...</source>
+        <target>A carregar dados do token...</target></trans-unit>
+      <trans-unit id="eth.token.unavailable" datatype="html"><source>Token unavailable</source>
+        <target>Token indisponível</target></trans-unit>
+      <trans-unit id="eth.token.try-again" datatype="html"><source>Try again</source>
+        <target>Tentar novamente</target></trans-unit>
+      <trans-unit id="eth.token.contract" datatype="html"><source>Contract</source>
+        <target>Contrato</target></trans-unit>
+      <trans-unit id="eth.token.metrics" datatype="html"><source>Token metrics</source>
+        <target>Métricas do token</target></trans-unit>
+      <trans-unit id="eth.token.price" datatype="html"><source>Price</source>
+        <target>Preço</target></trans-unit>
+      <trans-unit id="eth.token.market-cap" datatype="html"><source>Market cap</source>
+        <target>Capitalização de mercado</target></trans-unit>
+      <trans-unit id="eth.token.volume" datatype="html"><source>24h volume</source>
+        <target>Volume em 24 horas</target></trans-unit>
+      <trans-unit id="eth.token.holders" datatype="html"><source>Holders</source>
+        <target>Detentores</target></trans-unit>
+      <trans-unit id="eth.token.total-supply" datatype="html"><source>Total supply</source>
+        <target>Oferta total</target></trans-unit>
+      <trans-unit id="eth.token.circulating-supply" datatype="html"><source>Circulating supply</source>
+        <target>Oferta em circulação</target></trans-unit>
+      <trans-unit id="eth.token.recent-sample" datatype="html"><source>Recent transfer sample</source>
+        <target>Amostra de transferências recentes</target></trans-unit>
+      <trans-unit id="eth.token.recent-transfers" datatype="html"><source>Recent transfers</source>
+        <target>Transferências recentes</target></trans-unit>
+      <trans-unit id="eth.token.transfer-history" datatype="html"><source>Transfer history</source>
+        <target>Histórico de transferências</target></trans-unit>
+      <trans-unit id="eth.token.shown" datatype="html"><source><x id="INTERPOLATION" equiv-text="shown&lt;/span&gt;       &lt;/div&gt;        &lt;div *ngIf=&quot;transfers.lengt" /> shown</source>
+        <target><x id="INTERPOLATION" equiv-text="shown&lt;/span&gt;       &lt;/div&gt;        &lt;div *ngIf=&quot;transfers.lengt" /> apresentados</target></trans-unit>
+      <trans-unit id="eth.token.bounded-history" datatype="html"><source> This is a bounded recent sample from Ethereum RPC. Complete indexed transfer history is temporarily unavailable. </source>
+        <target> Esta é uma amostra limitada de transferências recentes do Ethereum RPC. O histórico completo e indexado está temporariamente indisponível. </target></trans-unit>
+      <trans-unit id="eth.token.approximate-usd" datatype="html"><source>Approximate USD value using the current token price</source>
+        <target>Valor aproximado em USD ao preço atual do token</target></trans-unit>
+      <trans-unit id="eth.token.from" datatype="html"><source>From</source>
+        <target>De</target></trans-unit>
+      <trans-unit id="eth.token.to" datatype="html"><source>To</source>
+        <target>Para</target></trans-unit>
+      <trans-unit id="eth.token.contract-creation" datatype="html"><source>Contract creation</source>
+        <target>Criação do contrato</target></trans-unit>
+      <trans-unit id="eth.token.show-fewer" datatype="html"><source>Show fewer transfers</source>
+        <target>Mostrar menos transferências</target></trans-unit>
+      <trans-unit id="eth.token.show-more" datatype="html"><source>Show <x id="INTERPOLATION" equiv-text="{{ hiddenTransferCount }}" /> more transfers</source>
+        <target>Mostrar mais <x id="INTERPOLATION" equiv-text="{{ hiddenTransferCount }}" /> transferências</target></trans-unit>
+      <trans-unit id="eth.token.loading-older" datatype="html"><source>Loading older transfers...</source>
+        <target>A carregar transferências anteriores...</target></trans-unit>
+      <trans-unit id="eth.token.load-older" datatype="html"><source>Load older transfers</source>
+        <target>Carregar transferências anteriores</target></trans-unit>
+      <trans-unit id="eth.token.older-error" datatype="html"><source>Older transfers could not be loaded. Try again.</source>
+        <target>Não foi possível carregar transferências anteriores. Tente novamente.</target></trans-unit>
+      <trans-unit id="eth.token.history-unavailable" datatype="html"><source>Transfer history is temporarily unavailable</source>
+        <target>O histórico de transferências está temporariamente indisponível</target></trans-unit>
+      <trans-unit id="eth.token.history-unavailable-detail" datatype="html"><source>Token metadata is current, but the indexed transfer feed could not be loaded.</source>
+        <target>Os metadados do token estão atualizados, mas não foi possível carregar o histórico indexado de transferências.</target></trans-unit>
+      <trans-unit id="eth.token.no-transfers" datatype="html"><source>No transfers were found for this token.</source>
+        <target>Não foram encontradas transferências para este token.</target></trans-unit>
+      <trans-unit id="eth.token.no-address" datatype="html"><source>No token contract address was provided.</source>
+        <target>Não foi fornecido o endereço do contrato do token.</target></trans-unit>
+      <trans-unit id="eth.token.not-found" datatype="html"><source>Token not found on Ethereum.</source>
+        <target>Token não encontrado no Ethereum.</target></trans-unit>
+      <trans-unit id="eth.token.fetch-error" datatype="html"><source>Token data is temporarily unavailable. Please try again.</source>
+        <target>Os dados do token estão temporariamente indisponíveis. Tente novamente.</target></trans-unit>
+      <trans-unit id="73408cc30eaf0f171209018a22bc6058538287aa" datatype="html"><source>Based on a simple ETH transfer using 21,000 gas</source>
+        <target>Baseado numa transferência simples de ETH com 21.000 gas</target></trans-unit>
+      <trans-unit id="ac0f81713a84217c9bd1d9bb460245d8190b073f" datatype="html"><source>More</source>
+        <target>Mais</target></trans-unit>
+      <trans-unit id="4ce06818b8fe60a7c040ce7bfecc10b11397401b" datatype="html"><source>24h Volume</source>
+        <target>Volume em 24 horas</target></trans-unit>
+      <trans-unit id="7729adad4cbe5f490e393a925fae8a9b90f8ac08" datatype="html"><source>Reserve Deficit</source>
+        <target>Défice das reservas</target></trans-unit>
+      <trans-unit id="489277af67abab02f1de98f4a7930fc611471eda" datatype="html"><source>occurrence</source>
+        <target>ocorrência</target></trans-unit>
+      <trans-unit id="850e39efd95e6090598e13a01b7825f6b71b1017" datatype="html"><source>occurrences</source>
+        <target>ocorrências</target></trans-unit>
+      <trans-unit id="57d63f33e6e6f3d4716fab5381cff30d517d5c4e" datatype="html"><source>usages</source>
+        <target>utilizações</target></trans-unit>
+      <trans-unit id="6d1c8856044cc923fc70f32cb4be360d200cfa82" datatype="html"><source>1 new transaction</source>
+        <target>1 nova transação</target></trans-unit>
+      <trans-unit id="a5c3bb57620832141bf6c51d7344e69af366c7e8" datatype="html"><source><x id="INTERPOLATION" equiv-text="new transactions&lt;/span&gt; &lt;/button&gt;  &lt;div [class.container-xl]=&quot;!widget&quot; [cla" /> new transactions</source>
+        <target><x id="INTERPOLATION" equiv-text="new transactions&lt;/span&gt; &lt;/button&gt;  &lt;div [class.container-xl]=&quot;!widget&quot; [cla" /> novas transações</target></trans-unit>
+      <trans-unit id="487bebf9352332c5e7f5bd00a78371cacff0fd95" datatype="html"><source>Pause/Resume</source>
+        <target>Pausar/retomar</target></trans-unit>
+      <trans-unit id="88f27d579752fd40ef53cfff5e936c293ca19221" datatype="html"><source>Pause/Resume</source>
+        <target>Pausar/retomar</target></trans-unit>
+      <trans-unit id="eth.maximumFee" datatype="html"><source>Maximum fee</source>
+        <target>Taxa máxima</target></trans-unit>
+      <trans-unit id="eth.fee" datatype="html"><source>Fee</source>
+        <target>Taxa</target></trans-unit>
+      <trans-unit id="eth.maximumFeePerGas" datatype="html"><source>Maximum fee per gas</source>
+        <target>Taxa máxima por gas</target></trans-unit>
+      <trans-unit id="eth.feeRate" datatype="html"><source>Fee rate</source>
+        <target>Taxa por unidade</target></trans-unit>
+      <trans-unit id="92626adb4b7e2aff0d35c2db5e023aac29d27f0f" datatype="html"><source>Cluster</source>
+        <target>Cluster</target></trans-unit>
+      <trans-unit id="eth.state" datatype="html"><source>State</source>
+        <target>Estado</target></trans-unit>
+      <trans-unit id="eth.fromTo" datatype="html"><source>From &amp; To</source>
+        <target>De e para</target></trans-unit>
+      <trans-unit id="eth.inputData" datatype="html"><source>Input data</source>
+        <target>Dados de entrada</target></trans-unit>
+      <trans-unit id="eth.notExecuted" datatype="html"><source>Not executed</source>
+        <target>Não executada</target></trans-unit>
+      <trans-unit id="eth.gasLimit" datatype="html"><source>Gas limit</source>
+        <target>Limite de gas</target></trans-unit>
+      <trans-unit id="eth.transactionFee" datatype="html"><source>Transaction fee</source>
+        <target>Taxa da transação</target></trans-unit>
+      <trans-unit id="eth.executionFee" datatype="html"><source>Execution fee</source>
+        <target>Taxa de execução</target></trans-unit>
+      <trans-unit id="eth.blobFee" datatype="html"><source>Blob fee</source>
+        <target>Taxa de blob</target></trans-unit>
+      <trans-unit id="eth.maximumBlobFee" datatype="html"><source>Maximum blob fee</source>
+        <target>Taxa máxima de blob</target></trans-unit>
+      <trans-unit id="eth.blobGasUsed" datatype="html"><source>Blob gas used</source>
+        <target>Gas de blob utilizado</target></trans-unit>
+      <trans-unit id="eth.transactionType" datatype="html"><source>Transaction type</source>
+        <target>Tipo de transação</target></trans-unit>
+      <trans-unit id="eth.method" datatype="html"><source>Method</source>
+        <target>Método</target></trans-unit>
+      <trans-unit id="eth.gasPrice" datatype="html"><source>Gas price</source>
+        <target>Preço do gas</target></trans-unit>
+      <trans-unit id="eth.blobGasPrice" datatype="html"><source>Blob gas price</source>
+        <target>Preço do gas de blob</target></trans-unit>
+      <trans-unit id="eth.maximumBlobFeePerGas" datatype="html"><source>Maximum blob fee per gas</source>
+        <target>Taxa máxima de blob por gas</target></trans-unit>
+      <trans-unit id="eth.revertReason" datatype="html"><source>Revert reason</source>
+        <target>Motivo da reversão</target></trans-unit>
+      <trans-unit id="eth.from" datatype="html"><source>From</source>
+        <target>De</target></trans-unit>
+      <trans-unit id="eth.tokenUsdTitle" datatype="html"><source>Approximate USD value using the current token price</source>
+        <target>Valor aproximado em USD ao preço atual do token</target></trans-unit>
+      <trans-unit id="eth.transfer" datatype="html"><source>transfer</source>
+        <target>transferência</target></trans-unit>
+      <trans-unit id="eth.transfers" datatype="html"><source>transfers</source>
+        <target>transferências</target></trans-unit>
+      <trans-unit id="eth.proposed" datatype="html"><source>Proposed</source>
+        <target>Proposta</target></trans-unit>
+      <trans-unit id="eth.intentUsdTitle" datatype="html"><source>Approximate USD value of the proposed call using the current token price</source>
+        <target>Valor aproximado em USD da chamada proposta ao preço atual do token</target></trans-unit>
+      <trans-unit id="c19bde6e194e95b60145a4e312fc31941197d90c" datatype="html"><source>LBTC Supply vs. BTC Holdings</source>
+        <target>Oferta de LBTC face às reservas em BTC</target></trans-unit>
+      <trans-unit id="6263132712305033285" datatype="html"><source>Transfers</source>
+        <target>Transferências</target></trans-unit>
+      <trans-unit id="3504995129774539345" datatype="html"><source>Ethereum activity</source>
+        <target>Atividade Ethereum</target></trans-unit>
+      <trans-unit id="eth.dashboard.gas-prices" datatype="html"><source>Ethereum Gas Prices</source><target>Preços do gás Ethereum</target></trans-unit>
+      <trans-unit id="eth.dashboard.pending-transactions" datatype="html"><source>Pending Transactions</source><target>Transações pendentes</target></trans-unit>
+      <trans-unit id="eth.dashboard.map-unavailable" datatype="html"><source>Transaction map unavailable in this browser</source><target>O mapa de transações não está disponível neste navegador</target></trans-unit>
+      <trans-unit id="eth.dashboard.fee-recipient" datatype="html"><source>Fee recipient</source><target>Destinatário das taxas</target></trans-unit>
+      <trans-unit id="eth.dashboard.gas-used" datatype="html"><source>Gas used</source><target>Gás utilizado</target></trans-unit>
+      <trans-unit id="eth.dashboard.low-gas" datatype="html"><source>Low gas price</source><target>Preço baixo do gás</target></trans-unit>
+      <trans-unit id="eth.dashboard.pending-sample" datatype="html"><source>Pending sample</source><target>Amostra de transações pendentes</target></trans-unit>
+      <trans-unit id="eth.dashboard.sampled-gas" datatype="html"><source>Sampled gas limits</source><target>Limites de gás da amostra</target></trans-unit>
+      <trans-unit id="eth.dashboard.execution-fees" datatype="html"><source>Estimated execution fees</source><target>Taxas de execução estimadas</target></trans-unit>
+      <trans-unit id="eth.dashboard.pending-title" datatype="html"><source>Observed pending transactions from the current provider; not a network-wide total</source><target>Transações pendentes observadas pelo fornecedor atual; não representam o total da rede</target></trans-unit>
+      <trans-unit id="eth.dashboard.gas-title" datatype="html"><source>Share of the projected blocks' gas capacity used by this pending sample</source><target>Parcela da capacidade de gás dos blocos projetados utilizada por esta amostra de transações pendentes</target></trans-unit>
+      <trans-unit id="eth.graph.gas-market" datatype="html"><source>Gas market</source><target>Mercado de gás</target></trans-unit>
+      <trans-unit id="eth.graph.legend" datatype="html"><source>Chart legend</source><target>Legenda do gráfico</target></trans-unit>
+      <trans-unit id="eth.graph.base-fee" datatype="html"><source>Base fee (gwei)</source><target>Taxa base (gwei)</target></trans-unit>
+      <trans-unit id="eth.graph.utilization" datatype="html"><source>Network utilization (%)</source><target>Utilização da rede (%)</target></trans-unit>
+      <trans-unit id="eth.footer.tagline" datatype="html"><source>Ethereum blocks, transactions, and gas at a glance</source><target>Blocos, transações e gás Ethereum num só lugar</target></trans-unit>
+      <trans-unit id="eth.footer.explore" datatype="html"><source>Explore</source><target>Explorar</target></trans-unit>
+      <trans-unit id="eth.footer.dashboard" datatype="html"><source>Dashboard</source><target>Painel</target></trans-unit>
+      <trans-unit id="eth.footer.blocks" datatype="html"><source>Recent Blocks</source><target>Blocos recentes</target></trans-unit>
+      <trans-unit id="eth.footer.transactions" datatype="html"><source>Recent Transactions</source><target>Transações recentes</target></trans-unit>
+      <trans-unit id="eth.footer.pending" datatype="html"><source>Pending Transactions</source><target>Transações pendentes</target></trans-unit>
+      <trans-unit id="eth.footer.docs" datatype="html"><source>Explorer documentation</source><target>Documentação do explorador</target></trans-unit>
+      <trans-unit id="eth.footer.what" datatype="html"><source>What is Ethereum?</source><target>O que é Ethereum?</target></trans-unit>
+      <trans-unit id="eth.footer.blocks-link" datatype="html"><source>Blocks</source><target>Blocos</target></trans-unit>
+      <trans-unit id="eth.footer.transactions-link" datatype="html"><source>Transactions</source><target>Transações</target></trans-unit>
+      <trans-unit id="eth.footer.gas" datatype="html"><source>Gas and fees</source><target>Gás e taxas</target></trans-unit>
+      <trans-unit id="eth.footer.about" datatype="html"><source>About</source><target>Sobre</target></trans-unit>
+      <trans-unit id="eth.footer.source" datatype="html"><source>Source code</source><target>Código-fonte</target></trans-unit>
+      <trans-unit id="eth.footer.status" datatype="html"><source>Status</source><target>Estado</target></trans-unit>
+      <trans-unit id="eth.footer.contact" datatype="html"><source>Contact Us</source><target>Contacte-nos</target></trans-unit>
+      <trans-unit id="eth.footer.legal" datatype="html"><source>Legal</source><target>Informações legais</target></trans-unit>
+      <trans-unit id="eth.footer.terms" datatype="html"><source>Terms of Service</source><target>Termos de serviço</target></trans-unit>
+      <trans-unit id="eth.footer.privacy" datatype="html"><source>Privacy Policy</source><target>Política de privacidade</target></trans-unit>
+      <trans-unit id="eth.footer.licenses" datatype="html"><source>Third-party Licenses</source><target>Licenças de terceiros</target></trans-unit>
+      <trans-unit id="eth.current-value-title" datatype="html"><source>Approximate value using the current token price</source><target>Valor aproximado com base no preço atual do token</target></trans-unit>
+      <trans-unit id="eth.current-intent-title" datatype="html"><source>Approximate value of the proposed call using the current token price</source><target>Valor aproximado da chamada proposta com base no preço atual do token</target></trans-unit>
+      <trans-unit id="eth.fiat.reference-title" datatype="html"><source>ECB reference rate</source><target>Taxa de referência do BCE</target></trans-unit>
+      <trans-unit id="eth.fiat.stale" datatype="html"><source> · stale</source><target> · desatualizado</target></trans-unit>
+      <trans-unit id="eth.about.title" datatype="html"><source>About eth.tx.taxi</source><target>Sobre eth.tx.taxi</target></trans-unit>
+      <trans-unit id="eth.about.subtitle" datatype="html"><source>The Ethereum explorer in the tx.taxi family.</source><target>O explorador Ethereum da família tx.taxi.</target></trans-unit>
+      <trans-unit id="eth.about.projectLinks" datatype="html"><source>Project links</source><target>Ligações do projeto</target></trans-unit>
+      <trans-unit id="eth.about.docs" datatype="html"><source>Ethereum documentation</source><target>Documentação Ethereum</target></trans-unit>
+      <trans-unit id="eth.about.contact" datatype="html"><source>Contact the maintainer</source><target>Contactar o responsável</target></trans-unit>
+      <trans-unit id="eth.about.intro" datatype="html"><source>eth.tx.taxi adapts the familiar Mempool explorer interface for Ethereum. It presents public Ethereum blocks, transactions, account balances, gas prices, and pending transaction activity in a consistent tx.taxi experience.</source><target>O eth.tx.taxi adapta a conhecida interface do explorador Mempool ao Ethereum. Apresenta blocos, transações, saldos de contas, preços do gás e atividade de transações pendentes da rede Ethereum numa experiência tx.taxi consistente.</target></trans-unit>
+      <trans-unit id="eth.about.sources" datatype="html"><source>Data sources</source><target>Fontes de dados</target></trans-unit>
+      <trans-unit id="eth.about.sourceDescription" datatype="html"><source>The explorer reads public Ethereum data through a compatibility adapter backed by configured public providers. Provider fallbacks keep the interface useful when one upstream endpoint is unavailable. Values shown here are observations from those providers, not independent consensus verification.</source><target>O explorador lê dados públicos do Ethereum através de um adaptador de compatibilidade suportado por fornecedores públicos configurados. Os fornecedores alternativos mantêm a interface útil quando uma origem fica indisponível. Os valores apresentados são observações desses fornecedores, não uma verificação independente do consenso.</target></trans-unit>
+      <trans-unit id="eth.about.lineage" datatype="html"><source>Open-source lineage</source><target>Origem de código aberto</target></trans-unit>
+      <trans-unit id="eth.about.lineageDescription" datatype="html"><source>The interface is derived from the Mempool Open Source Project and remains available under the GNU AGPLv3. Ethereum-specific terminology, data mapping, and tx.taxi branding are maintained separately.</source><target>A interface deriva do Mempool Open Source Project e continua disponível sob a GNU AGPLv3. A terminologia específica do Ethereum, o mapeamento de dados e a identidade tx.taxi são mantidos separadamente.</target></trans-unit>
+      <trans-unit id="eth.about.openSource" datatype="html"><source>Built on open source</source><target>Construído com código aberto</target></trans-unit>
+      <trans-unit id="eth.about.attribution1" datatype="html"><source>This explorer builds on the</source><target>Este explorador baseia-se no</target></trans-unit>
+      <trans-unit id="eth.about.attribution2" datatype="html"><source>See</source><target>Consulte</target></trans-unit>
+      <trans-unit id="eth.about.thirdParty" datatype="html"><source>third-party attribution</source><target>os créditos de terceiros</target></trans-unit>
+      <trans-unit id="eth.about.attribution3" datatype="html"><source>and contact the maintainer for source and license information.</source><target>e contacte o responsável para obter informações sobre o código-fonte e a licença.</target></trans-unit>
+      <trans-unit id="eth.intro.aria" datatype="html"><source>About tx.taxi</source><target>Sobre tx.taxi</target></trans-unit>
+      <trans-unit id="eth.intro.headline" datatype="html"><source>One search across chains.</source><target>Uma pesquisa em várias cadeias.</target></trans-unit>
+      <trans-unit id="eth.intro.description" datatype="html"><source>Paste a transaction, block or address into tx.taxi. Open a confirmed match, choose between possible networks, or head straight to your chain’s explorer.</source><target>Cole uma transação, bloco ou endereço no tx.taxi. Abra uma correspondência confirmada, escolha entre as redes possíveis ou aceda diretamente ao explorador da sua cadeia.</target></trans-unit>
+      <trans-unit id="eth.intro.open" datatype="html"><source>Open tx.taxi</source><target>Abrir tx.taxi</target></trans-unit>
+      <trans-unit id="eth.intro.explore" datatype="html"><source>Explore</source><target>Explorar</target></trans-unit>
+      <trans-unit id="eth.intro.explorer" datatype="html"><source>explorer</source><target>explorador</target></trans-unit>
+      <trans-unit id="eth.intro.documentation" datatype="html"><source>documentation</source><target>documentação</target></trans-unit>
+      <trans-unit id="eth.identity.unknown" datatype="html"><source>Unknown Ethereum entity</source><target>Entidade Ethereum desconhecida</target></trans-unit>
+      <trans-unit id="eth.identity.ethereum-address" datatype="html"><source>Ethereum address</source><target>Endereço Ethereum</target></trans-unit>
+      <trans-unit id="eth.identity.proxy" datatype="html"><source>Proxy</source><target>Proxy</target></trans-unit>
+      <trans-unit id="eth.identity.proxy-contract" datatype="html"><source>Proxy contract</source><target>Contrato proxy</target></trans-unit>
+      <trans-unit id="eth.identity.scam-warning" datatype="html"><source>Scam warning</source><target>Aviso de fraude</target></trans-unit>
+      <trans-unit id="eth.identity.verified-entity" datatype="html"><source>Verified entity</source><target>Entidade verificada</target></trans-unit>
+      <trans-unit id="eth.identity.verified" datatype="html"><source>Verified</source><target>Verificado</target></trans-unit>
+      <trans-unit id="eth.identity.smart-contract" datatype="html"><source>Smart contract</source><target>Contrato inteligente</target></trans-unit>
+      <trans-unit id="eth.identity.contract" datatype="html"><source>Contract</source><target>Contrato</target></trans-unit>
+      <trans-unit id="eth.identity.scam" datatype="html"><source>Scam</source><target>Fraude</target></trans-unit>
+      <trans-unit id="eth.transaction.block" datatype="html"><source>Block</source><target>Bloco</target></trans-unit>
+      <trans-unit id="eth.seo.description" datatype="html"><source>Track Ethereum blocks, transactions, addresses, and live gas conditions on eth.tx.taxi.</source><target>Acompanhe blocos, transações, endereços e condições atuais do gás Ethereum em eth.tx.taxi.</target></trans-unit>
+      <trans-unit id="eth.seo.explorer" datatype="html"><source>Ethereum Explorer</source><target>Explorador Ethereum</target></trans-unit>
+      <trans-unit id="eth.docs.guide" datatype="html"><source>Ethereum Guide</source><target>Guia Ethereum</target></trans-unit>
+      <trans-unit id="eth.docs.mainnet" datatype="html"><source>Ethereum mainnet</source><target>Rede principal Ethereum</target></trans-unit>
+      <trans-unit id="eth.docs.guideTitle" datatype="html"><source>Understand what the explorer shows</source><target>Entenda o que o explorador apresenta</target></trans-unit>
+      <trans-unit id="eth.docs.guideDescription" datatype="html"><source>Learn how Ethereum transactions, gas, accounts, contracts, and pending activity map to the mempool-style interface.</source><target>Saiba como as transações, o gás, as contas, os contratos e a atividade pendente do Ethereum são apresentados na interface ao estilo Mempool.</target></trans-unit>
+      <trans-unit id="eth.docs.developerReference" datatype="html"><source>Developer reference</source><target>Referência para programadores</target></trans-unit>
+      <trans-unit id="eth.docs.restTitle" datatype="html"><source>Ethereum REST API</source><target>API REST Ethereum</target></trans-unit>
+      <trans-unit id="eth.docs.restDescription" datatype="html"><source>Read the same normalized Ethereum data used by this explorer. Only endpoints implemented by the current adapter are listed.</source><target>Consulte os mesmos dados Ethereum normalizados utilizados por este explorador. Apenas são listados os pontos de acesso implementados pelo adaptador atual.</target></trans-unit>
+      <trans-unit id="eth.docs.live" datatype="html"><source>Live data</source><target>Dados em tempo real</target></trans-unit>
+      <trans-unit id="eth.docs.websocketTitle" datatype="html"><source>Ethereum WebSocket API</source><target>API WebSocket Ethereum</target></trans-unit>
+      <trans-unit id="eth.docs.websocketDescription" datatype="html"><source>Receive chain-tip and pending-sample updates, then subscribe to a transaction, account, or next-slot estimate.</source><target>Receba atualizações do bloco mais recente e da amostra de transações pendentes e subscreva uma transação, conta ou estimativa do próximo slot.</target></trans-unit>
+      <trans-unit id="eth.docs.baseUrl" datatype="html"><source>Base URL</source><target>URL base</target></trans-unit>
+      <trans-unit id="eth.docs.endpoint" datatype="html"><source>Endpoint</source><target>Ponto de acesso</target></trans-unit>
+      <trans-unit id="eth.docs.description" datatype="html"><source>Description</source><target>Descrição</target></trans-unit>
+      <trans-unit id="eth.docs.serverResponse" datatype="html"><source>Server response</source><target>Resposta do servidor</target></trans-unit>
+      <trans-unit id="eth.docs.publicData" datatype="html"><source>eth.tx.taxi displays public network data.</source><target>O eth.tx.taxi apresenta dados públicos da rede.</target></trans-unit>
+      <trans-unit id="eth.docs.noRecovery" datatype="html"><source>It cannot recover funds, reverse transactions, or access wallets.</source><target>Não pode recuperar fundos, reverter transações nem aceder a carteiras.</target></trans-unit>
+      <trans-unit id="eth.docs.clientMessage" datatype="html"><source>Client message</source><target>Mensagem do cliente</target></trans-unit>
+      <trans-unit id="eth.search.choose" datatype="html"><source>Choose search chain</source><target>Escolher a cadeia para pesquisa</target></trans-unit>
+      <trans-unit id="eth.search.placeholder" datatype="html"><source>Wave a taxi, paste anything here.</source><target>Chame um táxi e cole qualquer coisa aqui.</target></trans-unit>
+      <trans-unit id="eth.search.across" datatype="html"><source>Search across chains</source><target>Pesquisar em várias cadeias</target></trans-unit>
+      <trans-unit id="eth.nav.production" datatype="html"><source>Block production</source><target>Produção de blocos</target></trans-unit>
+      <trans-unit id="eth.docs.sections" datatype="html"><source>Documentation sections</source><target>Secções da documentação</target></trans-unit>
+      <trans-unit id="eth.meta.about.description" datatype="html"><source>Learn about eth.tx.taxi, its Ethereum data sources, open-source lineage, and operator contact details.</source><target>Conheça o eth.tx.taxi, as suas fontes de dados Ethereum, origem de código aberto e dados de contacto do operador.</target></trans-unit>
+      <trans-unit id="eth.meta.docs.guide" datatype="html"><source>Ethereum Guide</source><target>Guia Ethereum</target></trans-unit>
+      <trans-unit id="eth.meta.docs.guideDescription" datatype="html"><source>Understand Ethereum transactions, gas, account activity, confirmations, and the data shown by eth.tx.taxi.</source><target>Entenda as transações, o gás, a atividade das contas, as confirmações e os dados Ethereum apresentados pelo eth.tx.taxi.</target></trans-unit>
+      <trans-unit id="eth.meta.docs.restDescription" datatype="html"><source>Documentation for the eth.tx.taxi REST API: blocks, transactions, accounts, tokens, gas estimates, and explorer state.</source><target>Documentação da API REST do eth.tx.taxi: blocos, transações, contas, tokens, estimativas de gás e estado do explorador.</target></trans-unit>
+      <trans-unit id="eth.meta.docs.websocketDescription" datatype="html"><source>Documentation for the eth.tx.taxi WebSocket API: live Ethereum blocks, pending transactions, accounts, and transaction status.</source><target>Documentação da API WebSocket do eth.tx.taxi: blocos Ethereum em tempo real, transações pendentes, contas e estado das transações.</target></trans-unit>
+      <trans-unit id="eth.search.selectedExplorer" datatype="html"><source>Selected explorer</source><target>Explorador selecionado</target></trans-unit>
+      <trans-unit id="eth.search.selected" datatype="html"><source>SELECTED</source><target>SELECIONADO</target></trans-unit>
+      <trans-unit id="eth.search.automatic" datatype="html"><source>Automatic Routing</source><target>Encaminhamento automático</target></trans-unit>
+      <trans-unit id="eth.search.hubNewTab" datatype="html"><source>Open tx.taxi in a new tab</source><target>Abrir tx.taxi num novo separador</target></trans-unit>
+      <trans-unit id="eth.search.viewHub" datatype="html"><source>View Hub</source><target>Ver página principal</target></trans-unit>
+      <trans-unit id="eth.search.goStraight" datatype="html"><source>Or go straight to</source><target>Ou aceda diretamente a</target></trans-unit>
+      <trans-unit id="eth.search.native" datatype="html"><source>NATIVE EXPLORERS</source><target>EXPLORADORES NATIVOS</target></trans-unit>
+      <trans-unit id="eth.search.registryUnavailable" datatype="html"><source>Explorer registry unavailable</source><target>Registo de exploradores indisponível</target></trans-unit>
+      <trans-unit id="eth.search.thirdParty" datatype="html"><source>3RD-PARTY EXPLORERS</source><target>EXPLORADORES DE TERCEIROS</target></trans-unit>
+      <trans-unit id="eth.search.open" datatype="html"><source>Open</source><target>Abrir</target></trans-unit>
+      <trans-unit id="eth.search.opened" datatype="html"><source>Opened</source><target>Aberto</target></trans-unit>
+      <trans-unit id="eth.search.switch" datatype="html"><source>Switch</source><target>Mudar</target></trans-unit>
+      <trans-unit id="eth.search.loading" datatype="html"><source>Loading explorers</source><target>A carregar exploradores</target></trans-unit>
+      <trans-unit id="eth.search.found" datatype="html"><source>Found</source><target>Encontrado</target></trans-unit>
+      <trans-unit id="eth.search.possible" datatype="html"><source>Possible</source><target>Possível</target></trans-unit>
+      <trans-unit id="eth.search.futureBlock" datatype="html"><source>That block has not been produced yet.</source><target>Esse bloco ainda não foi produzido.</target></trans-unit>
+      <trans-unit id="eth.search.futureDate" datatype="html"><source>Enter a date or timestamp that is not in the future.</source><target>Introduza uma data ou marca temporal que não esteja no futuro.</target></trans-unit>
+      <trans-unit id="eth.search.dateNotFound" datatype="html"><source>No Ethereum block was found for that time.</source><target>Não foi encontrado nenhum bloco Ethereum para essa data.</target></trans-unit>
+      <trans-unit id="eth.search.invalidInput" datatype="html"><source>Enter an Ethereum address, transaction hash, or block number.</source><target>Introduza um endereço Ethereum, hash de transação ou número de bloco.</target></trans-unit>
+      <trans-unit id="eth.search.openExplorer" datatype="html"><source>Open <x id="name" /></source><target>Abrir <x id="name" /></target></trans-unit>
+      <trans-unit id="eth.search.openNewTab" datatype="html"><source>Open <x id="name" /> in a new tab</source><target>Abrir <x id="name" /> num novo separador</target></trans-unit>
+      <trans-unit id="eth.search.switchExplorer" datatype="html"><source>Switch to <x id="name" /></source><target>Mudar para <x id="name" /></target></trans-unit>
+      <trans-unit id="eth.search.additionalExplorers" datatype="html"><source><x id="name" /> additional explorers</source><target>Exploradores adicionais de <x id="name" /></target></trans-unit>
+      <trans-unit id="eth.search.hideOne" datatype="html"><source>Hide <x id="count" /> additional <x id="name" /> option</source><target>Ocultar <x id="count" /> opção adicional de <x id="name" /></target></trans-unit>
+      <trans-unit id="eth.search.hideMany" datatype="html"><source>Hide <x id="count" /> additional <x id="name" /> options</source><target>Ocultar <x id="count" /> opções adicionais de <x id="name" /></target></trans-unit>
+      <trans-unit id="eth.search.showOne" datatype="html"><source>Show <x id="count" /> additional <x id="name" /> option</source><target>Mostrar <x id="count" /> opção adicional de <x id="name" /></target></trans-unit>
+      <trans-unit id="eth.search.showMany" datatype="html"><source>Show <x id="count" /> additional <x id="name" /> options</source><target>Mostrar <x id="count" /> opções adicionais de <x id="name" /></target></trans-unit>
+      <trans-unit id="eth.legal.service" datatype="html"><source>Explorer service</source><target>Serviço de exploração</target></trans-unit>
+      <trans-unit id="eth.legal.serviceText" datatype="html"><source>eth.tx.taxi is a public Ethereum block explorer provided for informational purposes. It displays public blockchain data obtained from third-party infrastructure and may be delayed, incomplete, or unavailable.</source><target>O eth.tx.taxi é um explorador público de blocos Ethereum disponibilizado para fins informativos. Apresenta dados públicos da cadeia obtidos através de infraestrutura de terceiros, que podem estar atrasados, incompletos ou indisponíveis.</target></trans-unit>
+      <trans-unit id="eth.legal.advice" datatype="html"><source>No financial advice</source><target>Não constitui aconselhamento financeiro</target></trans-unit>
+      <trans-unit id="eth.legal.adviceText" datatype="html"><source>Nothing on this website is financial, investment, legal, or tax advice. Verify important transaction and account information with your own Ethereum node or another independent source before acting on it.</source><target>Nada neste site constitui aconselhamento financeiro, de investimento, jurídico ou fiscal. Antes de agir, verifique as informações importantes sobre transações e contas com o seu próprio nó Ethereum ou outra fonte independente.</target></trans-unit>
+      <trans-unit id="eth.legal.availability" datatype="html"><source>Availability and external services</source><target>Disponibilidade e serviços externos</target></trans-unit>
+      <trans-unit id="eth.legal.availabilityText" datatype="html"><source>The service is provided as-is without guarantees of accuracy, availability, or fitness for a particular purpose. External links are governed by their respective operators.</source><target>O serviço é fornecido tal como está, sem garantias de exatidão, disponibilidade ou adequação a um fim específico. As ligações externas são regidas pelos respetivos operadores.</target></trans-unit>
+      <trans-unit id="eth.legal.attribution" datatype="html"><source>Open-source attribution</source><target>Atribuição de código aberto</target></trans-unit>
+      <trans-unit id="eth.legal.attributionText" datatype="html"><source>The interface is derived from the Mempool Open Source Project and is distributed under the GNU AGPLv3.</source><target>A interface deriva do Mempool Open Source Project e é distribuída sob a GNU AGPLv3.</target></trans-unit>
+      <trans-unit id="eth.legal.contact" datatype="html"><source>Contact</source><target>Contacto</target></trans-unit>
+      <trans-unit id="eth.legal.questions" datatype="html"><source>Questions and issue reports can be sent to the operator at</source><target>As questões e os relatórios de problemas podem ser enviados ao operador em</target></trans-unit>
+      <trans-unit id="eth.legal.audience" datatype="html"><source>Audience measurement</source><target>Medição de audiência</target></trans-unit>
+      <trans-unit id="eth.legal.audienceText" datatype="html"><source>tx.taxi uses Cloudflare Web Analytics for page views and performance, and a first-party daily cookie shared across its explorers to count browsers once per UTC day. The daily audience collector stores only a daily identifier, the explorer hostname, and whether there was interaction. It does not receive search text, addresses, transaction IDs, URLs, or IP addresses. Individual daily records expire after 31 days; aggregate counts are retained for 400 days. Do Not Track and Global Privacy Control disable this first-party measurement.</source><target>O tx.taxi utiliza o Cloudflare Web Analytics para medir visualizações de páginas e desempenho, e um cookie próprio diário partilhado entre os seus exploradores para contar navegadores uma vez por dia UTC. O sistema de medição diária armazena apenas um identificador diário, o nome do servidor do explorador e a ocorrência de interação. Não recebe texto de pesquisa, endereços, identificadores de transações, URL nem endereços IP. Os registos diários individuais expiram após 31 dias; as contagens agregadas são conservadas durante 400 dias. O Do Not Track e o Global Privacy Control desativam esta medição própria.</target></trans-unit>
+      <trans-unit id="eth.legal.optOut" datatype="html"><source>Details and opt-out</source><target>Detalhes e opção de exclusão</target></trans-unit>
+      <trans-unit id="eth.legal.lookups" datatype="html"><source>Public blockchain lookups</source><target>Consultas públicas da blockchain</target></trans-unit>
+      <trans-unit id="eth.legal.lookupsText" datatype="html"><source>Ethereum addresses, transaction hashes, and block identifiers submitted to the explorer are public blockchain data. Requests are processed by eth.tx.taxi and its configured public Ethereum data providers.</source><target>Os endereços Ethereum, hashes de transações e identificadores de blocos submetidos ao explorador são dados públicos da blockchain. Os pedidos são processados pelo eth.tx.taxi e pelos fornecedores públicos de dados Ethereum configurados.</target></trans-unit>
+      <trans-unit id="eth.legal.preferences" datatype="html"><source>Local preferences</source><target>Preferências locais</target></trans-unit>
+      <trans-unit id="eth.legal.preferencesText" datatype="html"><source>Display preferences such as language, timezone, fiat currency, amount mode, and theme may be stored in your browser. These preferences are used to render the interface and are not Ethereum account credentials.</source><target>As preferências de apresentação, como idioma, fuso horário, moeda fiduciária, modo de valores e tema, podem ser armazenadas no navegador. Estas preferências são utilizadas para apresentar a interface e não são credenciais da conta Ethereum.</target></trans-unit>
+      <trans-unit id="eth.legal.records" datatype="html"><source>Operational records</source><target>Registos operacionais</target></trans-unit>
+      <trans-unit id="eth.legal.recordsText" datatype="html"><source>The hosting stack and upstream data providers may retain routine security and request logs. Do not use a public explorer when a lookup itself is sensitive; use your own Ethereum node and local tooling instead.</source><target>A infraestrutura de alojamento e os fornecedores de dados podem conservar registos habituais de segurança e pedidos. Não utilize um explorador público quando a própria consulta for sensível; utilize antes o seu próprio nó Ethereum e ferramentas locais.</target></trans-unit>
+      <trans-unit id="eth.legal.external" datatype="html"><source>External links</source><target>Ligações externas</target></trans-unit>
+      <trans-unit id="eth.legal.externalText" datatype="html"><source>Links to Ethereum documentation, Telegram, u.software, Blockscout, and the upstream Mempool project are governed by those services' own privacy policies.</source><target>As ligações à documentação Ethereum, Telegram, u.software, Blockscout e ao projeto Mempool original estão sujeitas às políticas de privacidade desses serviços.</target></trans-unit>
+      <trans-unit id="eth.legal.privacyQuestions" datatype="html"><source>Privacy questions can be sent to the operator at</source><target>As questões sobre privacidade podem ser enviadas ao operador em</target></trans-unit>
+      <trans-unit id="eth.legal.termsDescription" datatype="html"><source>Terms for using eth.tx.taxi, an independent Ethereum block explorer operated by tx.taxi.</source><target>Termos de utilização do eth.tx.taxi, um explorador independente de blocos Ethereum operado pelo tx.taxi.</target></trans-unit>
+      <trans-unit id="eth.legal.privacyDescription" datatype="html"><source>How eth.tx.taxi handles the limited technical data required to operate its Ethereum explorer.</source><target>Como o eth.tx.taxi trata os dados técnicos limitados necessários para operar o seu explorador Ethereum.</target></trans-unit>
+      <trans-unit id="eth.search.example" datatype="html"><source>tx.taxi/[your search]</source><target>tx.taxi/[a sua pesquisa]</target></trans-unit>
+      <trans-unit id="eth.blockDetails.totalFees" datatype="html"><source>Total fees</source><target>Taxas totais</target></trans-unit>
+      <trans-unit id="eth.blockDetails.medianFee" datatype="html"><source>Median fee rate</source><target>Taxa mediana</target></trans-unit>
+      <trans-unit id="eth.blockDetails.feeRange" datatype="html"><source>Fee range</source><target>Intervalo das taxas</target></trans-unit>
+      <trans-unit id="eth.blockDetails.estimatedFees" datatype="html"><source>Estimated execution fees</source><target>Taxas de execução estimadas</target></trans-unit>
+      <trans-unit id="eth.production.title" datatype="html"><source>Block production</source><target>Produção de blocos</target></trans-unit>
+      <trans-unit id="eth.production.unavailable" datatype="html"><source>Block production data is temporarily unavailable.</source><target>Os dados de produção de blocos estão temporariamente indisponíveis.</target></trans-unit>
+      <trans-unit id="eth.production.noBlocks" datatype="html"><source>No recent blocks are available.</source><target>Não existem blocos recentes disponíveis.</target></trans-unit>
+      <trans-unit id="eth.production.latest" datatype="html"><source>Latest block</source><target>Bloco mais recente</target></trans-unit>
+      <trans-unit id="eth.production.block" datatype="html"><source>Block</source><target>Bloco</target></trans-unit>
+      <trans-unit id="eth.production.recipient" datatype="html"><source>Fee recipient</source><target>Destinatário das taxas</target></trans-unit>
+      <trans-unit id="eth.production.transactions" datatype="html"><source>Transactions</source><target>Transações</target></trans-unit>
+      <trans-unit id="eth.production.gasUsed" datatype="html"><source>Gas used</source><target>Gás utilizado</target></trans-unit>
+      <trans-unit id="eth.production.produced" datatype="html"><source>Produced</source><target>Produzido</target></trans-unit>
+      <trans-unit id="eth.production.fees" datatype="html"><source>Total fees</source><target>Taxas totais</target></trans-unit>
+      <trans-unit id="eth.production.reward" datatype="html"><source>Validator reward</source><target>Recompensa do validador</target></trans-unit>
+      <trans-unit id="eth.production.recent" datatype="html"><source>Recent production</source><target>Produção recente</target></trans-unit>
+      <trans-unit id="eth.production.blocks" datatype="html"><source>blocks</source><target>blocos</target></trans-unit>
+      <trans-unit id="eth.production.execution" datatype="html"><source>Execution activity</source><target>Atividade de execução</target></trans-unit>
+      <trans-unit id="eth.production.averageGas" datatype="html"><source>Average gas used</source><target>Gás médio utilizado</target></trans-unit>
+      <trans-unit id="eth.production.interval" datatype="html"><source>Observed block interval</source><target>Intervalo observado entre blocos</target></trans-unit>
+      <trans-unit id="eth.production.unavailableShort" datatype="html"><source>Unavailable</source><target>Indisponível</target></trans-unit>
+      <trans-unit id="eth.production.seconds" datatype="html"><source>seconds</source><target>segundos</target></trans-unit>
+      <trans-unit id="eth.production.consensus" datatype="html"><source>Consensus</source><target>Consenso</target></trans-unit>
+      <trans-unit id="eth.production.pos" datatype="html"><source>Proof of Stake</source><target>Prova de participação</target></trans-unit>
+      <trans-unit id="eth.production.loading" datatype="html"><source>Loading block production...</source><target>A carregar a produção de blocos...</target></trans-unit>
+      <trans-unit id="eth.production.gasError" datatype="html"><source>Gas market history is temporarily unavailable.</source><target>O histórico do mercado de gás está temporariamente indisponível.</target></trans-unit>
+      <trans-unit id="eth.production.recentBlocks" datatype="html"><source>Recent blocks</source><target>Blocos recentes</target></trans-unit>
+      <trans-unit id="eth.production.seoTitle" datatype="html"><source>Ethereum Block Production</source><target>Produção de blocos Ethereum</target></trans-unit>
+      <trans-unit id="eth.production.seoDescription" datatype="html"><source>Follow recent Ethereum blocks, fee recipients, gas usage, transaction activity, and the live gas market.</source><target>Acompanhe blocos Ethereum recentes, destinatários das taxas, utilização de gás, atividade de transações e o mercado de gás em tempo real.</target></trans-unit>
+      <trans-unit id="eth.txRaw.prevoutsOffline" datatype="html"><source>Missing prevouts are not loaded. Some fields like fee rate cannot be calculated.</source><target>As saídas anteriores em falta não foram carregadas. Alguns campos, como a taxa por unidade, não podem ser calculados.</target></trans-unit>
+      <trans-unit id="eth.txRaw.prevoutsError" datatype="html"><source>Error loading missing prevouts</source><target>Erro ao carregar as saídas anteriores em falta</target></trans-unit>
+      <trans-unit id="eth.txRaw.reason" datatype="html"><source>Reason:</source><target>Motivo:</target></trans-unit>
+      <trans-unit id="eth.txRaw.cpfpError" datatype="html"><source>Error loading CPFP data</source><target>Erro ao carregar dados CPFP</target></trans-unit>
+      <trans-unit id="eth.preview.baseFee" datatype="html"><source>Base fee</source><target>Taxa base</target></trans-unit>
+      <trans-unit id="eth.block.transactionsUnavailable" datatype="html"><source>Transactions are temporarily unavailable</source><target>As transações estão temporariamente indisponíveis</target></trans-unit>
+      <trans-unit id="eth.block.transactionsUnavailableDetail" datatype="html"><source>The block summary is current, but its transaction rows could not be loaded.</source><target>O resumo do bloco está atualizado, mas não foi possível carregar as linhas das transações.</target></trans-unit>
+      <trans-unit id="eth.block.retryTransactions" datatype="html"><source>Retry transactions</source><target>Tentar novamente carregar as transações</target></trans-unit>
+      <trans-unit id="eth.pending.executionFeesTooltip" datatype="html"><source>Estimated execution fees at the current base fee, assuming each transaction uses its full gas limit</source><target>Taxas de execução estimadas à taxa base atual, assumindo que cada transação utiliza o seu limite total de gás</target></trans-unit>
+      <trans-unit id="eth.typeLabel" datatype="html"><source>Type</source><target>Tipo</target></trans-unit>
+      <trans-unit id="eth.divider.dashboard" datatype="html"><source>Ethereum explorer dashboard</source><target>Painel do explorador Ethereum</target></trans-unit>
+      <trans-unit id="eth.divider.displaySizes" datatype="html"><source>Switch to displaying block sizes</source><target>Passar a mostrar os tamanhos dos blocos</target></trans-unit>
+      <trans-unit id="eth.divider.displayFees" datatype="html"><source>Switch to displaying total fees per block</source><target>Passar a mostrar o total das taxas por bloco</target></trans-unit>
+      <trans-unit id="eth.divider.newestRight" datatype="html"><source>Switch to displaying newest blocks on the right</source><target>Passar a mostrar os blocos mais recentes à direita</target></trans-unit>
+      <trans-unit id="eth.divider.newestLeft" datatype="html"><source>Switch to displaying newest blocks on the left</source><target>Passar a mostrar os blocos mais recentes à esquerda</target></trans-unit>
+      <trans-unit id="eth.network.title" datatype="html"><source>Ethereum Network</source><target>Rede Ethereum</target></trans-unit>
+      <trans-unit id="eth.network.recentRewards" datatype="html"><source>Recent execution rewards</source><target>Recompensas de execução recentes</target></trans-unit>
+      <trans-unit id="eth.network.panel" datatype="html"><source>Ethereum network dashboard panel</source><target>Painel da rede Ethereum</target></trans-unit>
+      <trans-unit id="eth.network.network" datatype="html"><source>network</source><target>rede</target></trans-unit>
+      <trans-unit id="eth.network.rewards" datatype="html"><source>rewards</source><target>recompensas</target></trans-unit>
+      <trans-unit id="eth.network.gasUtilization" datatype="html"><source>Latest block gas utilization</source><target>Utilização de gás do último bloco</target></trans-unit>
+      <trans-unit id="eth.network.observedTime" datatype="html"><source>Observed block time</source><target>Tempo observado entre blocos</target></trans-unit>
+      <trans-unit id="eth.network.blockGasUsed" datatype="html"><source>Block gas used</source><target>Gás utilizado no bloco</target></trans-unit>
+      <trans-unit id="eth.network.latestBlock" datatype="html"><source>Latest block</source><target>Bloco mais recente</target></trans-unit>
+      <trans-unit id="eth.rewards.proposer" datatype="html"><source>Proposer rewards</source><target>Recompensas dos proponentes</target></trans-unit>
+      <trans-unit id="eth.rewards.proposerTooltip" datatype="html"><source>Priority fees paid to block proposers in the recent block sample</source><target>Taxas de prioridade pagas aos proponentes na amostra de blocos recente</target></trans-unit>
+      <trans-unit id="eth.rewards.execution" datatype="html"><source>Execution fees</source><target>Taxas de execução</target></trans-unit>
+      <trans-unit id="eth.rewards.executionTooltip" datatype="html"><source>All execution-layer gas fees in the recent block sample</source><target>Todas as taxas de gás da camada de execução na amostra de blocos recente</target></trans-unit>
+      <trans-unit id="eth.rewards.perBlock" datatype="html"><source>/block</source><target>/bloco</target></trans-unit>
+      <trans-unit id="eth.rewards.average" datatype="html"><source>Average tx fee</source><target>Taxa média por transação</target></trans-unit>
+      <trans-unit id="eth.rewards.averageTooltip" datatype="html"><source>Average execution-layer gas fee per transaction in the recent block sample</source><target>Taxa média de gás da camada de execução por transação na amostra de blocos recente</target></trans-unit>
+      <trans-unit id="eth.rewards.loading" datatype="html"><source>Loading recent execution rewards</source><target>A carregar recompensas de execução recentes</target></trans-unit>
+      <trans-unit id="eth.recent.value" datatype="html"><source>Value</source><target>Valor</target></trans-unit>
+      <trans-unit id="eth.graph.ethereumGasMarket" datatype="html"><source>Ethereum gas market</source><target>Mercado de gás Ethereum</target></trans-unit>
+      <trans-unit id="eth.graph.historyHeading" datatype="html"><source>Gas market, <x id="INTERPOLATION" /></source><target>Mercado de gás, <x id="INTERPOLATION" /></target></trans-unit>
+      <trans-unit id="eth.graph.baseFeeLabel" datatype="html"><source>Base fee</source><target>Taxa base</target></trans-unit>
+      <trans-unit id="eth.graph.utilizationLabel" datatype="html"><source>Network utilization</source><target>Utilização da rede</target></trans-unit>
+      <trans-unit id="eth.graph.averageGasPrice" datatype="html"><source>Average gas price</source><target>Preço médio do gás</target></trans-unit>
+      <trans-unit id="eth.graph.pendingSample" datatype="html"><source>Pending txs sampled</source><target>Transações pendentes na amostra</target></trans-unit>
+      <trans-unit id="eth.graph.loadingHistory" datatype="html"><source>Loading gas market history</source><target>A carregar histórico do mercado de gás</target></trans-unit>
+      <trans-unit id="eth.graph.noSamples" datatype="html"><source>No gas market samples are available for the last two hours</source><target>Não existem amostras do mercado de gás disponíveis nas últimas duas horas</target></trans-unit>
+      <trans-unit id="eth.graph.currentSummary" datatype="html"><source>Current gas market sample at <x id="TIME" />. Base fee <x id="FEE" /> gwei; network utilization <x id="UTILIZATION" />.</source><target>Amostra atual do mercado de gás às <x id="TIME" />. Taxa base <x id="FEE" /> gwei; utilização da rede <x id="UTILIZATION" />.</target></trans-unit>
+      <trans-unit id="eth.graph.historySummary" datatype="html"><source>Gas market history from <x id="START" /> to <x id="END" />. Latest base fee <x id="FEE" /> gwei; network utilization <x id="UTILIZATION" />.</source><target>Histórico do mercado de gás de <x id="START" /> a <x id="END" />. Última taxa base <x id="FEE" /> gwei; utilização da rede <x id="UTILIZATION" />.</target></trans-unit>
+      <trans-unit id="eth.graph.currentSample" datatype="html"><source>Current sample</source><target>Amostra atual</target></trans-unit>
+      <trans-unit id="eth.graph.liveHistory" datatype="html"><source>Live history</source><target>Histórico em tempo real</target></trans-unit>
+      <trans-unit id="eth.graph.lastTwoHours" datatype="html"><source>Last 2 hours</source><target>Últimas 2 horas</target></trans-unit>
+      <trans-unit id="eth.method.transfer" datatype="html"><source>Transfer</source><target>Transferência</target></trans-unit>
+      <trans-unit id="eth.feature.transfer" datatype="html"><source>ETH transfer</source><target>Transferência de ETH</target></trans-unit>
+      <trans-unit id="eth.feature.contractCall" datatype="html"><source>Contract call</source><target>Chamada de contrato</target></trans-unit>
+      <trans-unit id="eth.feature.tokenTransfer" datatype="html"><source>Token transfer / call</source><target>Transferência / chamada de token</target></trans-unit>
+      <trans-unit id="eth.list.tokenTransferCall" datatype="html"><source>Token transfer call</source><target>Chamada de transferência de token</target></trans-unit>
+      <trans-unit id="eth.list.contractDeployment" datatype="html"><source>Contract deployment</source><target>Implementação de contrato</target></trans-unit>
+      <trans-unit id="eth.value.unavailable" datatype="html"><source>Unavailable</source><target>Indisponível</target></trans-unit>
+      <trans-unit id="eth.list.proposedCall" datatype="html"><source>Proposed call: </source><target>Chamada proposta: </target></trans-unit>
+      <trans-unit id="eth.list.rawUnits" datatype="html"><source><x id="AMOUNT" /> raw units</source><target><x id="AMOUNT" /> unidades brutas</target></trans-unit>
+      <trans-unit id="eth.token.tokens" datatype="html"><source>tokens</source><target>tokens</target></trans-unit>
+      <trans-unit id="eth.token.generic" datatype="html"><source>Ethereum token</source><target>Token Ethereum</target></trans-unit>
+      <trans-unit id="eth.footer.madeWith" datatype="html"><source>Made with</source><target>Feito com</target></trans-unit>
+      <trans-unit id="eth.footer.by" datatype="html"><source>by</source><target>por</target></trans-unit>
+      <trans-unit id="eth.trademark.disclaimer" datatype="html"><source>This website is operated by tx.taxi and is not affiliated with Mempool Holdings S.A. de C.V.</source><target>Este site é gerido por tx.taxi e não está associado à Mempool Holdings S.A. de C.V.</target></trans-unit>
+      <trans-unit id="eth.trademark.viewPolicy" datatype="html"><source>Please view the Trademark Policy and Guidelines for The Mempool Open Source Project at</source><target>Consulte a Política e as Diretrizes de Marcas do Mempool Open Source Project em</target></trans-unit>
+      <trans-unit id="eth.trademark.title" datatype="html"><source>Trademark Policy</source><target>Política de marcas</target></trans-unit>
+      <trans-unit id="eth.trademark.description" datatype="html"><source>An overview of the trademarks registered by Mempool Holdings S.A. de C.V. and The Mempool Open Source Project® and what we consider to be lawful usage of those trademarks.</source><target>Uma visão geral das marcas registadas pela Mempool Holdings S.A. de C.V. e pelo Mempool Open Source Project® e do que consideramos ser uma utilização legítima dessas marcas.</target></trans-unit>
+      <trans-unit id="eth.block.loading" datatype="html"><source>Loading</source><target>A carregar</target></trans-unit>
+      <trans-unit id="eth.block.loadingHeight" datatype="html"><source>Loading block</source><target>A carregar bloco</target></trans-unit>
+      <trans-unit id="eth.block.loadingData" datatype="html"><source>Loading block data</source><target>A carregar dados do bloco</target></trans-unit>
+      <trans-unit id="eth.intro.openHost" datatype="html"><source>Open</source><target>Abrir</target></trans-unit>
+      <trans-unit id="eth.block.executionReward" datatype="html"><source>Execution-layer reward</source><target>Recompensa da camada de execução</target></trans-unit>
+      <trans-unit id="eth.block.reward" datatype="html"><source>Reward</source><target>Recompensa</target></trans-unit>
+      <trans-unit id="eth.address.viewBlockscout" datatype="html"><source>View on Blockscout</source><target>Ver no Blockscout</target></trans-unit>
+      <trans-unit id="eth.footer.joinTelegram" datatype="html"><source>Join the tx.taxi Telegram channel</source><target>Aderir ao canal Telegram do tx.taxi</target></trans-unit>
+      <trans-unit id="eth.returnLatestBlock" datatype="html"><source>Return to the latest Ethereum block</source><target>Voltar ao bloco Ethereum mais recente</target></trans-unit>
+      <trans-unit id="eth.returnLatestBlockShort" datatype="html"><source>Return to latest block</source><target>Voltar ao bloco mais recente</target></trans-unit>
+      <trans-unit id="taxi.clipboard.copy" datatype="html"><source>Copy</source><target>Copiar</target></trans-unit>
+      <trans-unit id="taxi.clipboard.copied" datatype="html"><source>Copied</source><target>Copiado</target></trans-unit>
+      <trans-unit id="taxi.clipboard.copyAria" datatype="html"><source>Copy to clipboard</source><target>Copiar para a área de transferência</target></trans-unit>
+      <trans-unit id="taxi.clipboard.copiedAria" datatype="html"><source>Copied to clipboard</source><target>Copiado para a área de transferência</target></trans-unit>
+      <trans-unit id="eth.meta.blockDetails" datatype="html"><source>See gas usage, fees, validator details, and transactions for Ethereum block <x id="HEIGHT"/> (<x id="HASH"/>).</source><target>Consulte a utilização de gas, taxas, validador e transações do bloco Ethereum <x id="HEIGHT"/> (<x id="HASH"/>).</target></trans-unit>
+      <trans-unit id="eth.meta.transactionDetails" datatype="html"><source>See sender, recipient, value, gas, fee, and confirmation details for Ethereum transaction <x id="HASH"/>.</source><target>Consulte remetente, destinatário, valor, gas, taxas e confirmações da transação Ethereum <x id="HASH"/>.</target></trans-unit>
+      <trans-unit id="eth.meta.addressDetails" datatype="html"><source>See the balance and recent transactions for Ethereum address <x id="ADDRESS"/>.</source><target>Consulte o saldo e as transações recentes do endereço Ethereum <x id="ADDRESS"/>.</target></trans-unit>
+      <trans-unit id="eth.meta.recentBlocks" datatype="html"><source>See recent Ethereum blocks with validator, gas usage, transaction count, rewards, and fees.</source><target>Consulte blocos Ethereum recentes com validador, gas utilizado, número de transações, recompensas e taxas.</target></trans-unit>
+      <trans-unit id="eth.meta.blockPage" datatype="html"><source>Blocks — page <x id="PAGE"/></source><target>Blocos — página <x id="PAGE"/></target></trans-unit>
+      <trans-unit id="eth.meta.recentTransactions" datatype="html"><source>See recent Ethereum transactions with value, gas used, and gas price, updated in real time.</source><target>Consulte transações Ethereum recentes com valor, gas utilizado e preço do gas, atualizados em tempo real.</target></trans-unit>
+      <trans-unit id="eth.meta.pendingTitle" datatype="html"><source>Pending transaction sample</source><target>Amostra de transações pendentes</target></trans-unit>
+      <trans-unit id="eth.meta.pendingSample" datatype="html"><source>See observed Ethereum pending transactions, gas-price ranges, gas limits, and estimated execution fees for the next validator slot.</source><target>Consulte transações Ethereum pendentes observadas, intervalos de preço e limites de gas e taxas de execução estimadas para o próximo slot do validador.</target></trans-unit>
+      <trans-unit id="eth.meta.trackTransaction" datatype="html"><source>Track the real-time status, gas, fee, and confirmation details for Ethereum transaction <x id="HASH"/>.</source><target>Acompanhe em tempo real o estado, gas, taxa e confirmações da transação Ethereum <x id="HASH"/>.</target></trans-unit>
+      <trans-unit id="eth.address.metadataAria" datatype="html"><source>Ethereum address metadata</source><target>Metadados do endereço Ethereum</target></trans-unit>
+      <trans-unit id="taxi.timezone.minus12" datatype="html"><source>Anywhere on Earth (AoE)</source><target>Em qualquer lugar da Terra (AoE)</target></trans-unit>
+      <trans-unit id="taxi.timezone.minus11" datatype="html"><source>Samoa Standard Time (SST)</source><target>Hora padrão de Samoa (SST)</target></trans-unit>
+      <trans-unit id="taxi.timezone.minus10" datatype="html"><source>Hawaii Standard Time (HST)</source><target>Hora padrão do Havai (HST)</target></trans-unit>
+      <trans-unit id="taxi.timezone.minus9" datatype="html"><source>Alaska Standard Time (AKST)</source><target>Hora padrão do Alasca (AKST)</target></trans-unit>
+      <trans-unit id="taxi.timezone.minus8" datatype="html"><source>Pacific Standard Time (PST)</source><target>Hora padrão do Pacífico (PST)</target></trans-unit>
+      <trans-unit id="taxi.timezone.minus7" datatype="html"><source>Mountain Standard Time (MST)</source><target>Hora padrão das Montanhas Rochosas (MST)</target></trans-unit>
+      <trans-unit id="taxi.timezone.minus6" datatype="html"><source>Central Standard Time (CST)</source><target>Hora padrão central (CST)</target></trans-unit>
+      <trans-unit id="taxi.timezone.minus5" datatype="html"><source>Eastern Standard Time (EST)</source><target>Hora padrão oriental (EST)</target></trans-unit>
+      <trans-unit id="taxi.timezone.minus4" datatype="html"><source>Atlantic Standard Time (AST)</source><target>Hora padrão do Atlântico (AST)</target></trans-unit>
+      <trans-unit id="taxi.timezone.minus3" datatype="html"><source>Argentina Time (ART)</source><target>Hora da Argentina (ART)</target></trans-unit>
+      <trans-unit id="taxi.timezone.minus2" datatype="html"><source>Fernando de Noronha Time (FNT)</source><target>Hora de Fernando de Noronha (FNT)</target></trans-unit>
+      <trans-unit id="taxi.timezone.minus1" datatype="html"><source>Azores Time (AZOT)</source><target>Hora dos Açores (AZOT)</target></trans-unit>
+      <trans-unit id="taxi.timezone.plus0" datatype="html"><source>Greenwich Mean Time (GMT)</source><target>Hora média de Greenwich (GMT)</target></trans-unit>
+      <trans-unit id="taxi.timezone.plus1" datatype="html"><source>Central European Time (CET)</source><target>Hora da Europa Central (CET)</target></trans-unit>
+      <trans-unit id="taxi.timezone.plus2" datatype="html"><source>Eastern European Time (EET)</source><target>Hora da Europa Oriental (EET)</target></trans-unit>
+      <trans-unit id="taxi.timezone.plus3" datatype="html"><source>Moscow Standard Time (MSK)</source><target>Hora padrão de Moscovo (MSK)</target></trans-unit>
+      <trans-unit id="taxi.timezone.plus4" datatype="html"><source>Armenia Time (AMT)</source><target>Hora da Arménia (AMT)</target></trans-unit>
+      <trans-unit id="taxi.timezone.plus5" datatype="html"><source>Pakistan Standard Time (PKT)</source><target>Hora padrão do Paquistão (PKT)</target></trans-unit>
+      <trans-unit id="taxi.timezone.plus6" datatype="html"><source>Xinjiang Time (XJT)</source><target>Hora de Xinjiang (XJT)</target></trans-unit>
+      <trans-unit id="taxi.timezone.plus7" datatype="html"><source>Indochina Time (ICT)</source><target>Hora da Indochina (ICT)</target></trans-unit>
+      <trans-unit id="taxi.timezone.plus8" datatype="html"><source>Hong Kong Time (HKT)</source><target>Hora de Hong Kong (HKT)</target></trans-unit>
+      <trans-unit id="taxi.timezone.plus9" datatype="html"><source>Japan Standard Time (JST)</source><target>Hora padrão do Japão (JST)</target></trans-unit>
+      <trans-unit id="taxi.timezone.plus10" datatype="html"><source>Australian Eastern Standard Time (AEST)</source><target>Hora padrão oriental australiana (AEST)</target></trans-unit>
+      <trans-unit id="taxi.timezone.plus11" datatype="html"><source>Norfolk Time (NFT)</source><target>Hora de Norfolk (NFT)</target></trans-unit>
+      <trans-unit id="taxi.timezone.plus12" datatype="html"><source>New Zealand Standard Time (NZST)</source><target>Hora padrão da Nova Zelândia (NZST)</target></trans-unit>
+      <trans-unit id="taxi.timezone.plus13" datatype="html"><source>Tonga Time (TOT)</source><target>Hora de Tonga (TOT)</target></trans-unit>
+      <trans-unit id="taxi.timezone.plus14" datatype="html"><source>Line Islands Time (LINT)</source><target>Hora das Ilhas da Linha (LINT)</target></trans-unit>
     </body>
   </file>
 </xliff>
