@@ -11,6 +11,15 @@ function displayExactNumber(value: string): string {
   return displayLocale() === 'en-US' ? value : value.replace('.', ',');
 }
 
+// Russian distinguishes one, a few, and many transactions. Other languages
+// continue to use the existing translated singular/plural templates.
+export function russianTransactionCount(count: number): string | null {
+  if (displayLocale() !== 'ru' || !Number.isFinite(count)) return null;
+  const form = new Intl.PluralRules('ru').select(count);
+  const noun = form === 'one' ? 'транзакция' : form === 'few' ? 'транзакции' : 'транзакций';
+  return `${count.toLocaleString('ru')} ${noun}`;
+}
+
 
 // Presentation only: never round provider data or detail-page amounts.
 export function compactBlockNumber(value: number, amount = false): string {

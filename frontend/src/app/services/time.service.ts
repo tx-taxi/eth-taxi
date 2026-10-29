@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable, LOCALE_ID } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { dates } from '@app/shared/i18n/dates';
 
@@ -22,12 +22,40 @@ const precisionThresholds = {
   second: 90
 };
 
+const russianUnits: Record<string, [string, string, string, string]> = {
+  year: ['год', 'года', 'лет', 'год'],
+  month: ['месяц', 'месяца', 'месяцев', 'месяц'],
+  week: ['неделя', 'недели', 'недель', 'неделю'],
+  day: ['день', 'дня', 'дней', 'день'],
+  hour: ['час', 'часа', 'часов', 'час'],
+  minute: ['минута', 'минуты', 'минут', 'минуту'],
+  second: ['секунда', 'секунды', 'секунд', 'секунду'],
+};
+
+function russianDuration(kind: string, unit: string, amount: number): string | null {
+  const forms = russianUnits[unit];
+  if (!forms || !Number.isFinite(amount)) return null;
+  const category = new Intl.PluralRules('ru').select(amount);
+  const index = category === 'one' ? 0 : category === 'few' || category === 'other' ? 1 : 2;
+  const accusative = kind === 'until' || kind === 'span' || kind === 'before';
+  const noun = kind === 'within' && index === 0 ? forms[1] : accusative && index === 0 ? forms[3] : forms[index];
+  const duration = `${amount.toLocaleString('ru')} ${noun}`;
+  switch (kind) {
+    case 'since': return `${duration} назад`;
+    case 'until': return `Через ~${duration}`;
+    case 'within': return `В течение ~${duration}`;
+    case 'span': return `Через ${duration}`;
+    case 'before': return `За ${duration} до`;
+    default: return duration;
+  }
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class TimeService {
 
-  constructor(private datePipe: DatePipe) {}
+  constructor(private datePipe: DatePipe, @Inject(LOCALE_ID) private locale: string) {}
 
   calculate(
     time: number,
@@ -121,6 +149,10 @@ export class TimeService {
   }
 
   private formatTime(kind, unit, number): string {
+    if (/^ru(?:-|$)/i.test(this.locale)) {
+      const localized = russianDuration(kind, unit, number);
+      if (localized) return localized;
+    }
     const dateStrings = dates(number);
     switch (kind) {
       case 'since':
