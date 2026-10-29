@@ -1773,7 +1773,7 @@
       </trans-unit>
       <trans-unit id="57cde27765d527a0d9195212fa5a7ce06408c827" datatype="html">
         <source>Bid Boost</source>
-        <target>Bid Boost</target>
+        <target>Aumento dell’offerta</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/acceleration/accelerations-list/accelerations-list.component.html</context>
           <context context-type="linenumber">17</context>
@@ -2040,7 +2040,7 @@
       </trans-unit>
       <trans-unit id="841f2a74ae5095e6e37f5749f3cc1851cf36a420" datatype="html">
         <source>Avg Max Bid</source>
-        <target>Avg Max Bid</target>
+        <target>Offerta massima media</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/acceleration/pending-stats/pending-stats.component.html</context>
           <context context-type="linenumber">11</context>
@@ -2577,7 +2577,7 @@
       </trans-unit>
       <trans-unit id="c5b2c0d65b8fd12ebf8c0d79f562703776fc954e" datatype="html">
         <source>Pegged in</source>
-        <target>Pegged in</target>
+        <target>Vincolato</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/asset/asset.component.html</context>
           <context context-type="linenumber">37</context>
@@ -2587,7 +2587,7 @@
       </trans-unit>
       <trans-unit id="8f5d6ce525a24b049fee47f9b2d8447cca97ccc8" datatype="html">
         <source>Pegged out</source>
-        <target>Pegged out</target>
+        <target>Svincolato</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/asset/asset.component.html</context>
           <context context-type="linenumber">41</context>
@@ -3690,7 +3690,7 @@
       </trans-unit>
       <trans-unit id="07193288a0312875e18f38c3a2486b927a15520a" datatype="html">
         <source>Timestamp</source>
-        <target>Timestamp</target>
+        <target>Data e ora</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/block/block-preview.component.html</context>
           <context context-type="linenumber">26</context>
@@ -3902,7 +3902,7 @@
       </trans-unit>
       <trans-unit id="0dc973e4853621b49d9e31be902a0680334f632d" datatype="html">
         <source>Stale</source>
-        <target>Stale</target>
+        <target>Non aggiornato</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/block/block.component.html</context>
           <context context-type="linenumber">34</context>
@@ -4046,7 +4046,7 @@
       </trans-unit>
       <trans-unit id="2862af5284f66d4b06bdcf77a5519141723b6989" datatype="html">
         <source>Stale</source>
-        <target>Stale</target>
+        <target>Non aggiornato</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/block/block.component.html</context>
           <context context-type="linenumber">239</context>
@@ -5710,7 +5710,7 @@
       </trans-unit>
       <trans-unit id="7a080851e25a41e898776a9c90cf8dbe81027f9a" datatype="html">
         <source>Output</source>
-        <target>Output</target>
+        <target>Uscita</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/liquid-reserves-audit/federation-utxos-list/federation-utxos-list.component.html</context>
           <context context-type="linenumber">8</context>
@@ -7264,7 +7264,7 @@
       </trans-unit>
       <trans-unit id="3181f08827514236ffd311786fe8ae62f0b361ab" datatype="html">
         <source><x id="START_TAG_SPAN" ctype="x-span" equiv-text="Stale&lt;/span&gt;&lt;/div&gt;               &lt;div class=&quot;block-w"/>Stale<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
-        <target><x id="START_TAG_SPAN" ctype="x-span" equiv-text="Stale&lt;/span&gt;&lt;/div&gt;               &lt;div class=&quot;block-w"/>Stale<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target><x id="START_TAG_SPAN" ctype="x-span" equiv-text="Non aggiornato&lt;/span&gt;&lt;/div&gt;               &lt;div class=&quot;block-w"/>Non aggiornato<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/stale-list/stale-list.component.html</context>
           <context context-type="linenumber">26,27</context>
@@ -8450,7 +8450,7 @@
       </trans-unit>
       <trans-unit id="3e242f213dd1a0754aad9164aa80887d67708500" datatype="html">
         <source>Input</source>
-        <target>Input</target>
+        <target>Ingresso</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/tx-bowtie-graph-tooltip/tx-bowtie-graph-tooltip.component.html</context>
           <context context-type="linenumber">42</context>
@@ -8662,7 +8662,7 @@
       </trans-unit>
       <trans-unit id="c0d4baf68f21ee9c4246d66f0ac828c5b73ae745" datatype="html">
         <source>Wallet</source>
-        <target>Wallet</target>
+        <target>Portafoglio</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/wallet/wallet-preview.component.html</context>
           <context context-type="linenumber">3</context>
@@ -8689,7 +8689,7 @@
       </trans-unit>
       <trans-unit id="wallet.component.browser-title" datatype="html">
         <source>Wallet: <x id="INTERPOLATION" equiv-text="walletName"/></source>
-        <target>Wallet: <x id="INTERPOLATION" equiv-text="walletName"/></target>
+        <target>Portafoglio: <x id="INTERPOLATION" equiv-text="walletName"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/wallet/wallet-preview.component.ts</context>
           <context context-type="linenumber">150</context>
@@ -8983,7 +8983,7 @@
       </trans-unit>
       <trans-unit id="3ec76ccfe1fdcbfd7ea152392f6472d93d4e8cab" datatype="html">
         <source>Zero base fee</source>
-        <target>Zero base fee</target>
+        <target>Commissione base nulla</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/lightning/channel/channel-box/channel-box.component.html</context>
           <context context-type="linenumber">45</context>
@@ -9001,7 +9001,7 @@
       </trans-unit>
       <trans-unit id="09a1bc9c4198e87e9e974a51e86b181429b480d3" datatype="html">
         <source>Non-zero base fee</source>
-        <target>Non-zero base fee</target>
+        <target>Commissione base diversa da zero</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/lightning/channel/channel-box/channel-box.component.html</context>
           <context context-type="linenumber">51</context>
@@ -9877,7 +9877,7 @@
       </trans-unit>
       <trans-unit id="142e923d3b04186ac6ba23387265d22a2fa404e0" datatype="html">
         <source>Lightning Explorer</source>
-        <target>Lightning Explorer</target>
+        <target>Explorer Lightning</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/lightning/lightning-dashboard/lightning-dashboard.component.ts</context>
           <context context-type="linenumber">34</context>
@@ -10355,7 +10355,7 @@
       </trans-unit>
       <trans-unit id="90a6a964ba53464578003e3b4b2873ef5d2132a1" datatype="html">
         <source>Top ISP</source>
-        <target>Top ISP</target>
+        <target>Principali ISP</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/lightning/nodes-per-country/nodes-per-country.component.html</context>
           <context context-type="linenumber">38</context>
@@ -10715,7 +10715,7 @@
       </trans-unit>
       <trans-unit id="time-until" datatype="html">
         <source>In ~<x id="DATE" equiv-text="dateStrings.i18nYear"/></source>
-        <target>In ~<x id="DATE" equiv-text="dateStrings.i18nYear"/></target>
+        <target>Tra ~<x id="DATE" equiv-text="dateStrings.i18nYear"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/time.service.ts</context>
           <context context-type="linenumber">152</context>
