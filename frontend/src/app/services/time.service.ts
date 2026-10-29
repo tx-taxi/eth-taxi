@@ -68,6 +68,27 @@ const czechUnits: Record<string, [string, string, string, string, string, string
   second: ['sekunda', 'sekundy', 'sekund', 'sekundy', 'sekundu', 'sekundou', 'sekundami'],
 };
 
+const swedishUnits: Record<string, [string, string]> = {
+  year: ['år', 'år'], month: ['månad', 'månader'], week: ['vecka', 'veckor'],
+  day: ['dag', 'dagar'], hour: ['timme', 'timmar'], minute: ['minut', 'minuter'],
+  second: ['sekund', 'sekunder'],
+};
+
+function swedishDuration(kind: string, unit: string, amount: number): string | null {
+  const forms = swedishUnits[unit];
+  if (!forms || !Number.isFinite(amount)) return null;
+  const noun = new Intl.PluralRules('sv').select(amount) === 'one' ? forms[0] : forms[1];
+  const duration = `${amount.toLocaleString('sv')} ${noun}`;
+  switch (kind) {
+    case 'since': return `För ${duration} sedan`;
+    case 'until': return `Om ~${duration}`;
+    case 'within': return `Inom ~${duration}`;
+    case 'span': return `Efter ${duration}`;
+    case 'before': return `${duration} tidigare`;
+    default: return duration;
+  }
+}
+
 function czechDuration(kind: string, unit: string, amount: number): string | null {
   const forms = czechUnits[unit];
   if (!forms || !Number.isFinite(amount)) return null;
@@ -240,6 +261,10 @@ export class TimeService {
   }
 
   private formatTime(kind, unit, number): string {
+    if (/^sv(?:-|$)/i.test(this.locale)) {
+      const localized = swedishDuration(kind, unit, number);
+      if (localized) return localized;
+    }
     if (/^cs(?:-|$)/i.test(this.locale)) {
       const localized = czechDuration(kind, unit, number);
       if (localized) return localized;

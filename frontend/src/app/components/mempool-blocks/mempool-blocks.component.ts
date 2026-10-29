@@ -1,4 +1,4 @@
-import { blockValueDetails, localizedSlavicTransactionCount } from '@app/shared/block-format';
+import { blockValueDetails, localizedTransactionCount } from '@app/shared/block-format';
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, HostListener, Input, OnChanges, SimpleChanges, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { Subscription, Observable, of, combineLatest } from 'rxjs';
 import { MempoolBlock } from '@interfaces/websocket.interface';
@@ -29,7 +29,7 @@ import { ThemeService } from '@app/services/theme.service';
 })
 export class MempoolBlocksComponent implements OnInit, OnChanges, OnDestroy {
   blockValueDetails = blockValueDetails;
-  localizedSlavicTransactionCount = localizedSlavicTransactionCount;
+  localizedTransactionCount = localizedTransactionCount;
   estimatedFeeLabel = $localize`:@@eth.blockDetails.estimatedFees:Estimated execution fees`;
   @Input() minimal: boolean = false;
   @Input() blockWidth: number = 125;

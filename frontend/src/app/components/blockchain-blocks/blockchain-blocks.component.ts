@@ -1,4 +1,4 @@
-import { blockValueDetails, localizedSlavicTransactionCount } from '@app/shared/block-format';
+import { blockValueDetails, localizedTransactionCount } from '@app/shared/block-format';
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { Observable, Subscription, delay, filter, tap } from 'rxjs';
 import { StateService } from '@app/services/state.service';
@@ -24,7 +24,7 @@ export class BlockchainBlocksComponent implements OnInit, OnChanges, OnDestroy {
     return height >= 0 ? $localize`:@@eth.block.loadingHeight:Loading block` + ' ' + height : $localize`:@@eth.block.loadingData:Loading block data`;
   }
   blockValueDetails = blockValueDetails;
-  localizedSlavicTransactionCount = localizedSlavicTransactionCount;
+  localizedTransactionCount = localizedTransactionCount;
   @Input() static: boolean = false;
   @Input() offset: number = 0;
   @Input() height: number = 0; // max height of blocks in chunk (dynamic blocks only)
