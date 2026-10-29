@@ -11993,6 +11993,10 @@
       <trans-unit id="eth.footer.joinTelegram" datatype="html"><source>Join the tx.taxi Telegram channel</source><target>Aderir ao canal Telegram do tx.taxi</target></trans-unit>
       <trans-unit id="eth.returnLatestBlock" datatype="html"><source>Return to the latest Ethereum block</source><target>Voltar ao bloco Ethereum mais recente</target></trans-unit>
       <trans-unit id="eth.returnLatestBlockShort" datatype="html"><source>Return to latest block</source><target>Voltar ao bloco mais recente</target></trans-unit>
+      <trans-unit id="taxi.clipboard.copy" datatype="html"><source>Copy</source><target>Copiar</target></trans-unit>
+      <trans-unit id="taxi.clipboard.copied" datatype="html"><source>Copied</source><target>Copiado</target></trans-unit>
+      <trans-unit id="taxi.clipboard.copyAria" datatype="html"><source>Copy to clipboard</source><target>Copiar para a área de transferência</target></trans-unit>
+      <trans-unit id="taxi.clipboard.copiedAria" datatype="html"><source>Copied to clipboard</source><target>Copiado para a área de transferência</target></trans-unit>
     </body>
   </file>
 </xliff>
