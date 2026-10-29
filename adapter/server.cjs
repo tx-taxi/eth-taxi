@@ -2226,7 +2226,7 @@ function presentationRoute(pathname) {
 
 async function serveStatic(pathname, res, spaFallback = true, search = '') {
   if (isApiPath(pathname)) return false;
-  const locale = pathname.match(/^\/(es|fr|de|it|pt|nl|ru|ja|zh)(?:\/|$)/)?.[1];
+  const locale = pathname.match(/^\/(es|fr|de|it|pt|nl|ru|ja|zh|ko)(?:\/|$)/)?.[1];
   if (locale && (pathname === `/${locale}` || pathname === `/${locale}/index.html`)) {
     res.writeHead(308, {location: `/${locale}/` + search, 'cache-control': 'no-store'}); res.end(); return true;
   }
@@ -2301,6 +2301,7 @@ async function serveStatic(pathname, res, spaFallback = true, search = '') {
           ru: ['eth.tx.taxi — обозреватель Ethereum', 'Блоки, транзакции, адреса и комиссии Ethereum.', 'ru_RU'],
           ja: ['eth.tx.taxi - Ethereumエクスプローラー', 'Ethereumのブロック、トランザクション、アドレス、手数料を確認できます。', 'ja_JP'],
           zh: ['eth.tx.taxi - Ethereum 浏览器', '查看 Ethereum 区块、交易、地址和手续费。', 'zh_CN'],
+          ko: ['eth.tx.taxi - Ethereum 탐색기', 'Ethereum 블록, 트랜잭션, 주소와 수수료를 확인하세요.', 'ko_KR'],
         };
         const [title, description, ogLocale] = labels[locale];
         const image = 'https://tx.taxi/assets/screenshots/eth-transaction-4abe31f2a24f.jpg';
