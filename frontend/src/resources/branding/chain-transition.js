@@ -28,13 +28,13 @@
       .then(response => response.ok ? response.json() : null)
       .then(data => {
         const locales = data?.version === 1 && Array.isArray(data?.hosts?.['tx.taxi']) ? data.hosts['tx.taxi'] : [];
-        hubLocales = locales.filter(locale => ['es', 'fr', 'de', 'it', 'pt', 'nl', 'ru'].includes(locale));
+        hubLocales = locales.filter(locale => ['es', 'fr', 'de', 'it', 'pt', 'nl', 'ru', 'ja'].includes(locale));
         if (hubLocales.length) window.dispatchEvent(new Event('txTaxiLocaleCapabilities'));
       }).catch(() => {}).finally(() => clearTimeout(timeout));
   } catch {}
   // Respect explicit and saved preferences only when the hub advertises the locale.
   const localizedHubPath = () => {
-    const explicit = location.pathname.match(/^\/(en|es|fr|de|it|pt|nl|ru)(?:\/|$)/i)?.[1]?.toLowerCase();
+    const explicit = location.pathname.match(/^\/(en|es|fr|de|it|pt|nl|ru|ja)(?:\/|$)/i)?.[1]?.toLowerCase();
     let saved = '';
     try { saved = decodeURIComponent(document.cookie.split(';').map(item => item.trim()).find(item => item.startsWith('txtaxi_language='))?.slice('txtaxi_language='.length) || ''); } catch {}
     const language = explicit || saved;
@@ -195,6 +195,7 @@
           pt: ['Voltar a tx.taxi', 'Painel ' + sourceName],
           nl: ['Terug naar tx.taxi', sourceName + '-dashboard'],
           ru: ['Вернуться на tx.taxi', 'Главная ' + sourceName],
+          ja: ['tx.taxiに戻る', sourceName + 'のダッシュボード'],
         };
         const label = labels[locale]?.[dashboard ? 0 : 1] || (dashboard ? 'Back to tx.taxi' : sourceName + ' dashboard');
         link.setAttribute('aria-label', label);
