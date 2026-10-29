@@ -44,6 +44,35 @@ const ukrainianUnits: Record<string, [string, string, string, string, string]> =
   second: ['секунда', 'секунди', 'секунд', 'секунду', 'секунди'],
 };
 
+// Singular, paucal, plural, accusative singular and genitive singular.
+const polishUnits: Record<string, [string, string, string, string, string]> = {
+  year: ['rok', 'lata', 'lat', 'rok', 'roku'],
+  month: ['miesiąc', 'miesiące', 'miesięcy', 'miesiąc', 'miesiąca'],
+  week: ['tydzień', 'tygodnie', 'tygodni', 'tydzień', 'tygodnia'],
+  day: ['dzień', 'dni', 'dni', 'dzień', 'dnia'],
+  hour: ['godzina', 'godziny', 'godzin', 'godzinę', 'godziny'],
+  minute: ['minuta', 'minuty', 'minut', 'minutę', 'minuty'],
+  second: ['sekunda', 'sekundy', 'sekund', 'sekundę', 'sekundy'],
+};
+
+function polishDuration(kind: string, unit: string, amount: number): string | null {
+  const forms = polishUnits[unit];
+  if (!forms || !Number.isFinite(amount)) return null;
+  const category = new Intl.PluralRules('pl').select(amount);
+  const index = category === 'one' ? 0 : category === 'few' ? 1 : category === 'many' ? 2 : 4;
+  const noun = kind === 'within' ? forms[index === 0 || index === 4 ? 4 : 2]
+    : ['since', 'until', 'span', 'before'].includes(kind) && index === 0 ? forms[3] : forms[index];
+  const duration = `${amount.toLocaleString('pl')} ${noun}`;
+  switch (kind) {
+    case 'since': return `${duration} temu`;
+    case 'until': return `Za ~${duration}`;
+    case 'within': return `W ciągu ~${duration}`;
+    case 'span': return `Za ${duration}`;
+    case 'before': return `${duration} przed`;
+    default: return duration;
+  }
+}
+
 function ukrainianDuration(kind: string, unit: string, amount: number): string | null {
   const forms = ukrainianUnits[unit];
   if (!forms || !Number.isFinite(amount)) return null;
@@ -179,6 +208,10 @@ export class TimeService {
   }
 
   private formatTime(kind, unit, number): string {
+    if (/^pl(?:-|$)/i.test(this.locale)) {
+      const localized = polishDuration(kind, unit, number);
+      if (localized) return localized;
+    }
     if (/^uk(?:-|$)/i.test(this.locale)) {
       const localized = ukrainianDuration(kind, unit, number);
       if (localized) return localized;

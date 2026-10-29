@@ -16,7 +16,7 @@ export class TxTaxiDocsIntroComponent {
 
   get explorerHome(): string {
     const locale = this.locale.toLowerCase().split('-')[0];
-    return ['es', 'fr', 'de', 'it', 'pt', 'nl', 'ru', 'ja', 'zh', 'ko', 'uk', 'vi'].includes(locale) ? `/${locale}/` : '/';
+    return ['es', 'fr', 'de', 'it', 'pt', 'nl', 'ru', 'ja', 'zh', 'ko', 'uk', 'vi', 'pl'].includes(locale) ? `/${locale}/` : '/';
   }
 
   get explorerAriaLabel(): string {
