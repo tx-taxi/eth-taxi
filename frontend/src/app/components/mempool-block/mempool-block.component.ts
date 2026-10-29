@@ -56,8 +56,8 @@ export class MempoolBlockComponent implements OnInit, OnDestroy {
                 }
                 const ordinal = this.getOrdinal(mempoolBlocks[this.mempoolBlockIndex]);
                 this.ordinal$.next(ordinal);
-                this.seoService.setTitle('Pending transaction sample');
-                this.seoService.setDescription('See observed Ethereum pending transactions, gas-price ranges, gas limits, and estimated execution fees for the next validator slot.');
+                this.seoService.setTitle($localize`:@@eth.meta.pendingTitle:Pending transaction sample`);
+                this.seoService.setDescription($localize`:@@eth.meta.pendingSample:See observed Ethereum pending transactions, gas-price ranges, gas limits, and estimated execution fees for the next validator slot.`);
                 mempoolBlocks[this.mempoolBlockIndex].isStack = mempoolBlocks[this.mempoolBlockIndex].blockVSize > this.stateService.blockVSize;
                 return mempoolBlocks[this.mempoolBlockIndex];
               })
