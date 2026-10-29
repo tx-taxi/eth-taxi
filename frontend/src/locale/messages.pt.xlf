@@ -11501,6 +11501,244 @@
         <source>Recent Transactions</source>
         <target>Transações Recentes</target>
       </trans-unit>
+      <trans-unit id="6693ca41dea3f8a2b1747ba08e3f780c52d074bf" datatype="html"><source>Using partner code</source>
+        <target>A usar código de parceiro</target></trans-unit>
+      <trans-unit id="graphs.accelerationFees.totalBidBoost" datatype="html"><source>Total bid boost</source>
+        <target>Aumento total da oferta</target></trans-unit>
+      <trans-unit id="graphs.accelerationFees.accelerated" datatype="html"><source>Accelerated</source>
+        <target>Aceleradas</target></trans-unit>
+      <trans-unit id="eth.createdBy" datatype="html"><source>Created by</source>
+        <target>Criado por</target></trans-unit>
+      <trans-unit id="eth.transactions" datatype="html"><source>Transactions</source>
+        <target>Transações</target></trans-unit>
+      <trans-unit id="eth.tokenTransfers" datatype="html"><source>Token transfers</source>
+        <target>Transferências de tokens</target></trans-unit>
+      <trans-unit id="eth.internalCalls" datatype="html"><source>Internal calls</source>
+        <target>Chamadas internas</target></trans-unit>
+      <trans-unit id="eth.gasUsed" datatype="html"><source>Gas used</source>
+        <target>Gas utilizado</target></trans-unit>
+      <trans-unit id="eth.tokenBalances" datatype="html"><source>Token balances</source>
+        <target>Saldos de tokens</target></trans-unit>
+      <trans-unit id="eth.shown" datatype="html"><source>shown</source>
+        <target>apresentadas</target></trans-unit>
+      <trans-unit id="eth.transactionHistory" datatype="html"><source>Transaction history</source>
+        <target>Histórico de transações</target></trans-unit>
+      <trans-unit id="eth.noTransactions" datatype="html"><source>No transactions</source>
+        <target>Sem transações</target></trans-unit>
+      <trans-unit id="eth.recentTransactions" datatype="html"><source>recent transactions</source>
+        <target>transações recentes</target></trans-unit>
+      <trans-unit id="eth.historyUnavailable" datatype="html"><source>Transaction history is temporarily unavailable</source>
+        <target>O histórico de transações está temporariamente indisponível</target></trans-unit>
+      <trans-unit id="eth.historyUnavailableDetail" datatype="html"><source>The balance and account type are current, but indexed transaction history is temporarily unavailable.</source>
+        <target>O saldo e o tipo de conta estão atualizados, mas o histórico indexado está temporariamente indisponível.</target></trans-unit>
+      <trans-unit id="eth.retryHistory" datatype="html"><source>Retry indexed history</source>
+        <target>Tentar novamente o histórico indexado</target></trans-unit>
+      <trans-unit id="1c4e5bd4e8f20285e3dfcdb58c3b87cced25bffa" datatype="html"><source><x id="LINE_BREAK" ctype="lb" /><x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;i&gt;" />There are too many transactions on this address, more than your backend can handle. See more on <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;/docs/faq#address-lookup-issues&quot;&gt;" />setting up a stronger backend<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;" />.<x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;/i&gt;" /><x id="LINE_BREAK" ctype="lb" /><x id="LINE_BREAK" ctype="lb" /> Consider viewing this address on another Ethereum explorer instead: </source>
+        <target><x id="LINE_BREAK" ctype="lb" /><x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;i&gt;" />Este endereço tem mais transações do que o backend consegue processar. Saiba como <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;/docs/faq#address-lookup-issues&quot;&gt;" />configurar um backend mais potente<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;" />.<x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;/i&gt;" /><x id="LINE_BREAK" ctype="lb" /><x id="LINE_BREAK" ctype="lb" /> Também pode consultar este endereço noutro explorador de Ethereum: </target></trans-unit>
+      <trans-unit id="eth.balance" datatype="html"><source>Balance</source>
+        <target>Saldo</target></trans-unit>
+      <trans-unit id="eth.confirmedBalance" datatype="html"><source>Confirmed balance</source>
+        <target>Saldo confirmado</target></trans-unit>
+      <trans-unit id="eth.pendingBalance" datatype="html"><source>Pending balance</source>
+        <target>Saldo pendente</target></trans-unit>
+      <trans-unit id="eth.pending" datatype="html"><source>Pending</source>
+        <target>Pendente</target></trans-unit>
+      <trans-unit id="eth.ethereumAccount" datatype="html"><source>Ethereum account</source>
+        <target>Conta Ethereum</target></trans-unit>
+      <trans-unit id="graphs.blockFees.feesBtc" datatype="html"><source>Fees BTC</source>
+        <target>Taxas BTC</target></trans-unit>
+      <trans-unit id="graphs.blockFees.feesFiat" datatype="html"><source>Fees <x id="currency" equiv-text="this.currency" /></source>
+        <target>Taxas <x id="currency" equiv-text="this.currency" /></target></trans-unit>
+      <trans-unit id="graphs.blockFees.avgBlock" datatype="html"><source>* On average around block <x id="block" equiv-text="data[0].data[2]" /></source>
+        <target>* Em média por volta do bloco <x id="block" equiv-text="data[0].data[2]" /></target></trans-unit>
+      <trans-unit id="graphs.blockFeesSubsidy.subsidy" datatype="html"><source>Subsidy</source>
+        <target>Subsídio</target></trans-unit>
+      <trans-unit id="graphs.blockFeesSubsidy.subsidyUsd" datatype="html"><source>Subsidy (USD)</source>
+        <target>Subsídio (USD)</target></trans-unit>
+      <trans-unit id="graphs.blockFeesSubsidy.feesUsd" datatype="html"><source>Fees (USD)</source>
+        <target>Taxas (USD)</target></trans-unit>
+      <trans-unit id="graphs.blockFeesSubsidy.subsidyPercent" datatype="html"><source>Subsidy (%)</source>
+        <target>Subsídio (%)</target></trans-unit>
+      <trans-unit id="graphs.blockFeesSubsidy.feesPercent" datatype="html"><source>Fees (%)</source>
+        <target>Taxas (%)</target></trans-unit>
+      <trans-unit id="eth.block.gas-used" datatype="html"><source>Gas used</source>
+        <target>Gas utilizado</target></trans-unit>
+      <trans-unit id="eth.block.validator-reward" datatype="html"><source>Validator reward</source>
+        <target>Recompensa do validador</target></trans-unit>
+      <trans-unit id="eth.block.fee-recipient" datatype="html"><source>Fee recipient</source>
+        <target>Beneficiário das taxas</target></trans-unit>
+      <trans-unit id="eth.block.parent-hash" datatype="html"><source>Parent hash</source>
+        <target>Hash do bloco anterior</target></trans-unit>
+      <trans-unit id="eth.block.transactions" datatype="html"><source>Transactions</source>
+        <target>Transações</target></trans-unit>
+      <trans-unit id="eth.block.data-size" datatype="html"><source>Data size</source>
+        <target>Tamanho dos dados</target></trans-unit>
+      <trans-unit id="eth.block.base-fee" datatype="html"><source>Base fee</source>
+        <target>Taxa base</target></trans-unit>
+      <trans-unit id="c4221ec405e432a0dac150a4c48c9100eac712bd" datatype="html"><source> Values were capped at the max supply of 21M BTC </source>
+        <target> Os valores foram limitados à oferta máxima de 21 milhões de BTC </target></trans-unit>
+      <trans-unit id="1cdb643999eb6d66bcd839aeaa381b62b8be8cd4" datatype="html"><source>mempool chunk</source>
+        <target>parte da mempool</target></trans-unit>
+      <trans-unit id="36028650a60cba9aa7f034ae34643c72f5364f1d" datatype="html"><source>this transaction</source>
+        <target>esta transação</target></trans-unit>
+      <trans-unit id="1eb8a98f68c1c98884c6436650f5ad80f4b3d5bf" datatype="html"><source>parents</source>
+        <target>ascendentes</target></trans-unit>
+      <trans-unit id="94c4e242e055d9521e1a0bfc7f1d165bbb37b94a" datatype="html"><source>children</source>
+        <target>descendentes</target></trans-unit>
+      <trans-unit id="d1ca10f0337c02e631f15b7da5d57dddc1954704" datatype="html"><source>parent</source>
+        <target>ascendente</target></trans-unit>
+      <trans-unit id="016d2ff8ad4b04f08717b98b5bc61eb122fb1ac8" datatype="html"><source>child</source>
+        <target>descendente</target></trans-unit>
+      <trans-unit id="954513036043312440" datatype="html"><source>ETH transfers</source>
+        <target>Transferências de ETH</target></trans-unit>
+      <trans-unit id="2971012579912877161" datatype="html"><source>Contract calls</source>
+        <target>Chamadas de contratos</target></trans-unit>
+      <trans-unit id="5240110572385374583" datatype="html"><source>Token transfers</source>
+        <target>Transferências de tokens</target></trans-unit>
+      <trans-unit id="eth.token.loading" datatype="html"><source>Loading token data...</source>
+        <target>A carregar dados do token...</target></trans-unit>
+      <trans-unit id="eth.token.unavailable" datatype="html"><source>Token unavailable</source>
+        <target>Token indisponível</target></trans-unit>
+      <trans-unit id="eth.token.try-again" datatype="html"><source>Try again</source>
+        <target>Tentar novamente</target></trans-unit>
+      <trans-unit id="eth.token.contract" datatype="html"><source>Contract</source>
+        <target>Contrato</target></trans-unit>
+      <trans-unit id="eth.token.metrics" datatype="html"><source>Token metrics</source>
+        <target>Métricas do token</target></trans-unit>
+      <trans-unit id="eth.token.price" datatype="html"><source>Price</source>
+        <target>Preço</target></trans-unit>
+      <trans-unit id="eth.token.market-cap" datatype="html"><source>Market cap</source>
+        <target>Capitalização de mercado</target></trans-unit>
+      <trans-unit id="eth.token.volume" datatype="html"><source>24h volume</source>
+        <target>Volume em 24 horas</target></trans-unit>
+      <trans-unit id="eth.token.holders" datatype="html"><source>Holders</source>
+        <target>Detentores</target></trans-unit>
+      <trans-unit id="eth.token.total-supply" datatype="html"><source>Total supply</source>
+        <target>Oferta total</target></trans-unit>
+      <trans-unit id="eth.token.circulating-supply" datatype="html"><source>Circulating supply</source>
+        <target>Oferta em circulação</target></trans-unit>
+      <trans-unit id="eth.token.recent-sample" datatype="html"><source>Recent transfer sample</source>
+        <target>Amostra de transferências recentes</target></trans-unit>
+      <trans-unit id="eth.token.recent-transfers" datatype="html"><source>Recent transfers</source>
+        <target>Transferências recentes</target></trans-unit>
+      <trans-unit id="eth.token.transfer-history" datatype="html"><source>Transfer history</source>
+        <target>Histórico de transferências</target></trans-unit>
+      <trans-unit id="eth.token.shown" datatype="html"><source><x id="INTERPOLATION" equiv-text="shown&lt;/span&gt;       &lt;/div&gt;        &lt;div *ngIf=&quot;transfers.lengt" /> shown</source>
+        <target><x id="INTERPOLATION" equiv-text="shown&lt;/span&gt;       &lt;/div&gt;        &lt;div *ngIf=&quot;transfers.lengt" /> apresentados</target></trans-unit>
+      <trans-unit id="eth.token.bounded-history" datatype="html"><source> This is a bounded recent sample from Ethereum RPC. Complete indexed transfer history is temporarily unavailable. </source>
+        <target> Esta é uma amostra limitada de transferências recentes do Ethereum RPC. O histórico completo e indexado está temporariamente indisponível. </target></trans-unit>
+      <trans-unit id="eth.token.approximate-usd" datatype="html"><source>Approximate USD value using the current token price</source>
+        <target>Valor aproximado em USD ao preço atual do token</target></trans-unit>
+      <trans-unit id="eth.token.from" datatype="html"><source>From</source>
+        <target>De</target></trans-unit>
+      <trans-unit id="eth.token.to" datatype="html"><source>To</source>
+        <target>Para</target></trans-unit>
+      <trans-unit id="eth.token.contract-creation" datatype="html"><source>Contract creation</source>
+        <target>Criação do contrato</target></trans-unit>
+      <trans-unit id="eth.token.show-fewer" datatype="html"><source>Show fewer transfers</source>
+        <target>Mostrar menos transferências</target></trans-unit>
+      <trans-unit id="eth.token.show-more" datatype="html"><source>Show <x id="INTERPOLATION" equiv-text="{{ hiddenTransferCount }}" /> more transfers</source>
+        <target>Mostrar mais <x id="INTERPOLATION" equiv-text="{{ hiddenTransferCount }}" /> transferências</target></trans-unit>
+      <trans-unit id="eth.token.loading-older" datatype="html"><source>Loading older transfers...</source>
+        <target>A carregar transferências anteriores...</target></trans-unit>
+      <trans-unit id="eth.token.load-older" datatype="html"><source>Load older transfers</source>
+        <target>Carregar transferências anteriores</target></trans-unit>
+      <trans-unit id="eth.token.older-error" datatype="html"><source>Older transfers could not be loaded. Try again.</source>
+        <target>Não foi possível carregar transferências anteriores. Tente novamente.</target></trans-unit>
+      <trans-unit id="eth.token.history-unavailable" datatype="html"><source>Transfer history is temporarily unavailable</source>
+        <target>O histórico de transferências está temporariamente indisponível</target></trans-unit>
+      <trans-unit id="eth.token.history-unavailable-detail" datatype="html"><source>Token metadata is current, but the indexed transfer feed could not be loaded.</source>
+        <target>Os metadados do token estão atualizados, mas não foi possível carregar o histórico indexado de transferências.</target></trans-unit>
+      <trans-unit id="eth.token.no-transfers" datatype="html"><source>No transfers were found for this token.</source>
+        <target>Não foram encontradas transferências para este token.</target></trans-unit>
+      <trans-unit id="eth.token.no-address" datatype="html"><source>No token contract address was provided.</source>
+        <target>Não foi fornecido o endereço do contrato do token.</target></trans-unit>
+      <trans-unit id="eth.token.not-found" datatype="html"><source>Token not found on Ethereum.</source>
+        <target>Token não encontrado no Ethereum.</target></trans-unit>
+      <trans-unit id="eth.token.fetch-error" datatype="html"><source>Token data is temporarily unavailable. Please try again.</source>
+        <target>Os dados do token estão temporariamente indisponíveis. Tente novamente.</target></trans-unit>
+      <trans-unit id="73408cc30eaf0f171209018a22bc6058538287aa" datatype="html"><source>Based on a simple ETH transfer using 21,000 gas</source>
+        <target>Baseado numa transferência simples de ETH com 21.000 gas</target></trans-unit>
+      <trans-unit id="ac0f81713a84217c9bd1d9bb460245d8190b073f" datatype="html"><source>More</source>
+        <target>Mais</target></trans-unit>
+      <trans-unit id="4ce06818b8fe60a7c040ce7bfecc10b11397401b" datatype="html"><source>24h Volume</source>
+        <target>Volume em 24 horas</target></trans-unit>
+      <trans-unit id="7729adad4cbe5f490e393a925fae8a9b90f8ac08" datatype="html"><source>Reserve Deficit</source>
+        <target>Défice das reservas</target></trans-unit>
+      <trans-unit id="489277af67abab02f1de98f4a7930fc611471eda" datatype="html"><source>occurrence</source>
+        <target>ocorrência</target></trans-unit>
+      <trans-unit id="850e39efd95e6090598e13a01b7825f6b71b1017" datatype="html"><source>occurrences</source>
+        <target>ocorrências</target></trans-unit>
+      <trans-unit id="57d63f33e6e6f3d4716fab5381cff30d517d5c4e" datatype="html"><source>usages</source>
+        <target>utilizações</target></trans-unit>
+      <trans-unit id="6d1c8856044cc923fc70f32cb4be360d200cfa82" datatype="html"><source>1 new transaction</source>
+        <target>1 nova transação</target></trans-unit>
+      <trans-unit id="a5c3bb57620832141bf6c51d7344e69af366c7e8" datatype="html"><source><x id="INTERPOLATION" equiv-text="new transactions&lt;/span&gt; &lt;/button&gt;  &lt;div [class.container-xl]=&quot;!widget&quot; [cla" /> new transactions</source>
+        <target><x id="INTERPOLATION" equiv-text="new transactions&lt;/span&gt; &lt;/button&gt;  &lt;div [class.container-xl]=&quot;!widget&quot; [cla" /> novas transações</target></trans-unit>
+      <trans-unit id="487bebf9352332c5e7f5bd00a78371cacff0fd95" datatype="html"><source>Pause/Resume</source>
+        <target>Pausar/retomar</target></trans-unit>
+      <trans-unit id="88f27d579752fd40ef53cfff5e936c293ca19221" datatype="html"><source>Pause/Resume</source>
+        <target>Pausar/retomar</target></trans-unit>
+      <trans-unit id="eth.maximumFee" datatype="html"><source>Maximum fee</source>
+        <target>Taxa máxima</target></trans-unit>
+      <trans-unit id="eth.fee" datatype="html"><source>Fee</source>
+        <target>Taxa</target></trans-unit>
+      <trans-unit id="eth.maximumFeePerGas" datatype="html"><source>Maximum fee per gas</source>
+        <target>Taxa máxima por gas</target></trans-unit>
+      <trans-unit id="eth.feeRate" datatype="html"><source>Fee rate</source>
+        <target>Taxa por unidade</target></trans-unit>
+      <trans-unit id="92626adb4b7e2aff0d35c2db5e023aac29d27f0f" datatype="html"><source>Cluster</source>
+        <target>Cluster</target></trans-unit>
+      <trans-unit id="eth.state" datatype="html"><source>State</source>
+        <target>Estado</target></trans-unit>
+      <trans-unit id="eth.fromTo" datatype="html"><source>From &amp; To</source>
+        <target>De e para</target></trans-unit>
+      <trans-unit id="eth.inputData" datatype="html"><source>Input data</source>
+        <target>Dados de entrada</target></trans-unit>
+      <trans-unit id="eth.notExecuted" datatype="html"><source>Not executed</source>
+        <target>Não executada</target></trans-unit>
+      <trans-unit id="eth.gasLimit" datatype="html"><source>Gas limit</source>
+        <target>Limite de gas</target></trans-unit>
+      <trans-unit id="eth.transactionFee" datatype="html"><source>Transaction fee</source>
+        <target>Taxa da transação</target></trans-unit>
+      <trans-unit id="eth.executionFee" datatype="html"><source>Execution fee</source>
+        <target>Taxa de execução</target></trans-unit>
+      <trans-unit id="eth.blobFee" datatype="html"><source>Blob fee</source>
+        <target>Taxa de blob</target></trans-unit>
+      <trans-unit id="eth.maximumBlobFee" datatype="html"><source>Maximum blob fee</source>
+        <target>Taxa máxima de blob</target></trans-unit>
+      <trans-unit id="eth.blobGasUsed" datatype="html"><source>Blob gas used</source>
+        <target>Gas de blob utilizado</target></trans-unit>
+      <trans-unit id="eth.transactionType" datatype="html"><source>Transaction type</source>
+        <target>Tipo de transação</target></trans-unit>
+      <trans-unit id="eth.method" datatype="html"><source>Method</source>
+        <target>Método</target></trans-unit>
+      <trans-unit id="eth.gasPrice" datatype="html"><source>Gas price</source>
+        <target>Preço do gas</target></trans-unit>
+      <trans-unit id="eth.blobGasPrice" datatype="html"><source>Blob gas price</source>
+        <target>Preço do gas de blob</target></trans-unit>
+      <trans-unit id="eth.maximumBlobFeePerGas" datatype="html"><source>Maximum blob fee per gas</source>
+        <target>Taxa máxima de blob por gas</target></trans-unit>
+      <trans-unit id="eth.revertReason" datatype="html"><source>Revert reason</source>
+        <target>Motivo da reversão</target></trans-unit>
+      <trans-unit id="eth.from" datatype="html"><source>From</source>
+        <target>De</target></trans-unit>
+      <trans-unit id="eth.tokenUsdTitle" datatype="html"><source>Approximate USD value using the current token price</source>
+        <target>Valor aproximado em USD ao preço atual do token</target></trans-unit>
+      <trans-unit id="eth.transfer" datatype="html"><source>transfer</source>
+        <target>transferência</target></trans-unit>
+      <trans-unit id="eth.transfers" datatype="html"><source>transfers</source>
+        <target>transferências</target></trans-unit>
+      <trans-unit id="eth.proposed" datatype="html"><source>Proposed</source>
+        <target>Proposta</target></trans-unit>
+      <trans-unit id="eth.intentUsdTitle" datatype="html"><source>Approximate USD value of the proposed call using the current token price</source>
+        <target>Valor aproximado em USD da chamada proposta ao preço atual do token</target></trans-unit>
+      <trans-unit id="c19bde6e194e95b60145a4e312fc31941197d90c" datatype="html"><source>LBTC Supply vs. BTC Holdings</source>
+        <target>Oferta de LBTC face às reservas em BTC</target></trans-unit>
+      <trans-unit id="6263132712305033285" datatype="html"><source>Transfers</source>
+        <target>Transferências</target></trans-unit>
+      <trans-unit id="3504995129774539345" datatype="html"><source>Ethereum activity</source>
+        <target>Atividade Ethereum</target></trans-unit>
     </body>
   </file>
 </xliff>
