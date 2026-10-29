@@ -10216,7 +10216,7 @@
       </trans-unit>
       <trans-unit id="meta.description.lightning.node-channel-map" datatype="html">
         <source>See the locations of non-Tor Lightning network nodes visualized on a world map. Hover/tap on points on the map for node names and details.</source>
-        <target>Просмомтреть каналы Лайтнинг-узлов, не использующих Tor, на карте мира. Наведите указатель мыши на точки на карте, чтобы просмотреть названия узлов и подробную информацию.</target>
+        <target>Расположение узлов сети Lightning, не использующих Tor, на карте мира. Наведите указатель мыши или нажмите на точки на карте, чтобы увидеть названия узлов и подробную информацию.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/lightning/nodes-map/nodes-map.component.ts</context>
           <context context-type="linenumber">53</context>
