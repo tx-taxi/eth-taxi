@@ -240,7 +240,7 @@ const inheritedLanguages: Language[] = [
 ];
 
 // Only languages verified for the Ethereum explorer are offered.
-export const languages: Language[] = inheritedLanguages.filter(({ code }) => ['en', 'es', 'fr', 'de'].includes(code));
+export const languages: Language[] = inheritedLanguages.filter(({ code }) => ['en', 'es', 'fr', 'de', 'it', 'pt'].includes(code));
 
 export const specialBlocks = {
   '0': {

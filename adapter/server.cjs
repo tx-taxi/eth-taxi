@@ -2226,7 +2226,7 @@ function presentationRoute(pathname) {
 
 async function serveStatic(pathname, res, spaFallback = true, search = '') {
   if (isApiPath(pathname)) return false;
-  const locale = pathname.match(/^\/(es|fr|de)(?:\/|$)/)?.[1];
+  const locale = pathname.match(/^\/(es|fr|de|it|pt)(?:\/|$)/)?.[1];
   if (locale && (pathname === `/${locale}` || pathname === `/${locale}/index.html`)) {
     res.writeHead(308, {location: `/${locale}/` + search, 'cache-control': 'no-store'}); res.end(); return true;
   }
@@ -2295,6 +2295,8 @@ async function serveStatic(pathname, res, spaFallback = true, search = '') {
           es: ['eth.tx.taxi - Explorador de Ethereum', 'Consulta bloques, transacciones, direcciones y comisiones de Ethereum.', 'es_ES'],
           fr: ['eth.tx.taxi - Explorateur Ethereum', 'Consultez les blocs, transactions, adresses et frais Ethereum.', 'fr_FR'],
           de: ['eth.tx.taxi - Ethereum-Explorer', 'Ethereum-Blöcke, Transaktionen, Adressen und Gebühren ansehen.', 'de_DE'],
+          it: ['eth.tx.taxi - Explorer Ethereum', 'Consulta blocchi, transazioni, indirizzi e commissioni Ethereum.', 'it_IT'],
+          pt: ['eth.tx.taxi - Explorador Ethereum', 'Consulte blocos, transações, endereços e taxas Ethereum.', 'pt_PT'],
         };
         const [title, description, ogLocale] = labels[locale];
         const image = 'https://tx.taxi/assets/screenshots/eth-transaction-4abe31f2a24f.jpg';
