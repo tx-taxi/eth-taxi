@@ -4,7 +4,7 @@ const DECIMALS = 18, SYMBOL = 'ETH', FEE_UNIT = 'gwei', FEE_SCALE = 1000000000;
 // Formatting is visual only; raw amounts and chain data remain unchanged.
 function displayLocale(): string {
   const lang = typeof document !== 'undefined' ? document.documentElement?.lang || '' : '';
-  const match = /^(es|fr|de|it|pt|nl|ru|ja|zh|ko|uk|vi|pl)(?:-|$)/i.exec(lang);
+  const match = /^(es|fr|de|it|pt|nl|ru|ja|zh|ko|uk|vi|pl|cs)(?:-|$)/i.exec(lang);
   return match ? match[1].toLowerCase() : 'en-US';
 }
 function displayExactNumber(value: string): string {
@@ -15,11 +15,12 @@ function displayExactNumber(value: string): string {
 // Slavic languages use different plural forms for transaction counts.
 export function localizedSlavicTransactionCount(count: number): string | null {
   const locale = displayLocale();
-  if (!['ru', 'uk', 'pl'].includes(locale) || !Number.isFinite(count)) return null;
+  if (!['ru', 'uk', 'pl', 'cs'].includes(locale) || !Number.isFinite(count)) return null;
   const form = new Intl.PluralRules(locale).select(count);
-  const words = locale === 'pl' ? ['transakcja', 'transakcje', 'transakcji']
+  const words = locale === 'cs' ? ['transakce', 'transakce', 'transakcí']
+    : locale === 'pl' ? ['transakcja', 'transakcje', 'transakcji']
     : locale === 'uk' ? ['транзакція', 'транзакції', 'транзакцій'] : ['транзакция', 'транзакции', 'транзакций'];
-  const noun = form === 'one' ? words[0] : form === 'few' ? words[1] : words[2];
+  const noun = form === 'one' ? words[0] : form === 'few' || (locale === 'cs' && form === 'many') ? words[1] : words[2];
   return `${count.toLocaleString(locale)} ${noun}`;
 }
 
