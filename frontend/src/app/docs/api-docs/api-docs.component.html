@@ -29,7 +29,7 @@
 
     <aside class="support-note" *ngIf="whichTab === 'faq'">
       <app-svg-images name="warning" viewBox="0 0 304 304" fill="#ffc107" width="30" height="30"></app-svg-images>
-      <p><strong i18n="@@eth.docs.publicData">eth.tx.taxi displays public network data.</strong> <span i18n="@@eth.docs.noRecovery">It cannot recover funds, reverse transactions, or access wallets.</span></p>
+      <p><strong i18n="@@eth.docs.publicData">eth.tx.taxi displays public network data.</strong>&ngsp;<span i18n="@@eth.docs.noRecovery">It cannot recover funds, reverse transactions, or access wallets.</span></p>
     </aside>
 
     <ng-container *ngFor="let item of docs">

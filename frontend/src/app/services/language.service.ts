@@ -21,10 +21,10 @@ export class LanguageService {
   }
 
   stripLanguageFromUrl(urlPath: string) {
-    let rawUrlPath = urlPath ? urlPath : document.location.pathname;
-    const urlLanguage = this.document.location.pathname.split('/')[1];
-    if (this.languages.map((lang) => lang.code).indexOf(urlLanguage) != -1) {
-      rawUrlPath = rawUrlPath.substring(3);
+    const rawUrlPath = urlPath ?? this.document.location.pathname;
+    const urlLanguage = rawUrlPath.split('/')[1];
+    if (this.languages.some(lang => lang.code === urlLanguage)) {
+      return rawUrlPath.slice(urlLanguage.length + 1) || '/';
     }
     return rawUrlPath;
   }

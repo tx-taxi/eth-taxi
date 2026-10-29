@@ -14,7 +14,14 @@ export class TxTaxiDocsIntroComponent {
 
   constructor(@Inject(LOCALE_ID) private locale: string) {}
 
-  get explorerHome(): string { return this.locale.toLowerCase().startsWith('es') ? '/es/' : '/'; }
+  get explorerHome(): string {
+    const locale = this.locale.toLowerCase().split('-')[0];
+    return ['es', 'fr', 'de'].includes(locale) ? `/${locale}/` : '/';
+  }
+
+  get explorerAriaLabel(): string {
+    return $localize`:@@eth.intro.openHost:Open` + ' ' + this.chainHost;
+  }
 
   get contextLabel(): string {
     return this.context === 'explorer'

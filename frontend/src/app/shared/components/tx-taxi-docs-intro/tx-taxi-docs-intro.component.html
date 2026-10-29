@@ -6,7 +6,7 @@
     <p i18n="@@eth.intro.description">Paste a transaction, block or address into tx.taxi. Open a confirmed match, choose between possible networks, or head straight to your chain’s explorer.</p>
     <div class="taxi-docs-actions">
       <a class="taxi-docs-button" href="https://tx.taxi/"><span i18n="@@eth.intro.open">Open tx.taxi</span> <span aria-hidden="true">↗︎</span></a>
-      <a class="taxi-docs-native" href="/" [href]="explorerHome" [attr.aria-label]="'Open ' + chainHost"><span i18n="@@eth.intro.explore">Explore</span> {{ chainName }} <span aria-hidden="true">→</span></a>
+      <a class="taxi-docs-native" href="/" [href]="explorerHome" [attr.aria-label]="explorerAriaLabel"><span i18n="@@eth.intro.explore">Explore</span> {{ chainName }} <span aria-hidden="true">→</span></a>
     </div>
   </div>
 </section>

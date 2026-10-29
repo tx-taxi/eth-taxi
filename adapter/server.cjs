@@ -2226,17 +2226,17 @@ function presentationRoute(pathname) {
 
 async function serveStatic(pathname, res, spaFallback = true, search = '') {
   if (isApiPath(pathname)) return false;
-  const spanish = pathname === '/es' || pathname.startsWith('/es/');
-  if (pathname === '/es' || pathname === '/es/index.html') {
-    res.writeHead(308, {location: '/es/' + search, 'cache-control': 'no-store'}); res.end(); return true;
+  const locale = pathname.match(/^\/(es|fr|de)(?:\/|$)/)?.[1];
+  if (locale && (pathname === `/${locale}` || pathname === `/${locale}/index.html`)) {
+    res.writeHead(308, {location: `/${locale}/` + search, 'cache-control': 'no-store'}); res.end(); return true;
   }
-  const routePath = spanish ? pathname.slice(3) || '/' : pathname;
-  const localizedAlias = spanish && staticSeo.alias(routePath.replace(/\/$/, '') || '/');
+  const routePath = locale ? pathname.slice(locale.length + 1) || '/' : pathname;
+  const localizedAlias = locale && staticSeo.alias(routePath.replace(/\/$/, '') || '/');
   if (localizedAlias) {
-    res.writeHead(301, {location: '/es' + localizedAlias + search, 'cache-control': 'no-store'}); res.end(); return true;
+    res.writeHead(301, {location: `/${locale}` + localizedAlias + search, 'cache-control': 'no-store'}); res.end(); return true;
   }
   const slashless = pathname.length > 1 ? pathname.replace(/\/$/, '') : pathname;
-  const slashlessRoute = spanish ? slashless.slice(3) || '/' : slashless;
+  const slashlessRoute = locale ? slashless.slice(locale.length + 1) || '/' : slashless;
   if (routePath !== '/' && slashless !== pathname && (ogEntityRoute(slashlessRoute) || staticSeo.page(slashlessRoute))) {
     res.writeHead(308, {location: slashless + search, 'cache-control': 'no-store'}); res.end(); return true;
   }
@@ -2278,25 +2278,29 @@ async function serveStatic(pathname, res, spaFallback = true, search = '') {
 
   // Localized builds place an index under en-US, while the default production
   // build emits it at the static root. Either layout must serve deep links.
-  const indexPaths = spanish ? [path.join(staticRoot, 'es', 'index.html')] : [
+  const indexPaths = locale ? [path.join(staticRoot, locale, 'index.html')] : [
     path.join(staticRoot, 'en-US', 'index.html'), path.join(staticRoot, 'index.html'),
   ];
   for (const indexPath of indexPaths) {
     try {
       const body = await fs.readFile(indexPath);
-      const noindex = spanish || page?.noindex || entityStatus === 404 || (!page && !entityMetadata);
+      const noindex = locale || page?.noindex || entityStatus === 404 || (!page && !entityMetadata);
       const status = entityMetadata ? entityStatus : !page && !presentationRoute(routePath) ? 404 : 200;
       res.writeHead(status, { 'content-type': contentTypes['.html'], 'cache-control': 'no-store', ...(noindex ? {'x-robots-tag': 'noindex, follow'} : {}), ...(status === 503 ? {'retry-after': '60'} : {}) });
-      if (spanish) {
-        // The Ethereum-specific Spanish pages are being completed. Keep them out
+      if (locale) {
+        // These localized pages are being completed. Keep them out
         // of search until the page content and localized metadata are reviewed.
         const canonical = `${OG_ORIGIN}${pathname}`;
-        const title = 'eth.tx.taxi - Explorador de Ethereum';
-        const description = 'Consulta bloques, transacciones, direcciones y comisiones de Ethereum.';
+        const labels = {
+          es: ['eth.tx.taxi - Explorador de Ethereum', 'Consulta bloques, transacciones, direcciones y comisiones de Ethereum.', 'es_ES'],
+          fr: ['eth.tx.taxi - Explorateur Ethereum', 'Consultez les blocs, transactions, adresses et frais Ethereum.', 'fr_FR'],
+          de: ['eth.tx.taxi - Ethereum-Explorer', 'Ethereum-Blöcke, Transaktionen, Adressen und Gebühren ansehen.', 'de_DE'],
+        };
+        const [title, description, ogLocale] = labels[locale];
         const image = 'https://tx.taxi/assets/screenshots/eth-transaction-4abe31f2a24f.jpg';
         const html = `<title>${title}</title><link id="canonical" rel="canonical" href="${ogEscape(canonical)}">` +
           `<meta name="robots" content="noindex, follow"><meta name="description" content="${description}">` +
-          `<meta property="og:locale" content="es_ES"><meta property="og:title" content="${title}">` +
+          `<meta property="og:locale" content="${ogLocale}"><meta property="og:title" content="${title}">` +
           `<meta property="og:description" content="${description}"><meta property="og:url" content="${ogEscape(canonical)}">` +
           `<meta property="og:type" content="website"><meta property="og:site_name" content="eth.tx.taxi">` +
           `<meta property="og:image" content="${image}"><meta name="twitter:card" content="summary_large_image">` +

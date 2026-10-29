@@ -20,6 +20,9 @@ interface BlockchainBlock extends BlockExtended {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BlockchainBlocksComponent implements OnInit, OnChanges, OnDestroy {
+  loadingBlockLabel(height: number): string {
+    return height >= 0 ? $localize`:@@eth.block.loadingHeight:Loading block` + ' ' + height : $localize`:@@eth.block.loadingData:Loading block data`;
+  }
   blockValueDetails = blockValueDetails;
   @Input() static: boolean = false;
   @Input() offset: number = 0;

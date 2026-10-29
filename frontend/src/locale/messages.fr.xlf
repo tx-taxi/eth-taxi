@@ -12879,6 +12879,14 @@
       <trans-unit id="taxi.timezone.plus12" datatype="html"><source>New Zealand Standard Time (NZST)</source><target>Heure normale de Nouvelle-Zélande (NZST)</target></trans-unit>
       <trans-unit id="taxi.timezone.plus13" datatype="html"><source>Tonga Time (TOT)</source><target>Heure des Tonga (TOT)</target></trans-unit>
       <trans-unit id="taxi.timezone.plus14" datatype="html"><source>Line Islands Time (LINT)</source><target>Heure des îles de la Ligne (LINT)</target></trans-unit>
+      <trans-unit id="eth.trademark.disclaimer" datatype="html"><source>This website is operated by an individual member of the Bitcoin community, and is not affiliated with Mempool Holdings S.A. de C.V.</source><target>Ce site est exploité par un membre de la communauté Bitcoin et n’est pas affilié à Mempool Holdings S.A. de C.V.</target></trans-unit>
+      <trans-unit id="eth.trademark.viewPolicy" datatype="html"><source>Please view the Trademark Policy and Guidelines for The Mempool Open Source Project at</source><target>Consultez la politique et les directives relatives aux marques de The Mempool Open Source Project à l’adresse</target></trans-unit>
+      <trans-unit id="eth.trademark.title" datatype="html"><source>Trademark Policy</source><target>Politique relative aux marques</target></trans-unit>
+      <trans-unit id="eth.trademark.description" datatype="html"><source>An overview of the trademarks registered by Mempool Holdings S.A. de C.V. and The Mempool Open Source Project® and what we consider to be lawful usage of those trademarks.</source><target>Un aperçu des marques déposées par Mempool Holdings S.A. de C.V. et The Mempool Open Source Project® et de ce que nous considérons comme une utilisation licite de ces marques.</target></trans-unit>
+      <trans-unit id="eth.block.loading" datatype="html"><source>Loading</source><target>Chargement</target></trans-unit>
+      <trans-unit id="eth.block.loadingHeight" datatype="html"><source>Loading block</source><target>Chargement du bloc</target></trans-unit>
+      <trans-unit id="eth.block.loadingData" datatype="html"><source>Loading block data</source><target>Chargement des données du bloc</target></trans-unit>
+      <trans-unit id="eth.intro.openHost" datatype="html"><source>Open</source><target>Ouvrir</target></trans-unit>
     </body>
   </file>
 </xliff>

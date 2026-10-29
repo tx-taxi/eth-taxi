@@ -2,11 +2,13 @@ const DECIMALS = 18, SYMBOL = 'ETH', FEE_UNIT = 'gwei', FEE_SCALE = 1000000000;
 
 // The document language follows the explicitly selected explorer or hub route.
 // Formatting is visual only; raw amounts and chain data remain unchanged.
-function usesSpanishDecimals(): boolean {
-  return typeof document !== 'undefined' && /^es(?:-|$)/i.test(document.documentElement?.lang || '');
+function displayLocale(): string {
+  const lang = typeof document !== 'undefined' ? document.documentElement?.lang || '' : '';
+  const match = /^(es|fr|de)(?:-|$)/i.exec(lang);
+  return match ? match[1].toLowerCase() : 'en-US';
 }
 function displayExactNumber(value: string): string {
-  return usesSpanishDecimals() ? value.replace('.', ',') : value;
+  return displayLocale() === 'en-US' ? value : value.replace('.', ',');
 }
 
 
@@ -20,9 +22,9 @@ export function compactBlockNumber(value: number, amount = false): string {
     let group = Math.min(4, Math.floor(Math.log10(abs) / 3));
     let scaled = Number((value / 1000 ** group).toPrecision(3));
     if (Math.abs(scaled) >= 1000 && group < 4) { group++; scaled /= 1000; }
-    return scaled.toLocaleString(usesSpanishDecimals() ? 'es-ES' : 'en-US', { maximumSignificantDigits: 3, useGrouping: false }) + units[group];
+    return scaled.toLocaleString(displayLocale(), { maximumSignificantDigits: 3, useGrouping: false }) + units[group];
   }
-  return value.toLocaleString(usesSpanishDecimals() ? 'es-ES' : 'en-US', amount
+  return value.toLocaleString(displayLocale(), amount
     ? { minimumFractionDigits: 2, maximumFractionDigits: 3, useGrouping: false }
     : { maximumSignificantDigits: 3, useGrouping: false });
 }

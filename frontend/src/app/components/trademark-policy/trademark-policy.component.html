@@ -1,8 +1,8 @@
 <div class="container-xl trademark-policy">
 
   <div *ngIf="!officialMempoolSpace">
-    <p>This website is operated by an individual member of the Bitcoin community, and is not affiliated with Mempool Holdings S.A. de C.V.</p>
-    <p>Please view the Trademark Policy and Guidelines for The Mempool Open Source Project at <a href="https://mempool.space/trademark-policy">https://mempool.space/trademark-policy</a>.</p>
+    <p i18n="@@eth.trademark.disclaimer">This website is operated by an individual member of the Bitcoin community, and is not affiliated with Mempool Holdings S.A. de C.V.</p>
+    <p><ng-container i18n="@@eth.trademark.viewPolicy">Please view the Trademark Policy and Guidelines for The Mempool Open Source Project at</ng-container>&ngsp;<a href="https://mempool.space/trademark-policy">https://mempool.space/trademark-policy</a>.</p>
   </div>
 
   <div *ngIf="officialMempoolSpace">
@@ -447,8 +447,6 @@
         </ol>
 
       </ol>
-
-      <p>EOF</p>
 
       <p>These guidelines are based on the <a href="http://www.modeltrademarkguidelines.org">Model Trademark Guidelines</a>, used under a <a href="https://creativecommons.org/licenses/by/3.0/deed.en_US">Creative Commons Attribution 3.0 Unported license</a>.</p>
 

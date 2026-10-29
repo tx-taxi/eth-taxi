@@ -46,9 +46,7 @@
       <span *ngIf="entity?.isVerified" class="ethereum-identity__badge ethereum-identity__badge--verified" aria-label="Verified entity" i18n-aria-label="@@eth.identity.verified-entity" i18n="@@eth.identity.verified">
         Verified
       </span>
-      <span *ngIf="entity?.proxyType" class="ethereum-identity__badge ethereum-identity__badge--proxy" [attr.aria-label]="proxyLabel" [title]="proxyLabel" i18n="@@eth.identity.proxy">
-        Proxy
-      </span>
+      <span *ngIf="entity?.proxyType" class="ethereum-identity__badge ethereum-identity__badge--proxy" [attr.aria-label]="proxyLabel" [title]="proxyLabel" i18n="@@eth.identity.proxy">Proxy</span>
       <span *ngIf="entity?.isContract" class="ethereum-identity__badge ethereum-identity__badge--contract" aria-label="Smart contract" i18n-aria-label="@@eth.identity.smart-contract" i18n="@@eth.identity.contract">
         Contract
       </span>
