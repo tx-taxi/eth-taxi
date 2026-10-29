@@ -12006,6 +12006,7 @@
       <trans-unit id="eth.meta.pendingTitle" datatype="html"><source>Pending transaction sample</source><target>Amostra de transações pendentes</target></trans-unit>
       <trans-unit id="eth.meta.pendingSample" datatype="html"><source>See observed Ethereum pending transactions, gas-price ranges, gas limits, and estimated execution fees for the next validator slot.</source><target>Consulte transações Ethereum pendentes observadas, intervalos de preço e limites de gas e taxas de execução estimadas para o próximo slot do validador.</target></trans-unit>
       <trans-unit id="eth.meta.trackTransaction" datatype="html"><source>Track the real-time status, gas, fee, and confirmation details for Ethereum transaction <x id="HASH"/>.</source><target>Acompanhe em tempo real o estado, gas, taxa e confirmações da transação Ethereum <x id="HASH"/>.</target></trans-unit>
+      <trans-unit id="eth.address.metadataAria" datatype="html"><source>Ethereum address metadata</source><target>Metadados do endereço Ethereum</target></trans-unit>
     </body>
   </file>
 </xliff>

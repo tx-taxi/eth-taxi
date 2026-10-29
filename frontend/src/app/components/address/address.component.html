@@ -18,7 +18,7 @@
 
   <ng-template [ngIf]="!isLoadingAddress && !error">
     <ng-container *ngIf="address?.ethereum as ethereum">
-    <section class="ethereum-address-profile" aria-label="Ethereum address metadata">
+    <section class="ethereum-address-profile" i18n-aria-label="@@eth.address.metadataAria" aria-label="Ethereum address metadata">
       <app-ethereum-identity
         [entity]="ethereum.identity"
         [link]="ethereumAddressTokenLink"
