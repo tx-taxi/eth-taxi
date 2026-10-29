@@ -279,7 +279,7 @@ export class AddressComponent implements OnInit, OnDestroy {
             this.addressString = this.addressString.toLowerCase();
           }
           this.seoService.setTitle($localize`:@@address.component.browser-title:Address: ${this.addressString}:INTERPOLATION:`);
-          this.seoService.setDescription(`See the balance and recent transactions for Ethereum address ${this.addressString}.`);
+          this.seoService.setDescription($localize`:@@eth.meta.addressDetails:See the balance and recent transactions for Ethereum address ${this.addressString}:ADDRESS:.`);
 
           this.addressTypeInfo = new AddressTypeInfo(this.stateService.network || 'mainnet', this.addressString);
 

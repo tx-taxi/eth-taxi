@@ -11979,7 +11979,7 @@
       <trans-unit id="eth.token.generic" datatype="html"><source>Ethereum token</source><target>Token Ethereum</target></trans-unit>
       <trans-unit id="eth.footer.madeWith" datatype="html"><source>Made with</source><target>Feito com</target></trans-unit>
       <trans-unit id="eth.footer.by" datatype="html"><source>by</source><target>por</target></trans-unit>
-      <trans-unit id="eth.trademark.disclaimer" datatype="html"><source>This website is operated by an individual member of the Bitcoin community, and is not affiliated with Mempool Holdings S.A. de C.V.</source><target>Este site é gerido por um membro individual da comunidade Bitcoin e não está afiliado à Mempool Holdings S.A. de C.V.</target></trans-unit>
+      <trans-unit id="eth.trademark.disclaimer" datatype="html"><source>This website is operated by tx.taxi and is not affiliated with Mempool Holdings S.A. de C.V.</source><target>Este site é gerido por tx.taxi e não está associado à Mempool Holdings S.A. de C.V.</target></trans-unit>
       <trans-unit id="eth.trademark.viewPolicy" datatype="html"><source>Please view the Trademark Policy and Guidelines for The Mempool Open Source Project at</source><target>Consulte a Política e as Diretrizes de Marcas do Mempool Open Source Project em</target></trans-unit>
       <trans-unit id="eth.trademark.title" datatype="html"><source>Trademark Policy</source><target>Política de marcas</target></trans-unit>
       <trans-unit id="eth.trademark.description" datatype="html"><source>An overview of the trademarks registered by Mempool Holdings S.A. de C.V. and The Mempool Open Source Project® and what we consider to be lawful usage of those trademarks.</source><target>Uma visão geral das marcas registadas pela Mempool Holdings S.A. de C.V. e pelo Mempool Open Source Project® e do que consideramos ser uma utilização legítima dessas marcas.</target></trans-unit>
@@ -11997,6 +11997,9 @@
       <trans-unit id="taxi.clipboard.copied" datatype="html"><source>Copied</source><target>Copiado</target></trans-unit>
       <trans-unit id="taxi.clipboard.copyAria" datatype="html"><source>Copy to clipboard</source><target>Copiar para a área de transferência</target></trans-unit>
       <trans-unit id="taxi.clipboard.copiedAria" datatype="html"><source>Copied to clipboard</source><target>Copiado para a área de transferência</target></trans-unit>
+      <trans-unit id="eth.meta.blockDetails" datatype="html"><source>See gas usage, fees, validator details, and transactions for Ethereum block <x id="HEIGHT"/> (<x id="HASH"/>).</source><target>Consulte a utilização de gas, taxas, validador e transações do bloco Ethereum <x id="HEIGHT"/> (<x id="HASH"/>).</target></trans-unit>
+      <trans-unit id="eth.meta.transactionDetails" datatype="html"><source>See sender, recipient, value, gas, fee, and confirmation details for Ethereum transaction <x id="HASH"/>.</source><target>Consulte remetente, destinatário, valor, gas, taxas e confirmações da transação Ethereum <x id="HASH"/>.</target></trans-unit>
+      <trans-unit id="eth.meta.addressDetails" datatype="html"><source>See the balance and recent transactions for Ethereum address <x id="ADDRESS"/>.</source><target>Consulte o saldo e as transações recentes do endereço Ethereum <x id="ADDRESS"/>.</target></trans-unit>
     </body>
   </file>
 </xliff>

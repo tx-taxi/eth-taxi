@@ -90,7 +90,7 @@ export class TransactionPreviewComponent implements OnInit, OnDestroy {
           this.seoService.setTitle(
             $localize`:@@bisq.transaction.browser-title:Transaction: ${this.txId}:INTERPOLATION:`
           );
-          this.seoService.setDescription(`See sender, recipient, value, gas, fee, and confirmation details for Ethereum transaction ${this.txId}.`);
+          this.seoService.setDescription($localize`:@@eth.meta.transactionDetails:See sender, recipient, value, gas, fee, and confirmation details for Ethereum transaction ${this.txId}:HASH:.`);
           this.resetTransaction();
           return merge(
             of(true),

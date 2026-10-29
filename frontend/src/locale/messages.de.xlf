@@ -14361,7 +14361,7 @@
       <trans-unit id="taxi.timezone.plus12" datatype="html"><source>New Zealand Standard Time (NZST)</source><target>Neuseeländische Normalzeit (NZST)</target></trans-unit>
       <trans-unit id="taxi.timezone.plus13" datatype="html"><source>Tonga Time (TOT)</source><target>Tonga-Zeit (TOT)</target></trans-unit>
       <trans-unit id="taxi.timezone.plus14" datatype="html"><source>Line Islands Time (LINT)</source><target>Line-Islands-Zeit (LINT)</target></trans-unit>
-      <trans-unit id="eth.trademark.disclaimer" datatype="html"><source>This website is operated by an individual member of the Bitcoin community, and is not affiliated with Mempool Holdings S.A. de C.V.</source><target>Diese Website wird von einem Mitglied der Bitcoin-Gemeinschaft betrieben und ist nicht mit Mempool Holdings S.A. de C.V. verbunden.</target></trans-unit>
+      <trans-unit id="eth.trademark.disclaimer" datatype="html"><source>This website is operated by tx.taxi and is not affiliated with Mempool Holdings S.A. de C.V.</source><target>Diese Website wird von tx.taxi betrieben und ist nicht mit Mempool Holdings S.A. de C.V. verbunden.</target></trans-unit>
       <trans-unit id="eth.trademark.viewPolicy" datatype="html"><source>Please view the Trademark Policy and Guidelines for The Mempool Open Source Project at</source><target>Die Markenrichtlinie und Leitlinien für The Mempool Open Source Project finden Sie unter</target></trans-unit>
       <trans-unit id="eth.trademark.title" datatype="html"><source>Trademark Policy</source><target>Markenrichtlinie</target></trans-unit>
       <trans-unit id="eth.trademark.description" datatype="html"><source>An overview of the trademarks registered by Mempool Holdings S.A. de C.V. and The Mempool Open Source Project® and what we consider to be lawful usage of those trademarks.</source><target>Ein Überblick über die von Mempool Holdings S.A. de C.V. und The Mempool Open Source Project® eingetragenen Marken und darüber, was wir als rechtmäßige Nutzung dieser Marken ansehen.</target></trans-unit>
@@ -14376,6 +14376,9 @@
 
       <trans-unit id="eth.returnLatestBlock" datatype="html"><source>Return to the latest Ethereum block</source><target>Zum neuesten Ethereum-Block zurückkehren</target></trans-unit>
       <trans-unit id="eth.returnLatestBlockShort" datatype="html"><source>Return to latest block</source><target>Zum neuesten Block zurückkehren</target></trans-unit>
+      <trans-unit id="eth.meta.blockDetails" datatype="html"><source>See gas usage, fees, validator details, and transactions for Ethereum block <x id="HEIGHT"/> (<x id="HASH"/>).</source><target>Gasverbrauch, Gebühren, Validator und Transaktionen für Ethereum-Block <x id="HEIGHT"/> (<x id="HASH"/>) ansehen.</target></trans-unit>
+      <trans-unit id="eth.meta.transactionDetails" datatype="html"><source>See sender, recipient, value, gas, fee, and confirmation details for Ethereum transaction <x id="HASH"/>.</source><target>Absender, Empfänger, Wert, Gas, Gebühren und Bestätigungen der Ethereum-Transaktion <x id="HASH"/> ansehen.</target></trans-unit>
+      <trans-unit id="eth.meta.addressDetails" datatype="html"><source>See the balance and recent transactions for Ethereum address <x id="ADDRESS"/>.</source><target>Guthaben und jüngste Transaktionen der Ethereum-Adresse <x id="ADDRESS"/> ansehen.</target></trans-unit>
     </body>
   </file>
 </xliff>
