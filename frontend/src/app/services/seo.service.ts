@@ -84,7 +84,7 @@ export class SeoService {
   }
 
   updateCanonical(path) {
-    const localePrefix = ['es', 'fr', 'de', 'it', 'pt', 'nl'].includes(this.locale) ? '/' + this.locale : '';
+    const localePrefix = ['es', 'fr', 'de', 'it', 'pt', 'nl', 'ru'].includes(this.locale) ? '/' + this.locale : '';
     // Location.path() is empty on a locale root; retain its canonical slash.
     const canonicalUrl = 'https://' + this.baseDomain + localePrefix + (path || '/');
     // Metadata for the initial server-rendered page must not describe a later SPA route.
