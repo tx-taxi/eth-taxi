@@ -10991,7 +10991,7 @@
       </trans-unit>
       <trans-unit id="40966c5744cc46092c2ae9dee1957e15c1faef4d" datatype="html">
         <source>bare multisig</source>
-        <target>bare multisig</target>
+        <target>необёрнутая мультиподпись</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/components/address-type/address-type.component.html</context>
           <context context-type="linenumber">21</context>
@@ -13480,6 +13480,10 @@
           <context context-type="sourcefile">src/app/components/search-form/search-form.component.ts</context>
           <context context-type="linenumber">125</context>
         </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.chooseSelected" datatype="html">
+        <source>Choose search chain. Selected: <x id="name" equiv-text="name" /></source>
+        <target>Выберите блокчейн для поиска. Выбрано: <x id="name" equiv-text="name" /></target>
       </trans-unit>
       <trans-unit id="eth.search.openExplorer" datatype="html">
         <source>Open <x id="name" equiv-text="name" /></source>
