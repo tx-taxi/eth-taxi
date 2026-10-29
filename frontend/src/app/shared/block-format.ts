@@ -8,7 +8,8 @@ function displayLocale(): string {
   return match ? match[1].toLowerCase() : 'en-US';
 }
 function displayExactNumber(value: string): string {
-  return displayLocale() === 'en-US' ? value : value.replace('.', ',');
+  const separator = new Intl.NumberFormat(displayLocale()).formatToParts(1.1).find(part => part.type === 'decimal')?.value || '.';
+  return value.replace('.', separator);
 }
 
 // Russian distinguishes one, a few, and many transactions. Other languages
