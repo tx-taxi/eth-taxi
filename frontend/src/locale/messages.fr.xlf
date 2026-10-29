@@ -11631,11 +11631,7 @@
       </trans-unit>
       <trans-unit id="1c4e5bd4e8f20285e3dfcdb58c3b87cced25bffa" datatype="html">
         <source><x id="LINE_BREAK" ctype="lb"/><x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;i&gt;"/>There are too many transactions on this address, more than your backend can handle. See more on <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;/docs/faq#address-lookup-issues&quot;&gt;"/>setting up a stronger backend<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.<x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;/i&gt;"/><x id="LINE_BREAK" ctype="lb"/><x id="LINE_BREAK" ctype="lb"/> Consider viewing this address on another Ethereum explorer instead: </source>
-        <target>
-          <x id="LINE_BREAK" ctype="lb" />
-          <x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;i&gt;" />Cette adresse contient plus de transactions que votre système ne peut en traiter. Consultez les instructions pour <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;/docs/faq#address-lookup-issues&quot;&gt;" />configurer une infrastructure plus performante<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;" />.<x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;/i&gt;" />
-          <x id="LINE_BREAK" ctype="lb" />
-          <x id="LINE_BREAK" ctype="lb" /> Vous pouvez également consulter cette adresse sur un autre explorateur Ethereum :</target>
+        <target><x id="LINE_BREAK" ctype="lb" /><x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;i&gt;" />Cette adresse contient plus de transactions que votre système ne peut en traiter. Consultez les instructions pour <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;/docs/faq#address-lookup-issues&quot;&gt;" />configurer une infrastructure plus performante<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;" />.<x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;/i&gt;" /><x id="LINE_BREAK" ctype="lb" /><x id="LINE_BREAK" ctype="lb" /> Vous pouvez également consulter cette adresse sur un autre explorateur Ethereum :</target>
       </trans-unit>
       <trans-unit id="eth.balance" datatype="html">
         <source>Balance</source>
@@ -11760,8 +11756,7 @@
       <trans-unit id="eth.graph.historyHeading" datatype="html">
         <source>Gas market, <x id="INTERPOLATION" equiv-text="{{ historyLabel }}" />
         </source>
-        <target>Marché du gas, <x id="INTERPOLATION" equiv-text="{{ historyLabel }}" />
-        </target>
+        <target>Marché du gas, <x id="INTERPOLATION" equiv-text="{{ historyLabel }}" /></target>
       </trans-unit>
       <trans-unit id="eth.graph.legend" datatype="html">
         <source>Chart legend</source>
@@ -11922,8 +11917,7 @@
       <trans-unit id="eth.token.shown" datatype="html">
         <source>
           <x id="INTERPOLATION" equiv-text="shown&lt;/span&gt;       &lt;/div&gt;        &lt;div *ngIf=&quot;transfers.lengt" /> shown</source>
-        <target>
-          <x id="INTERPOLATION" equiv-text="shown&lt;/span&gt;       &lt;/div&gt;        &lt;div *ngIf=&quot;transfers.lengt" /> affichés</target>
+        <target><x id="INTERPOLATION" equiv-text="shown&lt;/span&gt;       &lt;/div&gt;        &lt;div *ngIf=&quot;transfers.lengt" /> affichés</target>
       </trans-unit>
       <trans-unit id="eth.token.bounded-history" datatype="html">
         <source> This is a bounded recent sample from Ethereum RPC. Complete indexed transfer history is temporarily unavailable. </source>
@@ -12208,8 +12202,7 @@
       <trans-unit id="a5c3bb57620832141bf6c51d7344e69af366c7e8" datatype="html">
         <source>
           <x id="INTERPOLATION" equiv-text="new transactions&lt;/span&gt; &lt;/button&gt;  &lt;div [class.container-xl]=&quot;!widget&quot; [cla" /> new transactions</source>
-        <target>
-          <x id="INTERPOLATION" equiv-text="new transactions&lt;/span&gt; &lt;/button&gt;  &lt;div [class.container-xl]=&quot;!widget&quot; [cla" /> nouvelles transactions</target>
+        <target><x id="INTERPOLATION" equiv-text="new transactions&lt;/span&gt; &lt;/button&gt;  &lt;div [class.container-xl]=&quot;!widget&quot; [cla" /> nouvelles transactions</target>
       </trans-unit>
       <trans-unit id="487bebf9352332c5e7f5bd00a78371cacff0fd95" datatype="html">
         <source>Pause/Resume</source>
@@ -12338,8 +12331,7 @@
       <trans-unit id="eth.search.openExplorer" datatype="html">
         <source>Open <x id="name" equiv-text="name" />
         </source>
-        <target>Ouvrir <x id="name" equiv-text="name" />
-        </target>
+        <target>Ouvrir <x id="name" equiv-text="name" /></target>
       </trans-unit>
       <trans-unit id="eth.search.openNewTab" datatype="html">
         <source>Open <x id="name" equiv-text="name" /> in a new tab</source>
@@ -12348,34 +12340,28 @@
       <trans-unit id="eth.search.switchExplorer" datatype="html">
         <source>Switch to <x id="name" equiv-text="name" />
         </source>
-        <target>Passer à <x id="name" equiv-text="name" />
-        </target>
+        <target>Passer à <x id="name" equiv-text="name" /></target>
       </trans-unit>
       <trans-unit id="eth.search.additionalExplorers" datatype="html">
         <source>
           <x id="name" equiv-text="name" /> additional explorers</source>
-        <target>Explorateurs supplémentaires pour <x id="name" equiv-text="name" />
-        </target>
+        <target>Explorateurs supplémentaires pour <x id="name" equiv-text="name" /></target>
       </trans-unit>
       <trans-unit id="eth.search.hideOne" datatype="html">
         <source>Hide <x id="count" equiv-text="count" /> additional <x id="name" equiv-text="name" /> option</source>
-        <target>Masquer <x id="count" equiv-text="count" /> option supplémentaire pour <x id="name" equiv-text="name" />
-        </target>
+        <target>Masquer <x id="count" equiv-text="count" /> option supplémentaire pour <x id="name" equiv-text="name" /></target>
       </trans-unit>
       <trans-unit id="eth.search.hideMany" datatype="html">
         <source>Hide <x id="count" equiv-text="count" /> additional <x id="name" equiv-text="name" /> options</source>
-        <target>Masquer <x id="count" equiv-text="count" /> options supplémentaires pour <x id="name" equiv-text="name" />
-        </target>
+        <target>Masquer <x id="count" equiv-text="count" /> options supplémentaires pour <x id="name" equiv-text="name" /></target>
       </trans-unit>
       <trans-unit id="eth.search.showOne" datatype="html">
         <source>Show <x id="count" equiv-text="count" /> additional <x id="name" equiv-text="name" /> option</source>
-        <target>Afficher <x id="count" equiv-text="count" /> option supplémentaire pour <x id="name" equiv-text="name" />
-        </target>
+        <target>Afficher <x id="count" equiv-text="count" /> option supplémentaire pour <x id="name" equiv-text="name" /></target>
       </trans-unit>
       <trans-unit id="eth.search.showMany" datatype="html">
         <source>Show <x id="count" equiv-text="count" /> additional <x id="name" equiv-text="name" /> options</source>
-        <target>Afficher <x id="count" equiv-text="count" /> options supplémentaires pour <x id="name" equiv-text="name" />
-        </target>
+        <target>Afficher <x id="count" equiv-text="count" /> options supplémentaires pour <x id="name" equiv-text="name" /></target>
       </trans-unit>
       <trans-unit id="eth.search.futureBlock" datatype="html">
         <source>That block has not been produced yet.</source>
@@ -12576,8 +12562,7 @@
       <trans-unit id="eth.list.rawUnits" datatype="html">
         <source>
           <x id="AMOUNT" equiv-text="amount" /> raw units</source>
-        <target>
-          <x id="AMOUNT" equiv-text="amount" /> unités brutes</target>
+        <target><x id="AMOUNT" equiv-text="amount" /> unités brutes</target>
       </trans-unit>
       <trans-unit id="eth.list.tokenTransferCall" datatype="html">
         <source>Token transfer call</source>

@@ -11763,11 +11763,7 @@
       </trans-unit>
       <trans-unit id="1c4e5bd4e8f20285e3dfcdb58c3b87cced25bffa" datatype="html">
         <source><x id="LINE_BREAK" ctype="lb"/><x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;i&gt;"/>There are too many transactions on this address, more than your backend can handle. See more on <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;/docs/faq#address-lookup-issues&quot;&gt;"/>setting up a stronger backend<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.<x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;/i&gt;"/><x id="LINE_BREAK" ctype="lb"/><x id="LINE_BREAK" ctype="lb"/> Consider viewing this address on another Ethereum explorer instead: </source>
-        <target>
-          <x id="LINE_BREAK" ctype="lb" />
-          <x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;i&gt;" />Diese Adresse hat mehr Transaktionen, als dein Backend verarbeiten kann. Mehr zur <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;/docs/faq#address-lookup-issues&quot;&gt;" />Einrichtung eines leistungsfähigeren Backends<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;" />.<x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;/i&gt;" />
-          <x id="LINE_BREAK" ctype="lb" />
-          <x id="LINE_BREAK" ctype="lb" /> Alternativ kannst du diese Adresse in einem anderen Ethereum-Explorer ansehen:  </target>
+        <target><x id="LINE_BREAK" ctype="lb" /><x id="START_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;i&gt;" />Diese Adresse hat mehr Transaktionen, als dein Backend verarbeiten kann. Mehr zur <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;/docs/faq#address-lookup-issues&quot;&gt;" />Einrichtung eines leistungsfähigeren Backends<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;" />.<x id="CLOSE_ITALIC_TEXT" ctype="x-i" equiv-text="&lt;/i&gt;" /><x id="LINE_BREAK" ctype="lb" /><x id="LINE_BREAK" ctype="lb" /> Alternativ kannst du diese Adresse in einem anderen Ethereum-Explorer ansehen:  </target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/address/address.component.html</context>
           <context context-type="linenumber">321,325</context>
@@ -12057,8 +12053,7 @@
       <trans-unit id="eth.graph.historyHeading" datatype="html">
         <source>Gas market, <x id="INTERPOLATION" equiv-text="{{ historyLabel }}" />
         </source>
-        <target>Gasmarkt, <x id="INTERPOLATION" equiv-text="{{ historyLabel }}" />
-        </target>
+        <target>Gasmarkt, <x id="INTERPOLATION" equiv-text="{{ historyLabel }}" /></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/ethereum-gas-market-graph/ethereum-gas-market-graph.component.html</context>
           <context context-type="linenumber">5</context>
@@ -12391,8 +12386,7 @@
       <trans-unit id="eth.token.shown" datatype="html">
         <source>
           <x id="INTERPOLATION" equiv-text="shown&lt;/span&gt;       &lt;/div&gt;        &lt;div *ngIf=&quot;transfers.lengt" /> shown</source>
-        <target>
-          <x id="INTERPOLATION" equiv-text="shown&lt;/span&gt;       &lt;/div&gt;        &lt;div *ngIf=&quot;transfers.lengt" /> angezeigt</target>
+        <target><x id="INTERPOLATION" equiv-text="shown&lt;/span&gt;       &lt;/div&gt;        &lt;div *ngIf=&quot;transfers.lengt" /> angezeigt</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/ethereum-token/ethereum-token.component.html</context>
           <context context-type="linenumber">85</context>
@@ -12460,8 +12454,7 @@
       </trans-unit>
       <trans-unit id="eth.token.show-more" datatype="html">
         <source>Show <x id="INTERPOLATION" equiv-text="{{ hiddenTransferCount }}" /> more transfers</source>
-        <target>
-          <x id="INTERPOLATION" equiv-text="{{ hiddenTransferCount }}" /> weitere Transfers anzeigen</target>
+        <target><x id="INTERPOLATION" equiv-text="{{ hiddenTransferCount }}" /> weitere Transfers anzeigen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/ethereum-token/ethereum-token.component.html</context>
           <context context-type="linenumber">145</context>
@@ -12867,7 +12860,7 @@
       </trans-unit>
       <trans-unit id="eth.legal.audienceText" datatype="html">
         <source>tx.taxi uses Cloudflare Web Analytics for page views and performance, and a first-party daily cookie shared across its explorers to count browsers once per UTC day. The daily audience collector stores only a daily identifier, the explorer hostname, and whether there was interaction. It does not receive search text, addresses, transaction IDs, URLs, or IP addresses. Individual daily records expire after 31 days; aggregate counts are retained for 400 days. Do Not Track and Global Privacy Control disable this first-party measurement.</source>
-        <target>tx.taxi verwendet Cloudflare Web Analytics für Seitenaufrufe und Leistung sowie ein eigenes tägliches, über seine Explorer geteiltes Cookie, um Browser einmal pro UTC-Tag zu zählen. Die tägliche Besuchsmessung speichert nur eine tägliche Kennung, den Hostnamen des Explorers und ob eine Interaktion stattfand. Suchtexte, Adressen, Transaktions-IDs, URLs und IP-Adressen werden nicht übermittelt. Einzelne Tagesdatensätze verfallen nach 31 Tagen; aggregierte Zählwerte werden 400 Tage aufbewahrt. Do Not Track und Global Privacy Control deaktivieren diese eigene Messung.</target>
+        <target>tx.taxi verwendet Cloudflare Web Analytics für Seitenaufrufe und Leistung sowie ein eigenes tägliches, über seine Explorer geteiltes Cookie, um Browser einmal pro UTC-Tag zu zählen. Die tägliche Besuchsmessung speichert nur eine tägliche Kennung, den Hostnamen des Explorers und ob eine Interaktion stattfand. Der Zähler erhält keine Suchtexte, Adressen, Transaktions-IDs, URLs oder IP-Adressen. Einzelne Tagesdatensätze verfallen nach 31 Tagen; aggregierte Zählwerte werden 400 Tage aufbewahrt. Do Not Track und Global Privacy Control deaktivieren diese eigene Messung.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/privacy-policy/privacy-policy.component.html</context>
           <context context-type="linenumber">9</context>
@@ -12985,8 +12978,7 @@
       <trans-unit id="a5c3bb57620832141bf6c51d7344e69af366c7e8" datatype="html">
         <source>
           <x id="INTERPOLATION" equiv-text="new transactions&lt;/span&gt; &lt;/button&gt;  &lt;div [class.container-xl]=&quot;!widget&quot; [cla" /> new transactions</source>
-        <target>
-          <x id="INTERPOLATION" equiv-text="new transactions&lt;/span&gt; &lt;/button&gt;  &lt;div [class.container-xl]=&quot;!widget&quot; [cla" /> neue Transaktionen</target>
+        <target><x id="INTERPOLATION" equiv-text="new transactions&lt;/span&gt; &lt;/button&gt;  &lt;div [class.container-xl]=&quot;!widget&quot; [cla" /> neue Transaktionen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/recent-transactions-list/recent-transactions-list.component.html</context>
           <context context-type="linenumber">8</context>
@@ -13284,8 +13276,7 @@
       <trans-unit id="eth.search.openExplorer" datatype="html">
         <source>Open <x id="name" equiv-text="name" />
         </source>
-        <target>
-          <x id="name" equiv-text="name" /> öffnen</target>
+        <target><x id="name" equiv-text="name" /> öffnen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/search-form/search-form.component.ts</context>
           <context context-type="linenumber">127</context>
@@ -13293,8 +13284,7 @@
       </trans-unit>
       <trans-unit id="eth.search.openNewTab" datatype="html">
         <source>Open <x id="name" equiv-text="name" /> in a new tab</source>
-        <target>
-          <x id="name" equiv-text="name" /> in neuem Tab öffnen</target>
+        <target><x id="name" equiv-text="name" /> in neuem Tab öffnen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/search-form/search-form.component.ts</context>
           <context context-type="linenumber">128</context>
@@ -13312,8 +13302,7 @@
       <trans-unit id="eth.search.additionalExplorers" datatype="html">
         <source>
           <x id="name" equiv-text="name" /> additional explorers</source>
-        <target>Weitere Explorer für <x id="name" equiv-text="name" />
-        </target>
+        <target>Weitere Explorer für <x id="name" equiv-text="name" /></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/search-form/search-form.component.ts</context>
           <context context-type="linenumber">130</context>
@@ -13321,8 +13310,7 @@
       </trans-unit>
       <trans-unit id="eth.search.hideOne" datatype="html">
         <source>Hide <x id="count" equiv-text="count" /> additional <x id="name" equiv-text="name" /> option</source>
-        <target>
-          <x id="count" equiv-text="count" /> zusätzliche Option für <x id="name" equiv-text="name" /> ausblenden</target>
+        <target><x id="count" equiv-text="count" /> zusätzliche Option für <x id="name" equiv-text="name" /> ausblenden</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/search-form/search-form.component.ts</context>
           <context context-type="linenumber">133</context>
@@ -13330,8 +13318,7 @@
       </trans-unit>
       <trans-unit id="eth.search.hideMany" datatype="html">
         <source>Hide <x id="count" equiv-text="count" /> additional <x id="name" equiv-text="name" /> options</source>
-        <target>
-          <x id="count" equiv-text="count" /> zusätzliche Optionen für <x id="name" equiv-text="name" /> ausblenden</target>
+        <target><x id="count" equiv-text="count" /> zusätzliche Optionen für <x id="name" equiv-text="name" /> ausblenden</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/search-form/search-form.component.ts</context>
           <context context-type="linenumber">133</context>
@@ -13339,8 +13326,7 @@
       </trans-unit>
       <trans-unit id="eth.search.showOne" datatype="html">
         <source>Show <x id="count" equiv-text="count" /> additional <x id="name" equiv-text="name" /> option</source>
-        <target>
-          <x id="count" equiv-text="count" /> zusätzliche Option für <x id="name" equiv-text="name" /> anzeigen</target>
+        <target><x id="count" equiv-text="count" /> zusätzliche Option für <x id="name" equiv-text="name" /> anzeigen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/search-form/search-form.component.ts</context>
           <context context-type="linenumber">135</context>
@@ -13348,8 +13334,7 @@
       </trans-unit>
       <trans-unit id="eth.search.showMany" datatype="html">
         <source>Show <x id="count" equiv-text="count" /> additional <x id="name" equiv-text="name" /> options</source>
-        <target>
-          <x id="count" equiv-text="count" /> zusätzliche Optionen für <x id="name" equiv-text="name" /> anzeigen</target>
+        <target><x id="count" equiv-text="count" /> zusätzliche Optionen für <x id="name" equiv-text="name" /> anzeigen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/search-form/search-form.component.ts</context>
           <context context-type="linenumber">135</context>
@@ -13766,8 +13751,7 @@
       <trans-unit id="eth.list.rawUnits" datatype="html">
         <source>
           <x id="AMOUNT" equiv-text="amount" /> raw units</source>
-        <target>
-          <x id="AMOUNT" equiv-text="amount" /> unformatierte Einheiten</target>
+        <target><x id="AMOUNT" equiv-text="amount" /> unformatierte Einheiten</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/transactions-list/transactions-list.component.ts</context>
           <context context-type="linenumber">250</context>
