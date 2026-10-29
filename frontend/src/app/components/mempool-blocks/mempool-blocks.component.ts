@@ -29,7 +29,7 @@ import { ThemeService } from '@app/services/theme.service';
 })
 export class MempoolBlocksComponent implements OnInit, OnChanges, OnDestroy {
   blockValueDetails = blockValueDetails;
-  estimatedFeeLabel = typeof $localize === 'function' ? $localize`:@@eth.blockDetails.estimatedFees:Estimated execution fees` : 'Estimated execution fees';
+  estimatedFeeLabel = $localize`:@@eth.blockDetails.estimatedFees:Estimated execution fees`;
   @Input() minimal: boolean = false;
   @Input() blockWidth: number = 125;
   @Input() containerWidth: number = null;

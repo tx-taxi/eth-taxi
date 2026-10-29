@@ -11962,6 +11962,9 @@
       <trans-unit id="eth.block.reward" datatype="html"><source>Reward</source><target>Recompensa</target></trans-unit>
       <trans-unit id="eth.address.viewBlockscout" datatype="html"><source>View on Blockscout</source><target>Ver en Blockscout</target></trans-unit>
       <trans-unit id="eth.footer.joinTelegram" datatype="html"><source>Join the tx.taxi Telegram channel</source><target>Únete al canal de Telegram de tx.taxi</target></trans-unit>
+
+      <trans-unit id="eth.returnLatestBlock" datatype="html"><source>Return to the latest Ethereum block</source><target>Volver al último bloque de Ethereum</target></trans-unit>
+      <trans-unit id="eth.returnLatestBlockShort" datatype="html"><source>Return to latest block</source><target>Volver al último bloque</target></trans-unit>
     </body>
   </file>
 </xliff>

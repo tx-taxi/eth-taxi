@@ -33,7 +33,7 @@
     ></app-blockchain>
   </div>
   <button type="button" class="reset-scroll" [class.hidden]="pageIndex === 0" (click)="resetScroll()"
-    aria-label="Return to the latest Ethereum block" title="Return to latest block">
+    i18n-aria-label="@@eth.returnLatestBlock" aria-label="Return to the latest Ethereum block" i18n-title="@@eth.returnLatestBlockShort" title="Return to latest block">
     <fa-icon [icon]="['fas', 'circle-left']" [fixedWidth]="true"></fa-icon>
   </button>
 </div>

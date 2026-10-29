@@ -186,8 +186,15 @@
       const root = dashboardPath();
       document.querySelectorAll('a.navbar-brand, a.chain-divider-mark').forEach(link => {
         link.href = dashboard ? hubOrigin + localizedHubPath() : root;
-        link.setAttribute('aria-label', dashboard ? 'Back to tx.taxi' : sourceName + ' dashboard');
-        link.title = dashboard ? 'Back to tx.taxi' : sourceName + ' dashboard';
+        const locale = location.pathname.split('/')[1];
+        const labels = {
+          es: ['Volver a tx.taxi', 'Panel de ' + sourceName],
+          fr: ['Retour à tx.taxi', 'Tableau de bord ' + sourceName],
+          de: ['Zurück zu tx.taxi', sourceName + '-Übersicht'],
+        };
+        const label = labels[locale]?.[dashboard ? 0 : 1] || (dashboard ? 'Back to tx.taxi' : sourceName + ' dashboard');
+        link.setAttribute('aria-label', label);
+        link.title = label;
       });
     };
     const observer = new MutationObserver(() => {
