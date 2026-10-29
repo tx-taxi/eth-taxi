@@ -84,7 +84,7 @@ export class ApiDocsComponent implements OnInit, AfterViewInit {
     if (!element) {
       return;
     }
-    window.history.replaceState({}, '', `${document.location.pathname}#${fragment}`);
+    window.history.replaceState({}, '', `${document.location.pathname}${document.location.search}#${fragment}`);
     setTimeout(() => {
       const offset = this.mobileViewport ? 110 : 70;
       window.scrollTo({ top: element.offsetTop - offset, behavior: 'smooth' });
