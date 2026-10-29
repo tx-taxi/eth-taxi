@@ -13846,6 +13846,851 @@
           <context context-type="linenumber">34</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="taxi.timezone.plus14" datatype="html">
+        <source>Line Islands Time (LINT)</source>
+        <target state="needs-review-translation">Время островов Лайн (LINT)</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/timezone-selector/timezone-selector.component.ts</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.meta.trackTransaction" datatype="html">
+        <source>Track the real-time status, gas, fee, and confirmation details for Ethereum transaction <x id="HASH" equiv-text="this.txId" />.</source>
+        <target state="needs-review-translation">Отслеживайте статус, газ, комиссию и подтверждения транзакции Ethereum <x id="HASH" equiv-text="this.txId" /> в реальном времени.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/tracker/tracker.component.ts</context>
+          <context context-type="linenumber">449</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.trademark.disclaimer" datatype="html">
+        <source>This website is operated by tx.taxi and is not affiliated with Mempool Holdings S.A. de C.V.</source>
+        <target state="needs-review-translation">Этот сайт управляется tx.taxi и не связан с Mempool Holdings S.A. de C.V.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/trademark-policy/trademark-policy.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.trademark.viewPolicy" datatype="html">
+        <source>Please view the Trademark Policy and Guidelines for The Mempool Open Source Project at</source>
+        <target state="needs-review-translation">Ознакомьтесь с политикой и правилами использования товарных знаков проекта Mempool Open Source Project по адресу</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/trademark-policy/trademark-policy.component.html</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.trademark.title" datatype="html">
+        <source>Trademark Policy</source>
+        <target state="needs-review-translation">Политика товарных знаков</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/trademark-policy/trademark-policy.component.ts</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.trademark.description" datatype="html">
+        <source>An overview of the trademarks registered by Mempool Holdings S.A. de C.V. and The Mempool Open Source Project® and what we consider to be lawful usage of those trademarks.</source>
+        <target state="needs-review-translation">Обзор товарных знаков, зарегистрированных Mempool Holdings S.A. de C.V. и Mempool Open Source Project®, и того, что считается их правомерным использованием.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/trademark-policy/trademark-policy.component.ts</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.transaction.block" datatype="html">
+        <source>Block</source>
+        <target state="needs-review-translation">Блок</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction-details/transaction-details.component.html</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.maximumFee" datatype="html">
+        <source>Maximum fee</source>
+        <target state="needs-review-translation">Максимальная комиссия</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction-details/transaction-details.component.html</context>
+          <context context-type="linenumber">213</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction.component.html</context>
+          <context context-type="linenumber">177</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.fee" datatype="html">
+        <source>Fee</source>
+        <target state="needs-review-translation">Комиссия</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction-details/transaction-details.component.html</context>
+          <context context-type="linenumber">213</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.maximumFeePerGas" datatype="html">
+        <source>Maximum fee per gas</source>
+        <target state="needs-review-translation">Максимальная комиссия за единицу газа</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction-details/transaction-details.component.html</context>
+          <context context-type="linenumber">232</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction.component.html</context>
+          <context context-type="linenumber">215</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.feeRate" datatype="html">
+        <source>Fee rate</source>
+        <target state="needs-review-translation">Ставка комиссии</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction-details/transaction-details.component.html</context>
+          <context context-type="linenumber">232</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.meta.transactionDetails" datatype="html">
+        <source>See sender, recipient, value, gas, fee, and confirmation details for Ethereum transaction <x id="HASH" equiv-text="this.txId" />.</source>
+        <target state="needs-review-translation">Отправитель, получатель, сумма, газ, комиссия и подтверждения транзакции Ethereum <x id="HASH" equiv-text="this.txId" />.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction-preview.component.ts</context>
+          <context context-type="linenumber">93</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction.component.ts</context>
+          <context context-type="linenumber">636</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.txRaw.prevoutsOffline" datatype="html">
+        <source>Missing prevouts are not loaded. Some fields like fee rate cannot be calculated.</source>
+        <target state="needs-review-translation">Отсутствующие предыдущие выходы не загружены. Некоторые поля, например ставку комиссии, невозможно вычислить.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction-raw.component.html</context>
+          <context context-type="linenumber">68</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.txRaw.prevoutsError" datatype="html">
+        <source>Error loading missing prevouts</source>
+        <target state="needs-review-translation">Ошибка загрузки отсутствующих предыдущих выходов</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction-raw.component.html</context>
+          <context context-type="linenumber">70</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.txRaw.reason" datatype="html">
+        <source>Reason:</source>
+        <target state="needs-review-translation">Причина:</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction-raw.component.html</context>
+          <context context-type="linenumber">70</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction-raw.component.html</context>
+          <context context-type="linenumber">77</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.txRaw.cpfpError" datatype="html">
+        <source>Error loading CPFP data</source>
+        <target state="needs-review-translation">Ошибка загрузки данных CPFP</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction-raw.component.html</context>
+          <context context-type="linenumber">77</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="92626adb4b7e2aff0d35c2db5e023aac29d27f0f" datatype="html">
+        <source>Cluster</source>
+        <target state="needs-review-translation">Кластер</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction-raw.component.html</context>
+          <context context-type="linenumber">100</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction.component.html</context>
+          <context context-type="linenumber">68</context>
+        </context-group>
+        <note priority="1" from="description">Cluster</note>
+        <note priority="1" from="meaning">transaction.cluster</note>
+      </trans-unit>
+      <trans-unit id="eth.state" datatype="html">
+        <source>State</source>
+        <target state="needs-review-translation">Состояние</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction.component.html</context>
+          <context context-type="linenumber">130</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.fromTo" datatype="html">
+        <source>From &amp; To</source>
+        <target state="needs-review-translation">От и кому</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction.component.html</context>
+          <context context-type="linenumber">142</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction.component.html</context>
+          <context context-type="linenumber">242</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.inputData" datatype="html">
+        <source>Input data</source>
+        <target state="needs-review-translation">Входные данные</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction.component.html</context>
+          <context context-type="linenumber">160</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.notExecuted" datatype="html">
+        <source>Not executed</source>
+        <target state="needs-review-translation">Не выполнено</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction.component.html</context>
+          <context context-type="linenumber">167</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.transactionFee" datatype="html">
+        <source>Transaction fee</source>
+        <target state="needs-review-translation">Комиссия транзакции</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction.component.html</context>
+          <context context-type="linenumber">177</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.executionFee" datatype="html">
+        <source>Execution fee</source>
+        <target state="needs-review-translation">Комиссия за исполнение</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction.component.html</context>
+          <context context-type="linenumber">181</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.blobFee" datatype="html">
+        <source>Blob fee</source>
+        <target state="needs-review-translation">Комиссия blob</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction.component.html</context>
+          <context context-type="linenumber">185</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.maximumBlobFee" datatype="html">
+        <source>Maximum blob fee</source>
+        <target state="needs-review-translation">Максимальная комиссия blob</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction.component.html</context>
+          <context context-type="linenumber">189</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.blobGasUsed" datatype="html">
+        <source>Blob gas used</source>
+        <target state="needs-review-translation">Использовано blob-газа</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction.component.html</context>
+          <context context-type="linenumber">193</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.transactionType" datatype="html">
+        <source>Transaction type</source>
+        <target state="needs-review-translation">Тип транзакции</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction.component.html</context>
+          <context context-type="linenumber">203</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.typeLabel" datatype="html">
+        <source>Type</source>
+        <target state="needs-review-translation">Тип</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction.component.html</context>
+          <context context-type="linenumber">204</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.method" datatype="html">
+        <source>Method</source>
+        <target state="needs-review-translation">Метод</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction.component.html</context>
+          <context context-type="linenumber">211</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.blobGasPrice" datatype="html">
+        <source>Blob gas price</source>
+        <target state="needs-review-translation">Цена blob-газа</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction.component.html</context>
+          <context context-type="linenumber">219</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.maximumBlobFeePerGas" datatype="html">
+        <source>Maximum blob fee per gas</source>
+        <target state="needs-review-translation">Максимальная комиссия blob за единицу газа</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction.component.html</context>
+          <context context-type="linenumber">223</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.revertReason" datatype="html">
+        <source>Revert reason</source>
+        <target state="needs-review-translation">Причина отката</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction.component.html</context>
+          <context context-type="linenumber">227</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.method.transfer" datatype="html">
+        <source>Transfer</source>
+        <target state="needs-review-translation">Перевод</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction.component.ts</context>
+          <context context-type="linenumber">181</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.from" datatype="html">
+        <source>From</source>
+        <target state="needs-review-translation">От</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transactions-list/transactions-list.component.html</context>
+          <context context-type="linenumber">143</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.tokenUsdTitle" datatype="html">
+        <source>Approximate USD value using the current token price</source>
+        <target state="needs-review-translation">Приблизительная стоимость в USD по текущей цене токена</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transactions-list/transactions-list.component.html</context>
+          <context context-type="linenumber">420</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.transfer" datatype="html">
+        <source>transfer</source>
+        <target state="needs-review-translation">перевод</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transactions-list/transactions-list.component.html</context>
+          <context context-type="linenumber">424</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.transfers" datatype="html">
+        <source>transfers</source>
+        <target state="needs-review-translation">переводы</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transactions-list/transactions-list.component.html</context>
+          <context context-type="linenumber">424</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.proposed" datatype="html">
+        <source>Proposed</source>
+        <target state="needs-review-translation">Предложено</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transactions-list/transactions-list.component.html</context>
+          <context context-type="linenumber">430</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.intentUsdTitle" datatype="html">
+        <source>Approximate USD value of the proposed call using the current token price</source>
+        <target state="needs-review-translation">Приблизительная стоимость предложенного вызова в USD по текущей цене токена</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transactions-list/transactions-list.component.html</context>
+          <context context-type="linenumber">433</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.current-intent-title" datatype="html">
+        <source>Approximate value of the proposed call using the current token price</source>
+        <target state="needs-review-translation">Приблизительная стоимость предложенного вызова по текущей цене токена</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transactions-list/transactions-list.component.html</context>
+          <context context-type="linenumber">434</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.list.proposedCall" datatype="html">
+        <source>Proposed call: </source>
+        <target state="needs-review-translation">Предложенный вызов: </target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transactions-list/transactions-list.component.ts</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.list.rawUnits" datatype="html">
+        <source><x id="AMOUNT" equiv-text="amount" /> raw units</source>
+        <target state="needs-review-translation"><x id="AMOUNT" equiv-text="amount" /> исходных единиц</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transactions-list/transactions-list.component.ts</context>
+          <context context-type="linenumber">250</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transactions-list/transactions-list.component.ts</context>
+          <context context-type="linenumber">262</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.list.tokenTransferCall" datatype="html">
+        <source>Token transfer call</source>
+        <target state="needs-review-translation">Вызов перевода токена</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transactions-list/transactions-list.component.ts</context>
+          <context context-type="linenumber">270</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.list.contractDeployment" datatype="html">
+        <source>Contract deployment</source>
+        <target state="needs-review-translation">Развёртывание контракта</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transactions-list/transactions-list.component.ts</context>
+          <context context-type="linenumber">278</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.feature.contractCall" datatype="html">
+        <source>Contract call</source>
+        <target state="needs-review-translation">Вызов контракта</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transactions-list/transactions-list.component.ts</context>
+          <context context-type="linenumber">279</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/filters.utils.ts</context>
+          <context context-type="linenumber">113</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.dashboard.gas-prices" datatype="html">
+        <source>Ethereum Gas Prices</source>
+        <target state="needs-review-translation">Цены газа Ethereum</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/dashboard/dashboard.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.dashboard.map-unavailable" datatype="html">
+        <source>Transaction map unavailable in this browser</source>
+        <target state="needs-review-translation">Карта транзакций недоступна в этом браузере</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/dashboard/dashboard.component.html</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.dashboard.fee-recipient" datatype="html">
+        <source>Fee recipient</source>
+        <target state="needs-review-translation">Получатель комиссии</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/dashboard/dashboard.component.html</context>
+          <context context-type="linenumber">107</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.dashboard.gas-used" datatype="html">
+        <source>Gas used</source>
+        <target state="needs-review-translation">Использовано газа</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/dashboard/dashboard.component.html</context>
+          <context context-type="linenumber">109</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c19bde6e194e95b60145a4e312fc31941197d90c" datatype="html">
+        <source>LBTC Supply vs. BTC Holdings</source>
+        <target state="needs-review-translation">Предложение LBTC и запасы BTC</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/dashboard/dashboard.component.html</context>
+          <context context-type="linenumber">170</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/dashboard/dashboard.component.html</context>
+          <context context-type="linenumber">309</context>
+        </context-group>
+        <note priority="1" from="description">dashboard.lbtc-supply-vs-btc-holdings</note>
+      </trans-unit>
+      <trans-unit id="eth.dashboard.low-gas" datatype="html">
+        <source>Low gas price</source>
+        <target state="needs-review-translation">Низкая цена газа</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/dashboard/dashboard.component.html</context>
+          <context context-type="linenumber">254</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.dashboard.pending-title" datatype="html">
+        <source>Observed pending transactions from the current provider; not a network-wide total</source>
+        <target state="needs-review-translation">Ожидающие транзакции, наблюдаемые текущим поставщиком; это не общее число по сети</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/dashboard/dashboard.component.html</context>
+          <context context-type="linenumber">261</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.dashboard.pending-sample" datatype="html">
+        <source>Pending sample</source>
+        <target state="needs-review-translation">Выборка ожидающих транзакций</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/dashboard/dashboard.component.html</context>
+          <context context-type="linenumber">261</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.dashboard.gas-title" datatype="html">
+        <source>Share of the projected blocks' gas capacity used by this pending sample</source>
+        <target state="needs-review-translation">Доля газовой ёмкости прогнозируемых блоков, используемая этой выборкой ожидающих транзакций</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/dashboard/dashboard.component.html</context>
+          <context context-type="linenumber">267</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.dashboard.sampled-gas" datatype="html">
+        <source>Sampled gas limits</source>
+        <target state="needs-review-translation">Лимиты газа в выборке</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/dashboard/dashboard.component.html</context>
+          <context context-type="linenumber">267</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6263132712305033285" datatype="html">
+        <source>Transfers</source>
+        <target state="needs-review-translation">Переводы</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/dashboard/dashboard.component.ts</context>
+          <context context-type="linenumber">69</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.docs.sections" datatype="html">
+        <source>Documentation sections</source>
+        <target state="needs-review-translation">Разделы документации</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/docs/api-docs/api-docs-nav.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.docs.mainnet" datatype="html">
+        <source>Ethereum mainnet</source>
+        <target state="needs-review-translation">Основная сеть Ethereum</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/docs/api-docs/api-docs.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.docs.guideTitle" datatype="html">
+        <source>Understand what the explorer shows</source>
+        <target state="needs-review-translation">Что показывает обозреватель</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/docs/api-docs/api-docs.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.docs.guideDescription" datatype="html">
+        <source>Learn how Ethereum transactions, gas, accounts, contracts, and pending activity map to the mempool-style interface.</source>
+        <target state="needs-review-translation">Узнайте, как транзакции, газ, аккаунты, контракты и ожидающая активность Ethereum представлены в интерфейсе в стиле mempool.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/docs/api-docs/api-docs.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.docs.developerReference" datatype="html">
+        <source>Developer reference</source>
+        <target state="needs-review-translation">Справочник разработчика</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/docs/api-docs/api-docs.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.docs.restTitle" datatype="html">
+        <source>Ethereum REST API</source>
+        <target state="needs-review-translation">REST API Ethereum</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/docs/api-docs/api-docs.component.html</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.docs.restDescription" datatype="html">
+        <source>Read the same normalized Ethereum data used by this explorer. Only endpoints implemented by the current adapter are listed.</source>
+        <target state="needs-review-translation">Получайте те же нормализованные данные Ethereum, что использует этот обозреватель. Перечислены только конечные точки, реализованные текущим адаптером.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/docs/api-docs/api-docs.component.html</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.docs.baseUrl" datatype="html">
+        <source>Base URL</source>
+        <target state="needs-review-translation">Базовый URL</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/docs/api-docs/api-docs.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.docs.live" datatype="html">
+        <source>Live data</source>
+        <target state="needs-review-translation">Данные в реальном времени</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/docs/api-docs/api-docs.component.html</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.docs.websocketTitle" datatype="html">
+        <source>Ethereum WebSocket API</source>
+        <target state="needs-review-translation">WebSocket API Ethereum</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/docs/api-docs/api-docs.component.html</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.docs.websocketDescription" datatype="html">
+        <source>Receive chain-tip and pending-sample updates, then subscribe to a transaction, account, or next-slot estimate.</source>
+        <target state="needs-review-translation">Получайте обновления последнего блока и выборки ожидающих транзакций, а затем подпишитесь на транзакцию, аккаунт или оценку следующего слота.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/docs/api-docs/api-docs.component.html</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.docs.endpoint" datatype="html">
+        <source>Endpoint</source>
+        <target state="needs-review-translation">Конечная точка</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/docs/api-docs/api-docs.component.html</context>
+          <context context-type="linenumber">27</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/docs/api-docs/api-docs.component.html</context>
+          <context context-type="linenumber">57</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.docs.publicData" datatype="html">
+        <source>eth.tx.taxi displays public network data.</source>
+        <target state="needs-review-translation">eth.tx.taxi отображает публичные данные сети.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/docs/api-docs/api-docs.component.html</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.docs.noRecovery" datatype="html">
+        <source>It cannot recover funds, reverse transactions, or access wallets.</source>
+        <target state="needs-review-translation">Он не может восстанавливать средства, отменять транзакции или получать доступ к кошелькам.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/docs/api-docs/api-docs.component.html</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.docs.description" datatype="html">
+        <source>Description</source>
+        <target state="needs-review-translation">Описание</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/docs/api-docs/api-docs.component.html</context>
+          <context context-type="linenumber">62</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.docs.serverResponse" datatype="html">
+        <source>Server response</source>
+        <target state="needs-review-translation">Ответ сервера</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/docs/api-docs/api-docs.component.html</context>
+          <context context-type="linenumber">79</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.docs.clientMessage" datatype="html">
+        <source>Client message</source>
+        <target state="needs-review-translation">Сообщение клиента</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/docs/api-docs/api-docs.component.ts</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.docs.guide" datatype="html">
+        <source>Ethereum Guide</source>
+        <target state="needs-review-translation">Руководство по Ethereum</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/docs/docs/docs.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.meta.docs.guide" datatype="html">
+        <source>Ethereum Guide</source>
+        <target state="needs-review-translation">Руководство по Ethereum</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/docs/docs/docs.component.ts</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.meta.docs.guideDescription" datatype="html">
+        <source>Understand Ethereum transactions, gas, account activity, confirmations, and the data shown by eth.tx.taxi.</source>
+        <target state="needs-review-translation">Транзакции Ethereum, газ, активность аккаунтов, подтверждения и данные, отображаемые eth.tx.taxi.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/docs/docs/docs.component.ts</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.meta.docs.restDescription" datatype="html">
+        <source>Documentation for the eth.tx.taxi REST API: blocks, transactions, accounts, tokens, gas estimates, and explorer state.</source>
+        <target state="needs-review-translation">Документация REST API eth.tx.taxi: блоки, транзакции, аккаунты, токены, оценка газа и состояние обозревателя.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/docs/docs/docs.component.ts</context>
+          <context context-type="linenumber">54</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.meta.docs.websocketDescription" datatype="html">
+        <source>Documentation for the eth.tx.taxi WebSocket API: live Ethereum blocks, pending transactions, accounts, and transaction status.</source>
+        <target state="needs-review-translation">Документация WebSocket API eth.tx.taxi: блоки Ethereum в реальном времени, ожидающие транзакции, аккаунты и статус транзакций.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/docs/docs/docs.component.ts</context>
+          <context context-type="linenumber">62</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.seo.description" datatype="html">
+        <source>Track Ethereum blocks, transactions, addresses, and live gas conditions on eth.tx.taxi.</source>
+        <target state="needs-review-translation">Отслеживайте блоки, транзакции, адреса и актуальные цены газа Ethereum на eth.tx.taxi.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/seo.service.ts</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.seo.explorer" datatype="html">
+        <source>Ethereum Explorer</source>
+        <target state="needs-review-translation">Обозреватель Ethereum</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/seo.service.ts</context>
+          <context context-type="linenumber">110</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.blockDetails.totalFees" datatype="html">
+        <source>Total fees</source>
+        <target state="needs-review-translation">Общие комиссии</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/block-format.ts</context>
+          <context context-type="linenumber">48</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.blockDetails.medianFee" datatype="html">
+        <source>Median fee rate</source>
+        <target state="needs-review-translation">Медианная ставка комиссии</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/block-format.ts</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.blockDetails.feeRange" datatype="html">
+        <source>Fee range</source>
+        <target state="needs-review-translation">Диапазон комиссий</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/block-format.ts</context>
+          <context context-type="linenumber">50</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.footer.tagline" datatype="html">
+        <source>Ethereum blocks, transactions, and gas at a glance</source>
+        <target state="needs-review-translation">Блоки, транзакции и газ Ethereum с первого взгляда</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/global-footer/global-footer.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/global-footer/global-footer.component.html</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.footer.explore" datatype="html">
+        <source>Explore</source>
+        <target state="needs-review-translation">Обзор</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/global-footer/global-footer.component.html</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.footer.dashboard" datatype="html">
+        <source>Dashboard</source>
+        <target state="needs-review-translation">Главная</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/global-footer/global-footer.component.html</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.footer.blocks" datatype="html">
+        <source>Recent Blocks</source>
+        <target state="needs-review-translation">Последние блоки</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/global-footer/global-footer.component.html</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.footer.transactions" datatype="html">
+        <source>Recent Transactions</source>
+        <target state="needs-review-translation">Последние транзакции</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/global-footer/global-footer.component.html</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.footer.pending" datatype="html">
+        <source>Pending Transactions</source>
+        <target state="needs-review-translation">Ожидающие транзакции</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/global-footer/global-footer.component.html</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.footer.docs" datatype="html">
+        <source>Explorer documentation</source>
+        <target state="needs-review-translation">Документация обозревателя</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/global-footer/global-footer.component.html</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.footer.what" datatype="html">
+        <source>What is Ethereum?</source>
+        <target state="needs-review-translation">Что такое Ethereum?</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/global-footer/global-footer.component.html</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.footer.blocks-link" datatype="html">
+        <source>Blocks</source>
+        <target state="needs-review-translation">Блоки</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/global-footer/global-footer.component.html</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.footer.transactions-link" datatype="html">
+        <source>Transactions</source>
+        <target state="needs-review-translation">Транзакции</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/global-footer/global-footer.component.html</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.footer.gas" datatype="html">
+        <source>Gas and fees</source>
+        <target state="needs-review-translation">Газ и комиссии</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/global-footer/global-footer.component.html</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.footer.about" datatype="html">
+        <source>About</source>
+        <target state="needs-review-translation">О проекте</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/global-footer/global-footer.component.html</context>
+          <context context-type="linenumber">50</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.footer.source" datatype="html">
+        <source>Source code</source>
+        <target state="needs-review-translation">Исходный код</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/global-footer/global-footer.component.html</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.footer.status" datatype="html">
+        <source>Status</source>
+        <target state="needs-review-translation">Статус</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/global-footer/global-footer.component.html</context>
+          <context context-type="linenumber">52</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.footer.joinTelegram" datatype="html">
+        <source>Join the tx.taxi Telegram channel</source>
+        <target state="needs-review-translation">Присоединиться к Telegram-каналу tx.taxi</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/global-footer/global-footer.component.html</context>
+          <context context-type="linenumber">53</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.footer.contact" datatype="html">
+        <source>Contact Us</source>
+        <target state="needs-review-translation">Связаться с нами</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/global-footer/global-footer.component.html</context>
+          <context context-type="linenumber">54</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.footer.legal" datatype="html">
+        <source>Legal</source>
+        <target state="needs-review-translation">Правовая информация</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/global-footer/global-footer.component.html</context>
+          <context context-type="linenumber">58</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.footer.licenses" datatype="html">
+        <source>Third-party Licenses</source>
+        <target state="needs-review-translation">Лицензии сторонних компонентов</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/global-footer/global-footer.component.html</context>
+          <context context-type="linenumber">61</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.footer.madeWith" datatype="html">
+        <source>Made with</source>
+        <target state="needs-review-translation">Сделано с</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/global-footer/global-footer.component.html</context>
+          <context context-type="linenumber">67</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.footer.by" datatype="html">
+        <source>by</source>
+        <target state="needs-review-translation">командой</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/global-footer/global-footer.component.html</context>
+          <context context-type="linenumber">67</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.intro.aria" datatype="html">
+        <source>About tx.taxi</source>
+        <target state="needs-review-translation">О tx.taxi</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/tx-taxi-docs-intro/tx-taxi-docs-intro.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.intro.headline" datatype="html">
+        <source>One search across chains.</source>
+        <target state="needs-review-translation">Один поиск по разным блокчейнам.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/tx-taxi-docs-intro/tx-taxi-docs-intro.component.html</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.intro.description" datatype="html">
+        <source>Paste a transaction, block or address into tx.taxi. Open a confirmed match, choose between possible networks, or head straight to your chain’s explorer.</source>
+        <target state="needs-review-translation">Вставьте транзакцию, блок или адрес на tx.taxi. Откройте подтверждённое совпадение, выберите один из возможных блокчейнов или перейдите непосредственно в обозреватель своей сети.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/tx-taxi-docs-intro/tx-taxi-docs-intro.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.intro.open" datatype="html">
+        <source>Open tx.taxi</source>
+        <target state="needs-review-translation">Открыть tx.taxi</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/tx-taxi-docs-intro/tx-taxi-docs-intro.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.intro.explore" datatype="html">
+        <source>Explore</source>
+        <target state="needs-review-translation">Изучить</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/tx-taxi-docs-intro/tx-taxi-docs-intro.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.intro.openHost" datatype="html">
+        <source>Open</source>
+        <target state="needs-review-translation">Открыть</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/tx-taxi-docs-intro/tx-taxi-docs-intro.component.ts</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.intro.explorer" datatype="html">
+        <source>explorer</source>
+        <target state="needs-review-translation">обозреватель</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/tx-taxi-docs-intro/tx-taxi-docs-intro.component.ts</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.intro.documentation" datatype="html">
+        <source>documentation</source>
+        <target state="needs-review-translation">документация</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/tx-taxi-docs-intro/tx-taxi-docs-intro.component.ts</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.feature.transfer" datatype="html">
+        <source>ETH transfer</source>
+        <target state="needs-review-translation">Перевод ETH</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/filters.utils.ts</context>
+          <context context-type="linenumber">112</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.feature.tokenTransfer" datatype="html">
+        <source>Token transfer / call</source>
+        <target state="needs-review-translation">Перевод токена / вызов</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/filters.utils.ts</context>
+          <context context-type="linenumber">114</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3504995129774539345" datatype="html">
+        <source>Ethereum activity</source>
+        <target state="needs-review-translation">Активность Ethereum</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/filters.utils.ts</context>
+          <context context-type="linenumber">128</context>
+        </context-group>
+      </trans-unit>
     </body>
   </file>
 </xliff>
