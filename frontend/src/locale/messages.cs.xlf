@@ -3304,7 +3304,7 @@
       </trans-unit>
       <trans-unit id="13f5a75f3e01e5924e45052d2f336eda8bac37e8" datatype="html">
         <source>Weight</source>
-        <target>Velikost</target>
+        <target>Váha</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/block-overview-tooltip/block-overview-tooltip.component.html</context>
           <context context-type="linenumber">63</context>
@@ -3864,7 +3864,7 @@
       </trans-unit>
       <trans-unit id="e170a90ee0d3a604adf439a60c890caff9152466" datatype="html">
         <source>This block does not belong to the main chain, it has been replaced by:</source>
-        <target>Tento blok nepatří do hlavního chainu, byl nahrazen:</target>
+        <target>Tento blok nepatří do hlavního řetězce, byl nahrazen:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/block/block.component.html</context>
           <context context-type="linenumber">5</context>
@@ -4075,7 +4075,7 @@
       </trans-unit>
       <trans-unit id="1da6d9283e3222148d76c10c8e37abeeb66c93cb" datatype="html">
         <source>Actual</source>
-        <target>Aktuální</target>
+        <target>Skutečné</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/block/block.component.html</context>
           <context context-type="linenumber">248</context>
@@ -4102,7 +4102,7 @@
       </trans-unit>
       <trans-unit id="6efa73f0d6f0844a1e0c341c9b88323f51852d91" datatype="html">
         <source>Actual Block</source>
-        <target>Aktuální blok</target>
+        <target>Skutečný blok</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/block/block.component.html</context>
           <context context-type="linenumber">296</context>
@@ -4232,7 +4232,7 @@
       </trans-unit>
       <trans-unit id="1535773b0ebd72152246b84f01801104e823be0f" datatype="html">
         <source>There are <x id="INTERPOLATION" equiv-text="{{ block.extras.orphans.length }}" /> stale blocks at this height</source>
-        <target>V této hloubce jsou <x id="INTERPOLATION" equiv-text="{{ block.extras.orphans.length }}" /> zastaralé bloky</target>
+        <target>Zastaralé bloky v této výšce: <x id="INTERPOLATION" equiv-text="{{ block.extras.orphans.length }}" /></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/block/block.component.html</context>
           <context context-type="linenumber">374</context>
@@ -4649,7 +4649,7 @@
       </trans-unit>
       <trans-unit id="4fe744df6d36b5e9b0afab728b77fc635b99f040" datatype="html">
         <source>Recent Replacements</source>
-        <target>Nedávné nahrazení poplatků</target>
+        <target>Nedávné nahrazené transakce</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/custom-dashboard/custom-dashboard.component.html</context>
           <context context-type="linenumber">100</context>
