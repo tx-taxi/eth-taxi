@@ -13084,6 +13084,768 @@
           <context context-type="linenumber">38</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="eth.footer.privacy" datatype="html">
+        <source>Privacy Policy</source>
+        <target state="needs-review-translation">Политика конфиденциальности</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/privacy-policy/privacy-policy.component.ts</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/global-footer/global-footer.component.html</context>
+          <context context-type="linenumber">60</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.legal.audience" datatype="html">
+        <source>Audience measurement</source>
+        <target state="needs-review-translation">Измерение аудитории</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.legal.audienceText" datatype="html">
+        <source>tx.taxi uses Cloudflare Web Analytics for page views and performance, and a first-party daily cookie shared across its explorers to count browsers once per UTC day. The daily audience collector stores only a daily identifier, the explorer hostname, and whether there was interaction. It does not receive search text, addresses, transaction IDs, URLs, or IP addresses. Individual daily records expire after 31 days; aggregate counts are retained for 400 days. Do Not Track and Global Privacy Control disable this first-party measurement.</source>
+        <target state="needs-review-translation">Для измерения просмотров страниц и производительности tx.taxi использует Cloudflare Web Analytics, а для подсчёта браузеров один раз в день по UTC — собственный ежедневный файл cookie, общий для его обозревателей. Система ежедневного подсчёта аудитории сохраняет только ежедневный идентификатор, имя хоста обозревателя и факт взаимодействия. Она не получает поисковые запросы, адреса, идентификаторы транзакций, URL или IP-адреса. Отдельные ежедневные записи удаляются через 31 день; агрегированные подсчёты хранятся 400 дней. Сигналы Do Not Track и Global Privacy Control отключают это собственное измерение.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.legal.optOut" datatype="html">
+        <source>Details and opt-out</source>
+        <target state="needs-review-translation">Подробнее и отказ от измерения</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.legal.lookups" datatype="html">
+        <source>Public blockchain lookups</source>
+        <target state="needs-review-translation">Поиск публичных данных блокчейна</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.legal.lookupsText" datatype="html">
+        <source>Ethereum addresses, transaction hashes, and block identifiers submitted to the explorer are public blockchain data. Requests are processed by eth.tx.taxi and its configured public Ethereum data providers.</source>
+        <target state="needs-review-translation">Адреса Ethereum, хеши транзакций и идентификаторы блоков, переданные обозревателю, являются публичными данными блокчейна. Запросы обрабатываются eth.tx.taxi и настроенными публичными поставщиками данных Ethereum.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.legal.preferences" datatype="html">
+        <source>Local preferences</source>
+        <target state="needs-review-translation">Локальные настройки</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.legal.preferencesText" datatype="html">
+        <source>Display preferences such as language, timezone, fiat currency, amount mode, and theme may be stored in your browser. These preferences are used to render the interface and are not Ethereum account credentials.</source>
+        <target state="needs-review-translation">Настройки отображения, такие как язык, часовой пояс, фиатная валюта, формат сумм и тема, могут храниться в вашем браузере. Они используются для отображения интерфейса и не являются учётными данными аккаунта Ethereum.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.legal.records" datatype="html">
+        <source>Operational records</source>
+        <target state="needs-review-translation">Рабочие журналы</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.legal.recordsText" datatype="html">
+        <source>The hosting stack and upstream data providers may retain routine security and request logs. Do not use a public explorer when a lookup itself is sensitive; use your own Ethereum node and local tooling instead.</source>
+        <target state="needs-review-translation">Инфраструктура хостинга и поставщики данных могут сохранять обычные журналы безопасности и запросов. Если сам факт поиска является конфиденциальным, не используйте публичный обозреватель; используйте собственный узел Ethereum и локальные инструменты.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.legal.external" datatype="html">
+        <source>External links</source>
+        <target state="needs-review-translation">Внешние ссылки</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.legal.externalText" datatype="html">
+        <source>Links to Ethereum documentation, Telegram, u.software, Blockscout, and the upstream Mempool project are governed by those services' own privacy policies.</source>
+        <target state="needs-review-translation">На ссылки на документацию Ethereum, Telegram, u.software, Blockscout и исходный проект Mempool распространяются политики конфиденциальности соответствующих сервисов.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.legal.contact" datatype="html">
+        <source>Contact</source>
+        <target state="needs-review-translation">Контакты</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.legal.privacyQuestions" datatype="html">
+        <source>Privacy questions can be sent to the operator at</source>
+        <target state="needs-review-translation">Вопросы о конфиденциальности можно отправить оператору по адресу</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.legal.privacyDescription" datatype="html">
+        <source>How eth.tx.taxi handles the limited technical data required to operate its Ethereum explorer.</source>
+        <target state="needs-review-translation">Как eth.tx.taxi обрабатывает ограниченные технические данные, необходимые для работы обозревателя Ethereum.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/privacy-policy/privacy-policy.component.ts</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6d1c8856044cc923fc70f32cb4be360d200cfa82" datatype="html">
+        <source>1 new transaction</source>
+        <target state="needs-review-translation">1 новая транзакция</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/recent-transactions-list/recent-transactions-list.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+        <note priority="1" from="description">recent-transactions.new-tx-pill.singular</note>
+      </trans-unit>
+      <trans-unit id="a5c3bb57620832141bf6c51d7344e69af366c7e8" datatype="html">
+        <source><x id="INTERPOLATION" equiv-text="new transactions&lt;/span&gt; &lt;/button&gt;  &lt;div [class.container-xl]=&quot;!widget&quot; [cla" /> new transactions</source>
+        <target state="needs-review-translation">Новых транзакций: <x id="INTERPOLATION" equiv-text="new transactions&lt;/span&gt; &lt;/button&gt;  &lt;div [class.container-xl]=&quot;!widget&quot; [cla" /></target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/recent-transactions-list/recent-transactions-list.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+        <note priority="1" from="description">recent-transactions.new-tx-pill.plural</note>
+      </trans-unit>
+      <trans-unit id="487bebf9352332c5e7f5bd00a78371cacff0fd95" datatype="html">
+        <source>Pause/Resume</source>
+        <target state="needs-review-translation">Приостановить/возобновить</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/recent-transactions-list/recent-transactions-list.component.html</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+        <note priority="1" from="description">Tooltip for the pause/resume updates button</note>
+        <note priority="1" from="meaning">recent-transactions.pause-toggle.title</note>
+      </trans-unit>
+      <trans-unit id="88f27d579752fd40ef53cfff5e936c293ca19221" datatype="html">
+        <source>Pause/Resume</source>
+        <target state="needs-review-translation">Приостановить/возобновить</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/recent-transactions-list/recent-transactions-list.component.html</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+        <note priority="1" from="description">Accessible label for the pause/resume updates button</note>
+        <note priority="1" from="meaning">recent-transactions.pause-toggle.aria-label</note>
+      </trans-unit>
+      <trans-unit id="eth.recent.value" datatype="html">
+        <source>Value</source>
+        <target state="needs-review-translation">Сумма</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/recent-transactions-list/recent-transactions-list.component.html</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.gasPrice" datatype="html">
+        <source>Gas price</source>
+        <target state="needs-review-translation">Цена газа</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/recent-transactions-list/recent-transactions-list.component.html</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/transaction/transaction.component.html</context>
+          <context context-type="linenumber">215</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.meta.recentTransactions" datatype="html">
+        <source>See recent Ethereum transactions with value, gas used, and gas price, updated in real time.</source>
+        <target state="needs-review-translation">Последние транзакции Ethereum с суммой, использованным газом и его ценой; обновление в реальном времени.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/recent-transactions-list/recent-transactions-list.component.ts</context>
+          <context context-type="linenumber">95</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.rewards.proposerTooltip" datatype="html">
+        <source>Priority fees paid to block proposers in the recent block sample</source>
+        <target state="needs-review-translation">Приоритетные комиссии, выплаченные предложившим блоки валидаторам в выборке последних блоков</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/reward-stats/reward-stats.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.rewards.proposer" datatype="html">
+        <source>Proposer rewards</source>
+        <target state="needs-review-translation">Вознаграждения за предложение блоков</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/reward-stats/reward-stats.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/reward-stats/reward-stats.component.html</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.rewards.executionTooltip" datatype="html">
+        <source>All execution-layer gas fees in the recent block sample</source>
+        <target state="needs-review-translation">Все комиссии за газ на уровне исполнения в выборке последних блоков</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/reward-stats/reward-stats.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.rewards.execution" datatype="html">
+        <source>Execution fees</source>
+        <target state="needs-review-translation">Комиссии за исполнение</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/reward-stats/reward-stats.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/reward-stats/reward-stats.component.html</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.rewards.perBlock" datatype="html">
+        <source>/block</source>
+        <target state="needs-review-translation">/блок</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/reward-stats/reward-stats.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.rewards.averageTooltip" datatype="html">
+        <source>Average execution-layer gas fee per transaction in the recent block sample</source>
+        <target state="needs-review-translation">Средняя комиссия за газ на уровне исполнения на транзакцию в выборке последних блоков</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/reward-stats/reward-stats.component.html</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.rewards.average" datatype="html">
+        <source>Average tx fee</source>
+        <target state="needs-review-translation">Средняя комиссия за транзакцию</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/reward-stats/reward-stats.component.html</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/reward-stats/reward-stats.component.html</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.rewards.loading" datatype="html">
+        <source>Loading recent execution rewards</source>
+        <target state="needs-review-translation">Загрузка последних вознаграждений за исполнение</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/reward-stats/reward-stats.component.html</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.choose" datatype="html">
+        <source>Choose search chain</source>
+        <target state="needs-review-translation">Выберите блокчейн для поиска</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.selectedExplorer" datatype="html">
+        <source>Selected explorer</source>
+        <target state="needs-review-translation">Выбранный обозреватель</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.selected" datatype="html">
+        <source>SELECTED</source>
+        <target state="needs-review-translation">ВЫБРАНО</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.automatic" datatype="html">
+        <source>Automatic Routing</source>
+        <target state="needs-review-translation">Автоматическая маршрутизация</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.html</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.hubNewTab" datatype="html">
+        <source>Open tx.taxi in a new tab</source>
+        <target state="needs-review-translation">Открыть tx.taxi в новой вкладке</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.html</context>
+          <context context-type="linenumber">54</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.html</context>
+          <context context-type="linenumber">54</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.viewHub" datatype="html">
+        <source>View Hub</source>
+        <target state="needs-review-translation">Открыть главную</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.html</context>
+          <context context-type="linenumber">57</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.goStraight" datatype="html">
+        <source>Or go straight to</source>
+        <target state="needs-review-translation">Или перейти напрямую к</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.html</context>
+          <context context-type="linenumber">59</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.example" datatype="html">
+        <source>tx.taxi/[your search]</source>
+        <target state="needs-review-translation">tx.taxi/[ваш запрос]</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.html</context>
+          <context context-type="linenumber">59</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.native" datatype="html">
+        <source>NATIVE EXPLORERS</source>
+        <target state="needs-review-translation">СОБСТВЕННЫЕ ОБОЗРЕВАТЕЛИ</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.html</context>
+          <context context-type="linenumber">62</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.registryUnavailable" datatype="html">
+        <source>Explorer registry unavailable</source>
+        <target state="needs-review-translation">Реестр обозревателей недоступен</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.html</context>
+          <context context-type="linenumber">88</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.ts</context>
+          <context context-type="linenumber">122</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.thirdParty" datatype="html">
+        <source>3RD-PARTY EXPLORERS</source>
+        <target state="needs-review-translation">СТОРОННИЕ ОБОЗРЕВАТЕЛИ</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.html</context>
+          <context context-type="linenumber">90</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.open" datatype="html">
+        <source>Open</source>
+        <target state="needs-review-translation">Открыть</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.html</context>
+          <context context-type="linenumber">110</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.opened" datatype="html">
+        <source>Opened</source>
+        <target state="needs-review-translation">Открыто</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.html</context>
+          <context context-type="linenumber">157</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.switch" datatype="html">
+        <source>Switch</source>
+        <target state="needs-review-translation">Переключить</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.html</context>
+          <context context-type="linenumber">165</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.loading" datatype="html">
+        <source>Loading explorers</source>
+        <target state="needs-review-translation">Загрузка обозревателей</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.html</context>
+          <context context-type="linenumber">172</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.ts</context>
+          <context context-type="linenumber">123</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.placeholder" datatype="html">
+        <source>Wave a taxi, paste anything here.</source>
+        <target state="needs-review-translation">Вызовите такси: вставьте сюда любой запрос.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.html</context>
+          <context context-type="linenumber">176</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.across" datatype="html">
+        <source>Search across chains</source>
+        <target state="needs-review-translation">Поиск по блокчейнам</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.html</context>
+          <context context-type="linenumber">176</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.found" datatype="html">
+        <source>Found</source>
+        <target state="needs-review-translation">Найдено</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.ts</context>
+          <context context-type="linenumber">124</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.possible" datatype="html">
+        <source>Possible</source>
+        <target state="needs-review-translation">Возможно</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.ts</context>
+          <context context-type="linenumber">125</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.openExplorer" datatype="html">
+        <source>Open <x id="name" equiv-text="name" /></source>
+        <target state="needs-review-translation">Открыть <x id="name" equiv-text="name" /></target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.ts</context>
+          <context context-type="linenumber">127</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.openNewTab" datatype="html">
+        <source>Open <x id="name" equiv-text="name" /> in a new tab</source>
+        <target state="needs-review-translation">Открыть <x id="name" equiv-text="name" /> в новой вкладке</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.ts</context>
+          <context context-type="linenumber">128</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.switchExplorer" datatype="html">
+        <source>Switch to <x id="name" equiv-text="name" /></source>
+        <target state="needs-review-translation">Переключиться на <x id="name" equiv-text="name" /></target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.ts</context>
+          <context context-type="linenumber">129</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.additionalExplorers" datatype="html">
+        <source><x id="name" equiv-text="name" /> additional explorers</source>
+        <target state="needs-review-translation">Дополнительные обозреватели <x id="name" equiv-text="name" /></target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.ts</context>
+          <context context-type="linenumber">130</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.hideOne" datatype="html">
+        <source>Hide <x id="count" equiv-text="count" /> additional <x id="name" equiv-text="name" /> option</source>
+        <target state="needs-review-translation">Скрыть дополнительный вариант <x id="count" equiv-text="count" /> для <x id="name" equiv-text="name" /></target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.ts</context>
+          <context context-type="linenumber">133</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.hideMany" datatype="html">
+        <source>Hide <x id="count" equiv-text="count" /> additional <x id="name" equiv-text="name" /> options</source>
+        <target state="needs-review-translation">Скрыть дополнительные варианты <x id="count" equiv-text="count" /> для <x id="name" equiv-text="name" /></target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.ts</context>
+          <context context-type="linenumber">133</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.showOne" datatype="html">
+        <source>Show <x id="count" equiv-text="count" /> additional <x id="name" equiv-text="name" /> option</source>
+        <target state="needs-review-translation">Показать дополнительный вариант <x id="count" equiv-text="count" /> для <x id="name" equiv-text="name" /></target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.ts</context>
+          <context context-type="linenumber">135</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.showMany" datatype="html">
+        <source>Show <x id="count" equiv-text="count" /> additional <x id="name" equiv-text="name" /> options</source>
+        <target state="needs-review-translation">Показать дополнительные варианты <x id="count" equiv-text="count" /> для <x id="name" equiv-text="name" /></target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.ts</context>
+          <context context-type="linenumber">135</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.futureBlock" datatype="html">
+        <source>That block has not been produced yet.</source>
+        <target state="needs-review-translation">Этот блок ещё не создан.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.ts</context>
+          <context context-type="linenumber">619</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.futureDate" datatype="html">
+        <source>Enter a date or timestamp that is not in the future.</source>
+        <target state="needs-review-translation">Укажите дату или временную метку, которая не находится в будущем.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.ts</context>
+          <context context-type="linenumber">645</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.dateNotFound" datatype="html">
+        <source>No Ethereum block was found for that time.</source>
+        <target state="needs-review-translation">Блок Ethereum для этого времени не найден.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.ts</context>
+          <context context-type="linenumber">650</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.search.invalidInput" datatype="html">
+        <source>Enter an Ethereum address, transaction hash, or block number.</source>
+        <target state="needs-review-translation">Введите адрес Ethereum, хеш транзакции или номер блока.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/search-form/search-form.component.ts</context>
+          <context context-type="linenumber">653</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.returnLatestBlock" datatype="html">
+        <source>Return to the latest Ethereum block</source>
+        <target state="needs-review-translation">Вернуться к последнему блоку Ethereum</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/start/start.component.html</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.returnLatestBlockShort" datatype="html">
+        <source>Return to latest block</source>
+        <target state="needs-review-translation">Вернуться к последнему блоку</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/start/start.component.html</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.footer.terms" datatype="html">
+        <source>Terms of Service</source>
+        <target state="needs-review-translation">Условия использования</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/terms-of-service/terms-of-service.component.ts</context>
+          <context context-type="linenumber">27</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/global-footer/global-footer.component.html</context>
+          <context context-type="linenumber">59</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.legal.service" datatype="html">
+        <source>Explorer service</source>
+        <target state="needs-review-translation">Сервис обозревателя</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.legal.serviceText" datatype="html">
+        <source>eth.tx.taxi is a public Ethereum block explorer provided for informational purposes. It displays public blockchain data obtained from third-party infrastructure and may be delayed, incomplete, or unavailable.</source>
+        <target state="needs-review-translation">eth.tx.taxi — публичный обозреватель блоков Ethereum, предоставляемый в информационных целях. Он показывает публичные данные блокчейна, полученные из сторонней инфраструктуры; эти данные могут запаздывать, быть неполными или недоступными.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.legal.advice" datatype="html">
+        <source>No financial advice</source>
+        <target state="needs-review-translation">Не является финансовой рекомендацией</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.legal.adviceText" datatype="html">
+        <source>Nothing on this website is financial, investment, legal, or tax advice. Verify important transaction and account information with your own Ethereum node or another independent source before acting on it.</source>
+        <target state="needs-review-translation">Ничто на этом сайте не является финансовой, инвестиционной, юридической или налоговой рекомендацией. Перед принятием решений проверяйте важные сведения о транзакциях и аккаунтах с помощью собственного узла Ethereum или другого независимого источника.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.legal.availability" datatype="html">
+        <source>Availability and external services</source>
+        <target state="needs-review-translation">Доступность и внешние сервисы</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.legal.availabilityText" datatype="html">
+        <source>The service is provided as-is without guarantees of accuracy, availability, or fitness for a particular purpose. External links are governed by their respective operators.</source>
+        <target state="needs-review-translation">Сервис предоставляется как есть, без гарантий точности, доступности или пригодности для конкретной цели. Внешние ссылки регулируются условиями соответствующих операторов.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.legal.attribution" datatype="html">
+        <source>Open-source attribution</source>
+        <target state="needs-review-translation">Сведения об открытом исходном коде</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.legal.attributionText" datatype="html">
+        <source>The interface is derived from the Mempool Open Source Project and is distributed under the GNU AGPLv3.</source>
+        <target state="needs-review-translation">Интерфейс основан на проекте Mempool с открытым исходным кодом и распространяется по лицензии GNU AGPLv3.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.legal.questions" datatype="html">
+        <source>Questions and issue reports can be sent to the operator at</source>
+        <target state="needs-review-translation">Вопросы и сообщения о проблемах можно отправить оператору по адресу</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eth.legal.termsDescription" datatype="html">
+        <source>Terms for using eth.tx.taxi, an independent Ethereum block explorer operated by tx.taxi.</source>
+        <target state="needs-review-translation">Условия использования eth.tx.taxi — независимого обозревателя блоков Ethereum, управляемого tx.taxi.</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/terms-of-service/terms-of-service.component.ts</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="taxi.timezone.minus12" datatype="html">
+        <source>Anywhere on Earth (AoE)</source>
+        <target state="needs-review-translation">Любое место на Земле (AoE)</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/timezone-selector/timezone-selector.component.ts</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="taxi.timezone.minus11" datatype="html">
+        <source>Samoa Standard Time (SST)</source>
+        <target state="needs-review-translation">Стандартное время Самоа (SST)</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/timezone-selector/timezone-selector.component.ts</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="taxi.timezone.minus10" datatype="html">
+        <source>Hawaii Standard Time (HST)</source>
+        <target state="needs-review-translation">Гавайское стандартное время (HST)</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/timezone-selector/timezone-selector.component.ts</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="taxi.timezone.minus9" datatype="html">
+        <source>Alaska Standard Time (AKST)</source>
+        <target state="needs-review-translation">Аляскинское стандартное время (AKST)</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/timezone-selector/timezone-selector.component.ts</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="taxi.timezone.minus8" datatype="html">
+        <source>Pacific Standard Time (PST)</source>
+        <target state="needs-review-translation">Тихоокеанское стандартное время (PST)</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/timezone-selector/timezone-selector.component.ts</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="taxi.timezone.minus7" datatype="html">
+        <source>Mountain Standard Time (MST)</source>
+        <target state="needs-review-translation">Горное стандартное время (MST)</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/timezone-selector/timezone-selector.component.ts</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="taxi.timezone.minus6" datatype="html">
+        <source>Central Standard Time (CST)</source>
+        <target state="needs-review-translation">Центральное стандартное время (CST)</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/timezone-selector/timezone-selector.component.ts</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="taxi.timezone.minus5" datatype="html">
+        <source>Eastern Standard Time (EST)</source>
+        <target state="needs-review-translation">Восточное стандартное время (EST)</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/timezone-selector/timezone-selector.component.ts</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="taxi.timezone.minus4" datatype="html">
+        <source>Atlantic Standard Time (AST)</source>
+        <target state="needs-review-translation">Атлантическое стандартное время (AST)</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/timezone-selector/timezone-selector.component.ts</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="taxi.timezone.minus3" datatype="html">
+        <source>Argentina Time (ART)</source>
+        <target state="needs-review-translation">Время Аргентины (ART)</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/timezone-selector/timezone-selector.component.ts</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="taxi.timezone.minus2" datatype="html">
+        <source>Fernando de Noronha Time (FNT)</source>
+        <target state="needs-review-translation">Время Фернанду-ди-Норонья (FNT)</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/timezone-selector/timezone-selector.component.ts</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="taxi.timezone.minus1" datatype="html">
+        <source>Azores Time (AZOT)</source>
+        <target state="needs-review-translation">Время Азорских островов (AZOT)</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/timezone-selector/timezone-selector.component.ts</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="taxi.timezone.plus0" datatype="html">
+        <source>Greenwich Mean Time (GMT)</source>
+        <target state="needs-review-translation">Среднее время по Гринвичу (GMT)</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/timezone-selector/timezone-selector.component.ts</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="taxi.timezone.plus1" datatype="html">
+        <source>Central European Time (CET)</source>
+        <target state="needs-review-translation">Центральноевропейское время (CET)</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/timezone-selector/timezone-selector.component.ts</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="taxi.timezone.plus2" datatype="html">
+        <source>Eastern European Time (EET)</source>
+        <target state="needs-review-translation">Восточноевропейское время (EET)</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/timezone-selector/timezone-selector.component.ts</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="taxi.timezone.plus3" datatype="html">
+        <source>Moscow Standard Time (MSK)</source>
+        <target state="needs-review-translation">Московское стандартное время (MSK)</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/timezone-selector/timezone-selector.component.ts</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="taxi.timezone.plus4" datatype="html">
+        <source>Armenia Time (AMT)</source>
+        <target state="needs-review-translation">Время Армении (AMT)</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/timezone-selector/timezone-selector.component.ts</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="taxi.timezone.plus5" datatype="html">
+        <source>Pakistan Standard Time (PKT)</source>
+        <target state="needs-review-translation">Стандартное время Пакистана (PKT)</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/timezone-selector/timezone-selector.component.ts</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="taxi.timezone.plus6" datatype="html">
+        <source>Xinjiang Time (XJT)</source>
+        <target state="needs-review-translation">Время Синьцзяна (XJT)</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/timezone-selector/timezone-selector.component.ts</context>
+          <context context-type="linenumber">27</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="taxi.timezone.plus7" datatype="html">
+        <source>Indochina Time (ICT)</source>
+        <target state="needs-review-translation">Время Индокитая (ICT)</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/timezone-selector/timezone-selector.component.ts</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="taxi.timezone.plus8" datatype="html">
+        <source>Hong Kong Time (HKT)</source>
+        <target state="needs-review-translation">Время Гонконга (HKT)</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/timezone-selector/timezone-selector.component.ts</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="taxi.timezone.plus9" datatype="html">
+        <source>Japan Standard Time (JST)</source>
+        <target state="needs-review-translation">Стандартное время Японии (JST)</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/timezone-selector/timezone-selector.component.ts</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="taxi.timezone.plus10" datatype="html">
+        <source>Australian Eastern Standard Time (AEST)</source>
+        <target state="needs-review-translation">Восточное стандартное время Австралии (AEST)</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/timezone-selector/timezone-selector.component.ts</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="taxi.timezone.plus11" datatype="html">
+        <source>Norfolk Time (NFT)</source>
+        <target state="needs-review-translation">Время острова Норфолк (NFT)</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/timezone-selector/timezone-selector.component.ts</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="taxi.timezone.plus12" datatype="html">
+        <source>New Zealand Standard Time (NZST)</source>
+        <target state="needs-review-translation">Стандартное время Новой Зеландии (NZST)</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/timezone-selector/timezone-selector.component.ts</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="taxi.timezone.plus13" datatype="html">
+        <source>Tonga Time (TOT)</source>
+        <target state="needs-review-translation">Время Тонга (TOT)</target><context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/timezone-selector/timezone-selector.component.ts</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+      </trans-unit>
     </body>
   </file>
 </xliff>
