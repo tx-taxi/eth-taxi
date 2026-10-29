@@ -12,6 +12,7 @@ import { localizeEthereumDocsUkrainian } from './ethereum-docs-uk';
 import { localizeEthereumDocsVietnamese } from './ethereum-docs-vi';
 import { localizeEthereumDocsPolish } from './ethereum-docs-pl';
 import { localizeEthereumDocsCzech } from './ethereum-docs-cs';
+import { localizeEthereumDocsSwedish } from './ethereum-docs-sv';
 
 // Keep endpoint names, paths and examples from the source; translations describe
 // precisely the same provider-backed behavior and limitations.
@@ -84,6 +85,7 @@ export function localizeEthereumDocs(items: EthereumDocItem[], locale: string): 
   if (locale.toLowerCase().startsWith('vi')) { return localizeEthereumDocsVietnamese(items, locale); }
   if (locale.toLowerCase().startsWith('pl')) { return localizeEthereumDocsPolish(items, locale); }
   if (locale.toLowerCase().startsWith('cs')) { return localizeEthereumDocsCzech(items, locale); }
+  if (locale.toLowerCase().startsWith('sv')) { return localizeEthereumDocsSwedish(items, locale); }
   if (!locale.toLowerCase().startsWith('es')) { return items; }
   return items.map(item => {
     if (item.type === 'category') { return { ...item, title: categories[item.title] || item.title }; }
