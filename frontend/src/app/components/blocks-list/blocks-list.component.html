@@ -12,17 +12,17 @@
     <table class="table table-borderless">
       <thead>
         <th class="height text-start" [ngClass]="{'widget': widget, 'legacy': !isMempoolModule}" i18n="latest-blocks.height">Height</th>
-        <th *ngIf="isMempoolModule" class="pool text-start" [ngClass]="{'widget': widget, 'legacy': !isMempoolModule}">Fee recipient</th>
+        <th *ngIf="isMempoolModule" class="pool text-start" [ngClass]="{'widget': widget, 'legacy': !isMempoolModule}" i18n="@@eth.block.fee-recipient">Fee recipient</th>
         <th class="timestamp" i18n="latest-blocks.timestamp" *ngIf="!widget" [class]="isMempoolModule ? '' : 'legacy'">Timestamp</th>
         <th *ngIf="auditAvailable" class="health text-end" i18n="latest-blocks.health" [ngClass]="{'widget': widget, 'legacy': !isMempoolModule}"
           i18n-ngbTooltip="latest-blocks.health" ngbTooltip="Health" placement="bottom" #health [disableTooltip]="!isEllipsisActive(health)">Health</th>
-        <th *ngIf="isMempoolModule" class="reward text-end" [ngClass]="{'widget': widget, 'legacy': !isMempoolModule}" title="Execution-layer reward">Reward</th>
+        <th *ngIf="isMempoolModule" class="reward text-end" [ngClass]="{'widget': widget, 'legacy': !isMempoolModule}" title="Execution-layer reward" i18n-title="@@eth.block.executionReward" i18n="@@eth.block.reward">Reward</th>
         <th *ngIf="isMempoolModule && !auditAvailable || isMempoolModule && !widget" class="fees text-end" i18n="latest-blocks.fees" [class]="isMempoolModule ? '' : 'legacy'">Fees</th>
         <th *ngIf="auditAvailable && !widget" class="fee-delta" [ngClass]="{'widget': widget, 'legacy': !isMempoolModule}"></th>
         <th *ngIf="isMempoolModule" class="txs text-end" i18n="dashboard.txs" [ngClass]="{'widget': widget, 'legacy': !isMempoolModule}"
           i18n-ngbTooltip="dashboard.txs" ngbTooltip="TXs" placement="bottom" #txs [disableTooltip]="!isEllipsisActive(txs)">TXs</th>
         <th *ngIf="!isMempoolModule" class="txs text-end" i18n="dashboard.txs" [ngClass]="{'widget': widget, 'legacy': !isMempoolModule}">Transactions</th>
-        <th class="size" *ngIf="!widget" [class]="isMempoolModule ? '' : 'legacy'">Gas used</th>
+        <th class="size" *ngIf="!widget" [class]="isMempoolModule ? '' : 'legacy'" i18n="@@eth.block.gas-used">Gas used</th>
       </thead>
       <tbody *ngIf="blocks$ | async as blocks; else skeleton" [style]="isLoading ? 'opacity: 0.75' : ''">
         <tr *ngFor="let block of blocks; let i= index; trackBy: trackByBlock">

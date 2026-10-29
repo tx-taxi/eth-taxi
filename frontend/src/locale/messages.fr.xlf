@@ -12887,6 +12887,10 @@
       <trans-unit id="eth.block.loadingHeight" datatype="html"><source>Loading block</source><target>Chargement du bloc</target></trans-unit>
       <trans-unit id="eth.block.loadingData" datatype="html"><source>Loading block data</source><target>Chargement des données du bloc</target></trans-unit>
       <trans-unit id="eth.intro.openHost" datatype="html"><source>Open</source><target>Ouvrir</target></trans-unit>
+      <trans-unit id="eth.block.executionReward" datatype="html"><source>Execution-layer reward</source><target>Récompense de la couche d’exécution</target></trans-unit>
+      <trans-unit id="eth.block.reward" datatype="html"><source>Reward</source><target>Récompense</target></trans-unit>
+      <trans-unit id="eth.address.viewBlockscout" datatype="html"><source>View on Blockscout</source><target>Voir sur Blockscout</target></trans-unit>
+      <trans-unit id="eth.footer.joinTelegram" datatype="html"><source>Join the tx.taxi Telegram channel</source><target>Rejoindre le canal Telegram de tx.taxi</target></trans-unit>
     </body>
   </file>
 </xliff>
