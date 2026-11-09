@@ -68,6 +68,8 @@ const BLOB_GAS_PER_BLOB = 131_072n;
 const RPC_TOKEN_TRANSFER_BLOCK_SPAN = 2;
 const RPC_TOKEN_TRANSFER_LIMIT = 100;
 const BLOCK_PAGE_SIZE = 15;
+// Match the eight confirmed blocks retained by the explorer and hub strips.
+const SNAPSHOT_BLOCK_COUNT = 8;
 const TOKEN_METADATA_CACHE_MS = 15 * 60_000;
 const OG_CACHE_LIMIT = 128;
 const OG_MAX_ACTIVE_LOADS = 8;
@@ -1396,7 +1398,7 @@ async function latestBlocks() {
 }
 
 async function contiguousSnapshotBlocks(tipHeight) {
-  const heights = Array.from({ length: 6 }, (_, index) => tipHeight - index).filter((height) => height >= 0);
+  const heights = Array.from({ length: SNAPSHOT_BLOCK_COUNT }, (_, index) => tipHeight - index).filter((height) => height >= 0);
   const blocks = await Promise.all(heights.map((height) =>
     recentSnapshotBlocks.get(height) || blockById(String(height))));
   if (blocks.some((block, index) => block.height !== heights[index])) {
@@ -1771,7 +1773,7 @@ async function blockscoutSnapshot() {
 async function rpcSnapshot() {
   const tipHeightHex = await rpcJson('eth_blockNumber');
   const tipHeight = hexNumber(tipHeightHex);
-  const blockNumbers = Array.from({ length: 6 }, (_, index) => tipHeight - index).filter((height) => height > 0);
+  const blockNumbers = Array.from({ length: SNAPSHOT_BLOCK_COUNT }, (_, index) => tipHeight - index).filter((height) => height > 0);
   const [blocks, feeHistory, gasPrice, pendingBlock] = await Promise.all([
     Promise.all(blockNumbers.map((height) => rpcJson('eth_getBlockByNumber', [`0x${height.toString(16)}`, false], { requireResult: true }))),
     rpcJson('eth_feeHistory', ['0x5', 'latest', [10, 50, 90]]).catch(() => null),
